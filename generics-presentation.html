@@ -1,0 +1,234 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="claude:viewport-fit-sides" content="cover">
+<title>Generics presentation</title>
+<link rel="stylesheet" href="style.css">
+<style>
+  /* Bildspel: en bild i taget, stor text */
+  .slides { min-height: 60vh; display: flex; flex-direction: column; justify-content: center; }
+  .slide { display: none; font-size: 1.25rem; }
+  .slide.active { display: block; }
+  .slide h1 { font-size: clamp(2.2rem, 7vw, 3.6rem); margin: 0 0 8px; }
+  .slide h2 { margin-top: 0; font-size: clamp(1.6rem, 4.5vw, 2.2rem); }
+  .slide pre { font-size: clamp(14px, 2.4vw, 19px); }
+  .big { font-size: clamp(1.4rem, 4vw, 2rem); text-align: center; }
+  .controls { display: flex; align-items: center; justify-content: space-between; gap: 12px; border-top: 1px solid var(--line); padding-top: 12px; margin-top: 24px; }
+  .controls button { font: inherit; font-weight: 600; background: var(--card); color: var(--ink); border: 1px solid var(--line); border-radius: 8px; padding: 8px 16px; cursor: pointer; }
+  .controls button:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
+  .controls button:disabled { opacity: .4; cursor: default; }
+  .counter { color: var(--muted); font-variant-numeric: tabular-nums; }
+  .hint { color: var(--muted); font-size: .9rem; text-align: center; }
+  :fullscreen main { max-width: 1100px; }
+  :fullscreen { background: var(--bg); overflow: auto; }
+</style>
+</head>
+<body>
+<nav><a href="vecka43.html">Lektioner vecka 5</a><a href="vecka44.html" aria-current="true">Lektioner vecka 6</a><a href="index.html">Lektioner vecka 7</a></nav>
+<nav class="undermeny"><a href="linq-presentation.html">Presentation: LINQ</a><a href="vecka44.html">LINQ</a><a href="generics-presentation.html" aria-current="page">Presentation: Generics</a><a href="generics.html">Generics</a></nav>
+<main id="show">
+
+<div class="slides">
+
+<section class="slide">
+  <h1>Generics</h1>
+  <p class="lead">Skriv en klass eller metod en gång – använd den för vilken typ som helst.</p>
+</section>
+
+<section class="slide">
+  <h2>Du har redan använt generics</h2>
+  <pre><code>List&lt;int&gt;    numbers = new List&lt;int&gt;    { 1, 2, 3 };
+List&lt;string&gt; names   = new List&lt;string&gt; { "Ada", "Linus" };
+List&lt;Animal&gt; animals = new List&lt;Animal&gt;();</code></pre>
+  <p><code>T</code> i <code>List&lt;T&gt;</code> är en <b>typ-parameter</b> – en plats där du fyller i en typ.</p>
+</section>
+
+<section class="slide">
+  <h2>Typsäkert</h2>
+  <pre><code>List&lt;int&gt; numbers = new List&lt;int&gt;();
+numbers.Add(5);
+numbers.Add("hej");   // FEL – stoppas redan när du kompilerar</code></pre>
+  <p class="box">Fel typ blir <b>rött i Visual Studio</b> – inte en krasch när programmet körs.</p>
+</section>
+
+<section class="slide">
+  <h2>Utan generics: ArrayList</h2>
+  <pre><code>ArrayList old = new ArrayList();
+old.Add(5);
+old.Add("hej");                // tillåts – allt är object
+
+int second = (int)old[1];      // KRASCHAR när programmet körs</code></pre>
+  <p>Därför använder vi alltid <code>List&lt;T&gt;</code>.</p>
+</section>
+
+<section class="slide">
+  <h2>Egen generisk klass</h2>
+  <pre><code>class Box&lt;T&gt;
+{
+    private T content;
+
+    public void Put(T item) { content = item; }
+    public T Take() { return content; }
+}</code></pre>
+  <p><code>T</code> är en platshållare. Den fylls i när du skapar en <code>Box</code>.</p>
+</section>
+
+<section class="slide">
+  <h2>En klass – många typer</h2>
+  <pre><code>Box&lt;int&gt;    numberBox = new Box&lt;int&gt;();
+Box&lt;string&gt; wordBox   = new Box&lt;string&gt;();
+
+numberBox.Put(42);
+wordBox.Put("Hej!");
+
+int n = numberBox.Take();   // 42 – ingen typomvandling behövs</code></pre>
+</section>
+
+<section class="slide">
+  <h2>Egen generisk lista: MyList&lt;T&gt;</h2>
+  <pre><code>class MyList&lt;T&gt;
+{
+    private T[] items = new T[10];   // plats för 10 element
+    private int count = 0;           // hur många vi har lagt in
+
+    public void Add(T item)
+    {
+        items[count] = item;
+        count++;
+    }
+
+    public T Get(int index)
+    {
+        return items[index];
+    }
+
+    public int Count()
+    {
+        return count;
+    }
+}</code></pre>
+</section>
+
+<section class="slide">
+  <h2>Använda MyList&lt;T&gt;</h2>
+  <pre><code>MyList&lt;string&gt; names = new MyList&lt;string&gt;();
+names.Add("Ada");
+names.Add("Linus");
+names.Add("Grace");
+
+Console.WriteLine(names.Count());   // 3
+Console.WriteLine(names.Get(1));    // Linus
+
+MyList&lt;int&gt; numbers = new MyList&lt;int&gt;();
+numbers.Add(5);
+Console.WriteLine(numbers.Get(0));  // 5</code></pre>
+  <p class="box">Så fungerar <code>List&lt;T&gt;</code> inuti: en array. <code>List&lt;T&gt;</code> gör dessutom arrayen större när den blir full.</p>
+</section>
+
+<section class="slide">
+  <h2>Box&lt;T&gt; i MyList&lt;T&gt;</h2>
+  <pre><code>MyList&lt;Box&lt;string&gt;&gt; boxes = new MyList&lt;Box&lt;string&gt;&gt;();
+
+Box&lt;string&gt; box1 = new Box&lt;string&gt;();
+box1.Put("Kaffe");
+boxes.Add(box1);
+
+Box&lt;string&gt; box2 = new Box&lt;string&gt;();
+box2.Put("Te");
+boxes.Add(box2);
+
+Console.WriteLine(boxes.Count());         // 2
+Console.WriteLine(boxes.Get(1).Take());   // Te</code></pre>
+  <p class="box">Listans <code>T</code> blir <code>Box&lt;string&gt;</code>. Lådans <code>T</code> blir <code>string</code>. <a href="generics.html#demo">Prova demot</a></p>
+</section>
+
+<section class="slide">
+  <h2>Generisk metod</h2>
+  <pre><code>static void PrintTwo&lt;T&gt;(T a, T b)
+{
+    Console.WriteLine($"{a} och {b}");
+}
+
+PrintTwo(1, 2);           // T blir int
+PrintTwo("katt", "hund"); // T blir string</code></pre>
+</section>
+
+<section class="slide">
+  <h2>Krav på T med <code>where</code></h2>
+  <pre><code>class Garage&lt;T&gt; where T : IVehicle
+{
+    private List&lt;T&gt; vehicles = new List&lt;T&gt;();
+
+    public void Park(T v) { vehicles.Add(v); }
+
+    public void DriveAll()
+    {
+        foreach (T v in vehicles)
+        {
+            v.Drive();       // OK – alla T är IVehicle
+        }
+    }
+}</code></pre>
+  <p>Generics + interface: vi vet vad <code>T</code> <i>kan</i>.</p>
+</section>
+
+<section class="slide">
+  <h2>Sammanfattning</h2>
+  <div class="scroll"><table>
+    <tr><th>Skrivsätt</th><th>Betyder</th></tr>
+    <tr><td><code>List&lt;T&gt;</code></td><td>Lista som bara tar emot typen <code>T</code></td></tr>
+    <tr><td><code>class Box&lt;T&gt;</code></td><td>Egen generisk klass</td></tr>
+    <tr><td><code>class MyList&lt;T&gt;</code></td><td>Egen generisk lista – sparar i en array</td></tr>
+    <tr><td><code>void PrintTwo&lt;T&gt;(T a, T b)</code></td><td>Generisk metod</td></tr>
+    <tr><td><code>where T : IVehicle</code></td><td><code>T</code> måste implementera interfacet</td></tr>
+  </table></div>
+  <p class="box">Nu: <a href="generics.html">Generics-sidan</a> – läs exemplen och gör övningarna.</p>
+</section>
+
+</div>
+
+<div class="controls">
+  <button id="prev" type="button">← Föregående</button>
+  <span class="counter" id="counter"></span>
+  <button id="next" type="button">Nästa →</button>
+</div>
+<p class="hint">Piltangenterna byter bild · <button id="fs" type="button" style="font:inherit;background:none;border:0;color:var(--accent);cursor:pointer;padding:0">Helskärm (F)</button></p>
+
+</main>
+<script src="vs.js"></script>
+<script>
+  const slides = [...document.querySelectorAll(".slide")];
+  const prev = document.getElementById("prev"), next = document.getElementById("next");
+  let current = 0;
+
+  function show(i) {
+    current = Math.max(0, Math.min(slides.length - 1, i));
+    slides.forEach((s, n) => s.classList.toggle("active", n === current));
+    document.getElementById("counter").textContent = `${current + 1} / ${slides.length}`;
+    prev.disabled = current === 0;
+    next.disabled = current === slides.length - 1;
+    history.replaceState(null, "", "#" + (current + 1));
+  }
+
+  function fullscreen() {
+    try {
+      if (document.fullscreenElement) document.exitFullscreen();
+      else document.getElementById("show").requestFullscreen();
+    } catch (e) { }
+  }
+
+  prev.onclick = () => show(current - 1);
+  next.onclick = () => show(current + 1);
+  document.getElementById("fs").onclick = fullscreen;
+  document.addEventListener("keydown", e => {
+    if (e.key === "ArrowRight" || e.key === " " || e.key === "PageDown") { e.preventDefault(); show(current + 1); }
+    if (e.key === "ArrowLeft" || e.key === "PageUp") { e.preventDefault(); show(current - 1); }
+    if (e.key === "f" || e.key === "F") fullscreen();
+  });
+
+  show((parseInt(location.hash.slice(1)) || 1) - 1);
+</script>
+</body>
+</html>

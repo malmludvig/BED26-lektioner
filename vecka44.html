@@ -1,0 +1,591 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="claude:viewport-fit-sides" content="cover">
+<title>LINQ vecka 6</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<nav><a href="vecka43.html">Lektioner vecka 5</a><a href="vecka44.html" aria-current="true">Lektioner vecka 6</a><a href="index.html">Lektioner vecka 7</a></nav>
+<nav class="undermeny"><a href="linq-presentation.html">Presentation: LINQ</a><a href="vecka44.html" aria-current="page">LINQ</a><a href="generics-presentation.html">Presentation: Generics</a><a href="generics.html">Generics</a></nav>
+<main>
+
+<h1>LINQ vecka 6</h1>
+<p class="lead">Filtrera, sortera och räkna i listor – utan att skriva en enda <code>foreach</code>.</p>
+
+<div class="box">
+<p><b>Dagens plan</b></p>
+<ol>
+  <li>Varför LINQ? Samma sak med loop och med LINQ</li>
+  <li>Lambda-uttryck: <code>x =&gt; x &gt; 5</code></li>
+  <li>De vanligaste metoderna: <code>Where</code>, <code>Select</code>, <code>OrderBy</code>, <code>First</code>, <code>Any</code>, <code>Sum</code> …</li>
+  <li>LINQ på egna objekt – Kaffekoppens meny</li>
+  <li>Kedja ihop och gruppera</li>
+  <li>Fler metoder: <code>Take</code>, <code>Skip</code>, <code>Distinct</code>, <code>ThenBy</code>, <code>MaxBy</code> … och jämför två listor</li>
+  <li>Query-syntax och när frågan körs</li>
+  <li>Övningar</li>
+</ol>
+</div>
+
+<!-- ================= VARFÖR ================= -->
+<h2>1. Varför LINQ?</h2>
+<p><b>LINQ</b> (Language Integrated Query) är en samling metoder för att <b>ställa frågor till listor</b>. Uppgift: plocka ut alla tal större än 5.</p>
+
+<h3>Med en loop</h3>
+<pre><code>List&lt;int&gt; numbers = new List&lt;int&gt; { 5, 12, 3, 8, 20, 1 };
+List&lt;int&gt; bigNumbers = new List&lt;int&gt;();
+
+foreach (int x in numbers)
+{
+    if (x &gt; 5)
+    {
+        bigNumbers.Add(x);
+    }
+}</code></pre>
+
+<h3>Med LINQ</h3>
+<pre><code>List&lt;int&gt; bigNumbers = numbers.Where(x =&gt; x &gt; 5).ToList();   // 12, 8, 20</code></pre>
+<p>Samma resultat. Loopen beskriver <i>hur</i> datorn ska göra, LINQ beskriver <i>vad</i> du vill ha.</p>
+<p class="box">LINQ finns i <code>using System.Linq;</code>. I nya konsolprojekt (.NET 6 och senare) är den redan inkluderad – du behöver inte skriva något.</p>
+
+<!-- ================= LAMBDA ================= -->
+<h2>2. Lambda-uttryck</h2>
+<p>Det som står inuti <code>Where( … )</code> är ett <b>lambda-uttryck</b>: en liten metod utan namn.</p>
+<pre><code>x =&gt; x &gt; 5
+// ^      ^
+// |      vad som ska räknas ut (här: true eller false)
+// parametern – ett element i listan i taget</code></pre>
+<p>Läs pilen <code>=&gt;</code> som <i>"går till"</i>: "x går till x större än 5". Det är samma sak som att skriva en vanlig metod:</p>
+<pre><code>static bool IsLarge(int x)
+{
+    return x &gt; 5;
+}
+
+numbers.Where(IsLarge);         // fungerar också
+numbers.Where(x =&gt; x &gt; 5);     // men lambdan är kortare</code></pre>
+<p>Namnet på parametern väljer du själv. Här använder vi <code>x</code> för tal, och en bokstav som påminner om innehållet för objekt: <code>p</code> för produkt, <code>n</code> för namn.</p>
+
+<!-- ================= METODER ================= -->
+<h2>3. De vanligaste metoderna</h2>
+<p>Alla exempel använder samma lista:</p>
+<pre><code>List&lt;int&gt; numbers = new List&lt;int&gt; { 5, 12, 3, 8, 20, 1 };</code></pre>
+
+<h3>Filtrera och omvandla</h3>
+<pre><code>numbers.Where(x =&gt; x &gt; 5)          // 12, 8, 20        – behåll de som stämmer
+numbers.Select(x =&gt; x * 2)         // 10, 24, 6, 16, 40, 2  – gör om varje element
+numbers.OrderBy(x =&gt; x)            // 1, 3, 5, 8, 12, 20    – sortera stigande
+numbers.OrderByDescending(x =&gt; x)  // 20, 12, 8, 5, 3, 1    – sortera fallande</code></pre>
+
+<h3>Fem enkla Where</h3>
+<p><code>Where</code> behåller bara de element där villkoret är <code>true</code>. Elementen ändras inte – du får färre (eller lika många) tillbaka.</p>
+<pre><code>numbers.Where(x =&gt; x &lt; 5)                // 3, 1                – mindre än 5
+numbers.Where(x =&gt; x == 8)               // 8                   – exakt 8
+numbers.Where(x =&gt; x % 2 == 0)           // 12, 8, 20           – jämna tal
+numbers.Where(x =&gt; x != 3)               // 5, 12, 8, 20, 1     – allt utom 3
+numbers.Where(x =&gt; x &gt;= 5 &amp;&amp; x &lt;= 12)   // 5, 12, 8            – mellan 5 och 12</code></pre>
+
+<h3>Fem enkla Select</h3>
+<p><code>Select</code> gör om <b>varje</b> element. Du får alltid lika många tillbaka som du skickade in – 6 in, 6 ut.</p>
+<pre><code>numbers.Select(x =&gt; x + 1)        // 6, 13, 4, 9, 21, 2         – lägg till 1
+numbers.Select(x =&gt; x * 10)       // 50, 120, 30, 80, 200, 10   – gånger 10
+numbers.Select(x =&gt; x * x)        // 25, 144, 9, 64, 400, 1     – i kvadrat
+numbers.Select(x =&gt; "Tal " + x)   // "Tal 5", "Tal 12", …       – gör om till text
+numbers.Select(x =&gt; x &gt; 5)        // false, true, false, true, true, false</code></pre>
+<p class="box">Lägg märke till den sista: <code>Select(x =&gt; x &gt; 5)</code> <i>filtrerar inte</i>. Den svarar true eller false för varje tal. Vill du behålla bara de stora talen behöver du <code>Where</code>.</p>
+
+<div class="scroll"><table>
+  <tr><th></th><th><code>Select</code></th><th><code>Where</code></th></tr>
+  <tr><td>Gör</td><td>Gör om varje element</td><td>Väljer ut element</td></tr>
+  <tr><td>Antal ut</td><td>Alltid lika många</td><td>Färre eller lika många</td></tr>
+  <tr><td>Lambdan ger</td><td>Det nya värdet</td><td><code>true</code> eller <code>false</code></td></tr>
+</table></div>
+
+<h3>Hämta ett element</h3>
+<pre><code>numbers.First()                      // 5   – det första
+numbers.First(x =&gt; x &gt; 10)           // 12  – det första som stämmer
+numbers.FirstOrDefault(x =&gt; x &gt; 100) // 0   – inget stämmer → standardvärdet
+numbers.First(x =&gt; x &gt; 100)          // KRASCHAR – inget element hittades</code></pre>
+<p class="box">Är du inte säker på att något hittas: använd <code>FirstOrDefault</code>. För tal blir standardvärdet <code>0</code>, för objekt blir det <code>null</code>.</p>
+
+<h3>Ja/nej-frågor</h3>
+<pre><code>numbers.Any(x =&gt; x &gt; 15)    // true  – finns det något?
+numbers.All(x =&gt; x &gt; 0)     // true  – stämmer det för alla?
+numbers.Contains(8)         // true  – finns just 8?</code></pre>
+
+<h3>Räkna</h3>
+<pre><code>numbers.Count()              // 6
+numbers.Count(x =&gt; x &gt; 5)    // 3
+numbers.Sum()                // 49
+numbers.Min()                // 1
+numbers.Max()                // 20
+numbers.Average()            // 8,1666…</code></pre>
+
+<h3>Från fråga till lista</h3>
+<p><code>Where</code>, <code>Select</code> och <code>OrderBy</code> ger inte en <code>List</code> tillbaka, utan en <code>IEnumerable&lt;T&gt;</code> – "något man kan loopa igenom". Vill du ha en riktig lista: lägg till <code>.ToList()</code>.</p>
+<pre><code>IEnumerable&lt;int&gt; query = numbers.Where(x =&gt; x &gt; 5);
+List&lt;int&gt;        list = numbers.Where(x =&gt; x &gt; 5).ToList();
+
+var bigNumbers = numbers.Where(x =&gt; x &gt; 5).ToList();   // var – kompilatorn räknar ut typen</code></pre>
+
+<div class="box">
+<p><b>Koppling till generics och interface</b></p>
+<p><code>IEnumerable&lt;T&gt;</code> är ett <b>generiskt interface</b>. <code>List&lt;T&gt;</code>, arrayer och många andra samlingar implementerar det – därför fungerar LINQ på alla. Precis som <code>Garage&lt;T&gt;</code> på sidan <a href="generics.html">Generics</a> kunde anropa <code>Drive()</code> på allt som var <code>IVehicle</code>.</p>
+</div>
+
+<!-- ================= PERSONER ================= -->
+<h2>3.5 Samma sak med en lista av personer</h2>
+<p>Samma fem <code>Where</code> och fem <code>Select</code> – men nu är varje element ett <code>Person</code>-objekt i stället för ett tal.</p>
+<pre><code>class Person
+{
+    public string Name { get; }
+    public int Age { get; }
+    public int ClassId { get; }
+    public string City { get; }
+
+    public Person(string name, int age, int classId, string city)
+    {
+        Name = name;
+        Age = age;
+        ClassId = classId;
+        City = city;
+    }
+}
+
+List&lt;Person&gt; people = new List&lt;Person&gt;
+{
+    new Person("Ada", 17, 1, "Stockholm"),
+    new Person("Linus", 19, 2, "Göteborg"),
+    new Person("Grace", 16, 1, "Malmö"),
+    new Person("Bjarne", 18, 2, "Stockholm"),
+    new Person("Ola", 20, 1, "Göteborg"),
+    new Person("Margaret", 17, 2, "Uppsala")
+};</code></pre>
+<p>Nu är <code>p</code> en hel person. Med punkt kommer du åt egenskaperna: <code>p.Name</code>, <code>p.Age</code>, <code>p.ClassId</code>, <code>p.City</code>.</p>
+
+<h3>Fem enkla Where</h3>
+<p>Du får tillbaka <b>hela personer</b> – bara färre. Kommentaren visar namnen på de som blir kvar.</p>
+<pre><code>people.Where(p =&gt; p.Age &lt; 18)                     // Ada, Grace, Margaret        – yngre än 18
+people.Where(p =&gt; p.City == "Stockholm")          // Ada, Bjarne                 – bor i Stockholm
+people.Where(p =&gt; p.ClassId == 2)                 // Linus, Bjarne, Margaret     – går i klass 2
+people.Where(p =&gt; p.City != "Göteborg")           // Ada, Grace, Bjarne, Margaret – alla utom Göteborg
+people.Where(p =&gt; p.Age &gt;= 17 &amp;&amp; p.Age &lt;= 18)     // Ada, Bjarne, Margaret       – mellan 17 och 18</code></pre>
+
+<h3>Fem enkla Select</h3>
+<p>Du får tillbaka <b>lika många</b> – 6 personer in, 6 värden ut. Men det som kommer ut är inte längre personer.</p>
+<pre><code>people.Select(p =&gt; p.Name)                   // "Ada", "Linus", "Grace", …    – bara namnen
+people.Select(p =&gt; p.Age + 1)                // 18, 20, 17, 19, 21, 18        – åldern nästa år
+people.Select(p =&gt; p.City.ToUpper())         // "STOCKHOLM", "GÖTEBORG", …    – stad med versaler
+people.Select(p =&gt; $"{p.Name} ({p.Age})")    // "Ada (17)", "Linus (19)", …   – gör om till text
+people.Select(p =&gt; p.Age &gt;= 18)              // false, true, false, true, true, false – myndig?</code></pre>
+<p class="box"><code>Where</code> ger tillbaka <code>Person</code>-objekt. <code>Select(p =&gt; p.Name)</code> ger tillbaka <code>string</code> och <code>Select(p =&gt; p.Age + 1)</code> ger <code>int</code>. <b>Select kan byta typ – Where kan inte.</b></p>
+
+<h3>Tillsammans</h3>
+<p>Vilka bor i Stockholm? Skriv ut namnen:</p>
+<pre><code>List&lt;string&gt; names = people
+    .Where(p =&gt; p.City == "Stockholm")   // först: välj personer
+    .Select(p =&gt; p.Name)                 // sedan: ta bara namnet
+    .ToList();
+
+Console.WriteLine(string.Join(", ", names));   // Ada, Bjarne</code></pre>
+
+<!-- ================= EGNA OBJEKT ================= -->
+<h2>4. LINQ på egna objekt</h2>
+<p>LINQ blir riktigt användbart när listan innehåller objekt. Vi använder Kaffekoppens meny, med publika egenskaper så att vi kan läsa dem utifrån.</p>
+<pre><code>class Product
+{
+    public string Name { get; }
+    public decimal Price { get; }
+    public string Category { get; }
+
+    public Product(string name, decimal price, string category)
+    {
+        Name = name;
+        Price = price;
+        Category = category;
+    }
+}
+
+List&lt;Product&gt; menu = new List&lt;Product&gt;
+{
+    new Product("Kaffe", 30, "Dryck"),
+    new Product("Te", 25, "Dryck"),
+    new Product("Ostsmörgås", 55, "Smörgås"),
+    new Product("Skinksmörgås", 60, "Smörgås"),
+    new Product("Kanelbulle", 35, "Bakverk"),
+    new Product("Croissant", 30, "Bakverk")
+};</code></pre>
+
+<p>Nu är <code>p</code> en hel produkt. Med punkt kommer vi åt dess egenskaper:</p>
+<pre><code>var cheap   = menu.Where(p =&gt; p.Price &lt; 40);       // Kaffe, Te, Kanelbulle, Croissant
+var drinks   = menu.Where(p =&gt; p.Category == "Dryck"); // Kaffe, Te
+var names      = menu.Select(p =&gt; p.Name);           // bara namnen, som string
+var sorted = menu.OrderBy(p =&gt; p.Price);          // Te först, Skinksmörgås sist
+
+decimal sum   = menu.Sum(p =&gt; p.Price);            // 235
+decimal mostExpensive  = menu.Max(p =&gt; p.Price);            // 60
+Product? coffee  = menu.FirstOrDefault(p =&gt; p.Name == "Kaffe");</code></pre>
+<p class="box">Lägg märke till <code>Select</code>: in går en <code>Product</code>, ut kommer en <code>string</code>. <code>Select</code> kan alltså byta typ.</p>
+
+<!-- ================= KEDJA ================= -->
+<h2>5. Kedja ihop</h2>
+<p>Varje LINQ-metod ger tillbaka något nytt som man kan fortsätta på. Läs kedjan uppifrån och ned:</p>
+<pre><code>List&lt;string&gt; cheapNames = menu
+    .Where(p =&gt; p.Price &lt; 40)     // 1. behåll produkter under 40 kr
+    .OrderBy(p =&gt; p.Price)        // 2. sortera på pris
+    .Select(p =&gt; p.Name)         // 3. ta bara namnet
+    .ToList();                   // 4. gör en lista
+
+Console.WriteLine(string.Join(", ", cheapNames));</code></pre>
+<p>Utskrift:</p>
+<pre><code class="nohighlight">Te, Kaffe, Croissant, Kanelbulle</code></pre>
+
+<pre class="mermaid">
+flowchart LR
+  A["menu<br>6 products"] --> B["Where<br>Price &lt; 40"]
+  B --> C["OrderBy<br>Price"]
+  C --> D["Select<br>Name"]
+  D --> E["ToList<br>4 names"]
+</pre>
+<p class="box"><b>Ordningen spelar roll.</b> Gör <code>Select(p =&gt; p.Name)</code> först, så finns inget pris kvar att filtrera på – du har bara strängar.</p>
+
+<!-- ================= GROUPBY ================= -->
+<h2>6. Gruppera med GroupBy</h2>
+<p><code>GroupBy</code> delar upp listan i grupper. Varje grupp har en <code>Key</code> (det man grupperade på) och går själv att använda LINQ på.</p>
+<pre><code>foreach (var categoryGroup in menu.GroupBy(p =&gt; p.Category))
+{
+    Console.WriteLine($"{categoryGroup.Key}: {categoryGroup.Count()} st, {categoryGroup.Sum(p =&gt; p.Price)} kr");
+}</code></pre>
+<p>Utskrift:</p>
+<pre><code class="nohighlight">Dryck: 2 st, 55 kr
+Smörgås: 2 st, 115 kr
+Bakverk: 2 st, 65 kr</code></pre>
+
+<!-- ================= FLER METODER ================= -->
+<h2>7. Fler användbara metoder</h2>
+
+<h3>Ta och hoppa över: Take och Skip</h3>
+<pre><code>numbers.Take(3)              // 5, 12, 3   – de tre första
+numbers.Skip(3)              // 8, 20, 1   – allt utom de tre första
+numbers.Skip(2).Take(2)      // 3, 8       – hoppa över 2, ta 2
+numbers.Last()               // 1          – det sista
+numbers.Last(x =&gt; x &gt; 5)     // 20         – det sista som stämmer</code></pre>
+<p>Tillsammans med sortering blir det en topplista:</p>
+<pre><code>numbers.OrderByDescending(x =&gt; x).Take(3)   // 20, 12, 8 – de tre största</code></pre>
+<p class="box"><code>Skip</code> + <code>Take</code> används för <b>sidor</b>, till exempel i en webbshop: sida 2 med 10 varor per sida är <code>Skip(10).Take(10)</code>.</p>
+
+<h3>Ta bort dubbletter: Distinct</h3>
+<pre><code>List&lt;int&gt; dice = new List&lt;int&gt; { 3, 6, 3, 1, 6, 6 };
+dice.Distinct()                              // 3, 6, 1
+
+menu.Select(p =&gt; p.Category).Distinct()      // Dryck, Smörgås, Bakverk</code></pre>
+
+<h3>Sortera på två saker: ThenBy</h3>
+<p>Kaffe och Croissant kostar båda 30 kr. Vilken kommer först? Med <code>ThenBy</code> bestämmer du vad som avgör när det blir lika.</p>
+<pre><code>menu.OrderBy(p =&gt; p.Price)      // 1. sortera på pris
+    .ThenBy(p =&gt; p.Name)        // 2. samma pris? sortera på namn
+// Te, Croissant, Kaffe, Kanelbulle, Ostsmörgås, Skinksmörgås</code></pre>
+<p class="box">Skriv inte <code>OrderBy(…).OrderBy(…)</code>. Då gör den andra sorteringen om ordningen och den första tappar sin betydelse. Använd <code>ThenBy</code> eller <code>ThenByDescending</code>.</p>
+
+<h3>Hela objektet med högst värde: MaxBy och MinBy</h3>
+<pre><code>decimal highest = menu.Max(p =&gt; p.Price);             // 60            – bara priset
+Product? mostExpensive = menu.MaxBy(p =&gt; p.Price);    // Skinksmörgås  – hela produkten
+Product? cheapest = menu.MinBy(p =&gt; p.Price);         // Te</code></pre>
+<p class="box"><code>Max</code> svarar med ett <b>värde</b>. <code>MaxBy</code> svarar med <b>objektet</b> som har det högsta värdet. Det är samma sak som <code>OrderByDescending(p =&gt; p.Price).First()</code>, fast kortare.</p>
+
+<h3>Slå upp med namn: ToDictionary</h3>
+<pre><code>Dictionary&lt;string, decimal&gt; prices = menu.ToDictionary(p =&gt; p.Name, p =&gt; p.Price);
+
+Console.WriteLine(prices["Kaffe"]);   // 30</code></pre>
+<p>Första lambdan blir <b>nyckeln</b>, andra blir <b>värdet</b>. Nycklarna måste vara unika – två produkter med samma namn kraschar programmet.</p>
+
+<h3>Skapa tal: Enumerable.Range</h3>
+<pre><code>Enumerable.Range(1, 10)                           // 1, 2, 3 … 10
+Enumerable.Range(1, 10).Where(x =&gt; x % 2 == 0)    // 2, 4, 6, 8, 10
+Enumerable.Range(1, 5).Select(x =&gt; x * x)         // 1, 4, 9, 16, 25</code></pre>
+<p class="box">Första talet är <b>start</b>, andra är <b>hur många</b> – inte det sista talet. <code>Range(5, 3)</code> ger 5, 6, 7.</p>
+
+<!-- ================= TVÅ LISTOR ================= -->
+<h2>8. Jämför två listor</h2>
+<p>Vilka elever läser både programmering och matte? LINQ kan jämföra två listor.</p>
+<pre><code>List&lt;string&gt; programming = new List&lt;string&gt; { "Ada", "Linus", "Grace" };
+List&lt;string&gt; math        = new List&lt;string&gt; { "Grace", "Ola", "Ada" };
+
+programming.Concat(math)      // Ada, Linus, Grace, Grace, Ola, Ada
+programming.Union(math)       // Ada, Linus, Grace, Ola
+programming.Intersect(math)   // Ada, Grace
+programming.Except(math)      // Linus</code></pre>
+<div class="scroll"><table>
+  <tr><th>Metod</th><th>Ger</th><th>Dubbletter?</th></tr>
+  <tr><td><code>Concat</code></td><td>Båda listorna efter varandra</td><td>Ja, de finns kvar</td></tr>
+  <tr><td><code>Union</code></td><td>Allt som finns i någon av listorna</td><td>Nej</td></tr>
+  <tr><td><code>Intersect</code></td><td>Det som finns i <b>båda</b></td><td>Nej</td></tr>
+  <tr><td><code>Except</code></td><td>Det som <b>bara</b> finns i den första</td><td>Nej</td></tr>
+</table></div>
+
+<!-- ================= QUERY-SYNTAX ================= -->
+<h2>9. Två sätt att skriva: metod- och query-syntax</h2>
+<p>LINQ kan också skrivas så att det liknar databasspråket SQL. Resultatet blir exakt detsamma.</p>
+<pre><code>// Metodsyntax
+var a = menu.Where(p =&gt; p.Price &lt; 40)
+            .OrderBy(p =&gt; p.Price)
+            .Select(p =&gt; p.Name);
+
+// Query-syntax
+var b = from p in menu
+        where p.Price &lt; 40
+        orderby p.Price
+        select p.Name;</code></pre>
+<div class="scroll"><table>
+  <tr><th></th><th>Metodsyntax</th><th>Query-syntax</th></tr>
+  <tr><td>Ser ut som</td><td>Vanliga metodanrop</td><td>SQL</td></tr>
+  <tr><td>Kan allt</td><td>Ja – <code>Count</code>, <code>First</code>, <code>Sum</code> …</td><td>Nej, de måste ändå skrivas som metoder</td></tr>
+  <tr><td>Vanligast</td><td>Ja</td><td>Mindre vanligt</td></tr>
+</table></div>
+<p class="box">Tumregel: lär dig <b>metodsyntaxen</b> först. Känn igen query-syntaxen när du ser den.</p>
+
+<!-- ================= FÖRDRÖJD ================= -->
+<h2>10. Se upp: frågan körs först när du använder den</h2>
+<p><code>Where</code> gör ingenting direkt – den sparar bara <i>frågan</i>. Listan läses först när du loopar, räknar eller gör <code>ToList()</code>.</p>
+<pre><code>List&lt;int&gt; numbers = new List&lt;int&gt; { 1, 2, 3 };
+
+var query = numbers.Where(x =&gt; x &gt; 1);            // ingenting händer än
+var list = numbers.Where(x =&gt; x &gt; 1).ToList();   // körs nu: 2, 3
+
+numbers.Add(10);
+
+Console.WriteLine(query.Count());   // 3 – listan lästes först nu, 10 kom med
+Console.WriteLine(list.Count);     // 2 – en kopia från innan</code></pre>
+<p class="box">Vill du ha resultatet <b>som det ser ut just nu</b>: avsluta med <code>.ToList()</code>.</p>
+
+<!-- ================= ÖVNINGAR ================= -->
+<h2>11. Övningar</h2>
+<p class="lead">Börja enkelt, blir svårare. Försök själv först – öppna facit när du är klar.</p>
+
+<h3>Övning 1: Namn</h3>
+<div class="box">
+<pre><code>List&lt;string&gt; names = new List&lt;string&gt; { "Ada", "Linus", "Grace", "Bjarne", "Ola" };</code></pre>
+<ol>
+  <li>Skriv ut alla namn som är längre än 3 bokstäver.</li>
+  <li>Skriv ut alla namn i bokstavsordning.</li>
+  <li>Skriv ut alla namn med VERSALER.</li>
+</ol>
+<p><b>Tips:</b> en sträng har <code>.Length</code> och <code>.ToUpper()</code>. Skriv ut med <code>string.Join(", ", …)</code>.</p>
+<details>
+<summary>Visa facit</summary>
+<pre><code>Console.WriteLine(string.Join(", ", names.Where(n =&gt; n.Length &gt; 3)));
+Console.WriteLine(string.Join(", ", names.OrderBy(n =&gt; n)));
+Console.WriteLine(string.Join(", ", names.Select(n =&gt; n.ToUpper())));</code></pre>
+<p>Utskrift:</p>
+<pre><code class="nohighlight">Linus, Grace, Bjarne
+Ada, Bjarne, Grace, Linus, Ola
+ADA, LINUS, GRACE, BJARNE, OLA</code></pre>
+</details>
+</div>
+
+<h3>Övning 2: Tal</h3>
+<div class="box">
+<pre><code>List&lt;int&gt; numbers = new List&lt;int&gt; { 4, 7, 10, 13, 16, 19 };</code></pre>
+<ol>
+  <li>Plocka ut de jämna talen.</li>
+  <li>Räkna ut summan av de jämna talen.</li>
+  <li>Finns det något tal större än 18?</li>
+  <li>Gör en lista med kvadraten av alla <i>udda</i> tal.</li>
+</ol>
+<p><b>Tips:</b> ett tal är jämnt om <code>x % 2 == 0</code>.</p>
+<details>
+<summary>Visa facit</summary>
+<pre><code>var evens = numbers.Where(x =&gt; x % 2 == 0).ToList();                    // 4, 10, 16
+int sum = numbers.Where(x =&gt; x % 2 == 0).Sum();                        // 30
+bool exists = numbers.Any(x =&gt; x &gt; 18);                                   // true
+var squares = numbers.Where(x =&gt; x % 2 != 0).Select(x =&gt; x * x).ToList(); // 49, 169, 361</code></pre>
+<p>I sista raden filtrerar vi <b>först</b> och omvandlar <b>sedan</b>.</p>
+</details>
+</div>
+
+<h3>Övning 3: Skriv om loopen</h3>
+<div class="box">
+<p>Använd <code>menu</code> från avsnitt 4. Skriv om koden nedan till <b>en rad</b> LINQ.</p>
+<pre><code>List&lt;string&gt; expensive = new List&lt;string&gt;();
+
+foreach (Product p in menu)
+{
+    if (p.Price &gt; 50)
+    {
+        expensive.Add(p.Name);
+    }
+}</code></pre>
+<details>
+<summary>Visa facit</summary>
+<pre><code>List&lt;string&gt; expensive = menu.Where(p =&gt; p.Price &gt; 50).Select(p =&gt; p.Name).ToList();</code></pre>
+<p>Resultat: <code>Ostsmörgås</code>, <code>Skinksmörgås</code>. <code>if</code> blir <code>Where</code>, <code>expensive.Add(p.Name)</code> blir <code>Select</code>.</p>
+</details>
+</div>
+
+<h3>Övning 4: Frågor till menyn</h3>
+<div class="box">
+<p>Använd <code>menu</code> från avsnitt 4. Svara med LINQ:</p>
+<ol>
+  <li>Vilken är den billigaste smörgåsen?</li>
+  <li>Vad är genomsnittspriset för bakverk?</li>
+  <li>Hur många produkter kostar exakt 30 kr?</li>
+  <li>Finns det någon produkt som heter "Muffin"? Skriv ut "Slut" om den inte finns.</li>
+</ol>
+<details>
+<summary>Visa facit</summary>
+<pre><code>Product cheapest = menu
+    .Where(p =&gt; p.Category == "Smörgås")
+    .OrderBy(p =&gt; p.Price)
+    .First();
+Console.WriteLine(cheapest.Name);                                       // Ostsmörgås
+
+decimal average = menu.Where(p =&gt; p.Category == "Bakverk").Average(p =&gt; p.Price);
+Console.WriteLine(average);                                                // 32,5
+
+Console.WriteLine(menu.Count(p =&gt; p.Price == 30));                        // 2
+
+Product? muffin = menu.FirstOrDefault(p =&gt; p.Name == "Muffin");
+if (muffin == null)
+{
+    Console.WriteLine("Slut");
+}</code></pre>
+<p><code>FirstOrDefault</code> ger <code>null</code> när inget hittas. Med <code>First</code> hade programmet kraschat.</p>
+</details>
+</div>
+
+<h3>Övning 5: Dyraste i varje kategori</h3>
+<div class="box">
+<p>Skriv ut den dyraste produkten i varje kategori med hjälp av <code>GroupBy</code>.</p>
+<details>
+<summary>Visa facit</summary>
+<pre><code>foreach (var categoryGroup in menu.GroupBy(p =&gt; p.Category))
+{
+    Product mostExpensive = categoryGroup.OrderByDescending(p =&gt; p.Price).First();
+    Console.WriteLine($"{categoryGroup.Key}: {mostExpensive.Name} ({mostExpensive.Price} kr)");
+}</code></pre>
+<p>Utskrift:</p>
+<pre><code class="nohighlight">Dryck: Kaffe (30 kr)
+Smörgås: Skinksmörgås (60 kr)
+Bakverk: Kanelbulle (35 kr)</code></pre>
+</details>
+</div>
+
+<h3>Övning 6: Topplistor och sidor</h3>
+<div class="box">
+<pre><code>List&lt;int&gt; numbers = Enumerable.Range(1, 20).ToList();   // 1 … 20</code></pre>
+<ol>
+  <li>Varje sida visar 5 tal. Skriv ut sida 3.</li>
+  <li>Skriv ut namnen på de tre dyraste produkterna i <code>menu</code>.</li>
+  <li>Vilka kategorier finns i <code>menu</code>? Varje kategori ska bara skrivas ut en gång.</li>
+  <li>Skriv ut namnet på den billigaste produkten med <code>MinBy</code>.</li>
+</ol>
+<details>
+<summary>Visa facit</summary>
+<pre><code>Console.WriteLine(string.Join(", ", numbers.Skip(10).Take(5)));
+
+var top3 = menu.OrderByDescending(p =&gt; p.Price).Take(3).Select(p =&gt; p.Name);
+Console.WriteLine(string.Join(", ", top3));
+
+Console.WriteLine(string.Join(", ", menu.Select(p =&gt; p.Category).Distinct()));
+
+Console.WriteLine(menu.MinBy(p =&gt; p.Price)?.Name);</code></pre>
+<p>Utskrift:</p>
+<pre><code class="nohighlight">11, 12, 13, 14, 15
+Skinksmörgås, Ostsmörgås, Kanelbulle
+Dryck, Smörgås, Bakverk
+Te</code></pre>
+<p>Sida 3 börjar efter två hela sidor: hoppa över <code>2 * 5 = 10</code> tal.</p>
+</details>
+</div>
+
+<h3>Övning 7: Två kurser</h3>
+<div class="box">
+<pre><code>List&lt;string&gt; programming = new List&lt;string&gt; { "Ada", "Linus", "Grace", "Bjarne" };
+List&lt;string&gt; math        = new List&lt;string&gt; { "Grace", "Ola", "Ada", "Margaret" };</code></pre>
+<ol>
+  <li>Vilka läser båda kurserna?</li>
+  <li>Vilka läser bara programmering?</li>
+  <li>Skriv ut alla elever, men ingen två gånger.</li>
+  <li>Hur många olika elever finns det totalt?</li>
+</ol>
+<details>
+<summary>Visa facit</summary>
+<pre><code>Console.WriteLine(string.Join(", ", programming.Intersect(math)));
+Console.WriteLine(string.Join(", ", programming.Except(math)));
+Console.WriteLine(string.Join(", ", programming.Union(math)));
+Console.WriteLine(programming.Union(math).Count());</code></pre>
+<p>Utskrift:</p>
+<pre><code class="nohighlight">Ada, Grace
+Linus, Bjarne
+Ada, Linus, Grace, Bjarne, Ola, Margaret
+6</code></pre>
+<p><code>programming.Concat(math).Distinct()</code> ger samma resultat som <code>Union</code>.</p>
+</details>
+</div>
+
+<h3>Extra: LINQ och interface</h3>
+<div class="box">
+<p>Ta fram <code>IShape</code>, <code>Circle</code> och <code>Rectangle</code> från <a href="interface.html">övning 2 i interface-övningen</a>. Lägg en <code>Circle(2)</code>, en <code>Rectangle(3, 4)</code> och en <code>Rectangle(1, 1)</code> i en <code>List&lt;IShape&gt;</code>.</p>
+<ol>
+  <li>Räkna ut den totala arean – utan loop.</li>
+  <li>Skriv ut namnen på figurerna med area större än 10.</li>
+</ol>
+<details>
+<summary>Visa facit</summary>
+<pre><code>List&lt;IShape&gt; figurer = new List&lt;IShape&gt; { new Circle(2), new Rectangle(3, 4), new Rectangle(1, 1) };
+
+double total = figurer.Sum(f =&gt; f.Area());
+Console.WriteLine($"Total area: {total:0.00}");
+
+foreach (IShape f in figurer.Where(f =&gt; f.Area() &gt; 10))
+{
+    Console.WriteLine(f.Name);
+}</code></pre>
+<p>Utskrift:</p>
+<pre><code class="nohighlight">Total area: 25,57
+Cirkel
+Rektangel</code></pre>
+<p>LINQ vet inget om cirklar och rektanglar. Den anropar bara <code>Area()</code> – och varje figur svarar själv. Polymorfism igen!</p>
+</details>
+</div>
+
+<!-- ================= SAMMANFATTNING ================= -->
+<h2>12. Sammanfattning</h2>
+<div class="scroll"><table>
+  <tr><th>Metod</th><th>Gör</th><th>Ger tillbaka</th></tr>
+  <tr><td><code>Where</code></td><td>Behåller de som stämmer</td><td>Färre element</td></tr>
+  <tr><td><code>Select</code></td><td>Gör om varje element</td><td>Lika många, kanske annan typ</td></tr>
+  <tr><td><code>OrderBy</code> / <code>OrderByDescending</code></td><td>Sorterar</td><td>Samma element, ny ordning</td></tr>
+  <tr><td><code>First</code> / <code>FirstOrDefault</code></td><td>Hämtar ett element</td><td>Ett element (eller standardvärde)</td></tr>
+  <tr><td><code>Any</code> / <code>All</code></td><td>Ja/nej-fråga</td><td><code>bool</code></td></tr>
+  <tr><td><code>Count</code>, <code>Sum</code>, <code>Min</code>, <code>Max</code>, <code>Average</code></td><td>Räknar</td><td>Ett tal</td></tr>
+  <tr><td><code>ThenBy</code> / <code>ThenByDescending</code></td><td>Sorterar vid lika värden</td><td>Samma element, ny ordning</td></tr>
+  <tr><td><code>Take</code> / <code>Skip</code></td><td>Tar eller hoppar över de första</td><td>Färre element</td></tr>
+  <tr><td><code>Last</code></td><td>Hämtar det sista elementet</td><td>Ett element</td></tr>
+  <tr><td><code>Distinct</code></td><td>Tar bort dubbletter</td><td>Färre element</td></tr>
+  <tr><td><code>MaxBy</code> / <code>MinBy</code></td><td>Hämtar objektet med högst/lägst värde</td><td>Ett element</td></tr>
+  <tr><td><code>GroupBy</code></td><td>Delar upp i grupper</td><td>Grupper med <code>Key</code></td></tr>
+  <tr><td><code>Concat</code>, <code>Union</code>, <code>Intersect</code>, <code>Except</code></td><td>Jämför två listor</td><td>En ny samling</td></tr>
+  <tr><td><code>ToDictionary</code></td><td>Gör en uppslagstabell</td><td><code>Dictionary&lt;K, V&gt;</code></td></tr>
+  <tr><td><code>ToList</code></td><td>Kör frågan</td><td><code>List&lt;T&gt;</code></td></tr>
+</table></div>
+
+<h3>Klart när</h3>
+<ul>
+  <li>☐ Du kan läsa ett lambda-uttryck, t.ex. <code>p =&gt; p.Price &lt; 40</code>.</li>
+  <li>☐ Du kan skriva om en <code>foreach</code> med <code>if</code> till <code>Where</code> + <code>Select</code>.</li>
+  <li>☐ Du vet skillnaden mellan <code>First</code> och <code>FirstOrDefault</code>.</li>
+  <li>☐ Du kan kedja ihop flera metoder och förklara varför ordningen spelar roll.</li>
+  <li>☐ Du kan göra en topplista med <code>OrderByDescending</code> + <code>Take</code>.</li>
+  <li>☐ Du kan jämföra två listor med <code>Intersect</code> och <code>Except</code>.</li>
+</ul>
+
+</main>
+<script type="module">
+  import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.esm.min.mjs";
+  mermaid.initialize({ startOnLoad: true, theme: "neutral" });
+</script>
+<script src="vs.js"></script>
+</body>
+</html>

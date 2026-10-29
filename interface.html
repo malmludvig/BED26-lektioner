@@ -1,0 +1,371 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="claude:viewport-fit-sides" content="cover">
+<title>Övning: Interface</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<nav><a href="vecka43.html" aria-current="true">Lektioner vecka 5</a><a href="vecka44.html">Lektioner vecka 6</a><a href="index.html">Lektioner vecka 7</a></nav>
+<nav class="undermeny"><a href="vecka43.html">Interfaces</a><a href="kaffekoppen.html">Övning: Från UML till C#</a><a href="interface.html" aria-current="page">Övning: Interface</a><a href="smarthem.html">Övning: Smarta hemmet</a></nav>
+<main>
+
+<h1>Övning: Interface</h1>
+<p class="lead">Fem övningar som börjar enkelt och blir lite svårare. Försök själv först – öppna facit när du är klar.</p>
+
+<div class="box">
+<p><b>Kom ihåg</b></p>
+<ul>
+  <li>Ett interface är ett <b>kontrakt</b>: det säger <i>vad</i> en klass kan göra, inte <i>hur</i>.</li>
+  <li>Namnet börjar med <b>I</b>, t.ex. <code>ISound</code>.</li>
+  <li>Klassen som implementerar interfacet <b>måste</b> ha alla metoder i det.</li>
+</ul>
+</div>
+
+<h2>Övning 1: Något som låter</h2>
+<p>Så här ska det se ut när du är klar:</p>
+<pre class="mermaid">
+classDiagram
+  class ISound {
+    &lt;&lt;interface&gt;&gt;
+    +MakeSound() string
+  }
+  class Dog { +MakeSound() string }
+  class Cat { +MakeSound() string }
+  class Car { +MakeSound() string }
+  ISound <|.. Dog
+  ISound <|.. Cat
+  ISound <|.. Car
+</pre>
+
+<!-- ================= STEG 1 ================= -->
+<h3>Steg 1: Skapa interfacet</h3>
+<p>Skapa ett nytt konsolprojekt. Lägg till en fil <code>ISound.cs</code> med ett interface som har metoden <code>string MakeSound()</code>.</p>
+<details>
+<summary>Visa facit</summary>
+<pre><code>interface ISound
+{
+    string MakeSound();
+}</code></pre>
+<p>Ingen kropp med <code>{ }</code> – bara löftet om att metoden finns.</p>
+</details>
+
+<!-- ================= STEG 2 ================= -->
+<h3>Steg 2: Hund och Katt</h3>
+<p>Skapa klasserna <code>Dog</code> och <code>Cat</code>. Båda ska implementera <code>ISound</code>. Hunden säger "Voff!" och katten "Mjau!".</p>
+<details>
+<summary>Visa facit</summary>
+<pre><code>class Dog : ISound
+{
+    public string MakeSound() => "Voff!";
+}
+
+class Cat : ISound
+{
+    public string MakeSound() => "Mjau!";
+}</code></pre>
+</details>
+<p class="box"><b>Testa:</b> ta bort metoden <code>MakeSound</code> från <code>Cat</code>. Vilket fel får du? Sätt tillbaka den.</p>
+
+<!-- ================= STEG 3 ================= -->
+<h3>Steg 3: En Bil</h3>
+<p>Skapa en klass <code>Car</code> som också implementerar <code>ISound</code> och säger "Tut tut!".</p>
+<details>
+<summary>Visa facit</summary>
+<pre><code>class Car : ISound
+{
+    public string MakeSound() => "Tut tut!";
+}</code></pre>
+</details>
+<p class="box"><b>Fundera:</b> varför hade det varit konstigt att lösa det här med en basklass <code>Animal</code>? (En bil <i>är inte</i> ett djur – men den <i>kan</i> låta.)</p>
+
+<!-- ================= STEG 4 ================= -->
+<h3>Steg 4: Låt alla låta</h3>
+<p>I <code>Program.cs</code>: skapa en <code>List&lt;ISound&gt;</code> med en hund, en katt och en bil. Loopa igenom listan och skriv ut ljudet.</p>
+<details>
+<summary>Visa facit</summary>
+<pre><code>List&lt;ISound&gt; things = new List&lt;ISound&gt; { new Dog(), new Cat(), new Car() };
+
+foreach (ISound thing in things)
+{
+    Console.WriteLine(thing.MakeSound());
+}</code></pre>
+<p>Utskrift:</p>
+<pre><code class="nohighlight">Voff!
+Mjau!
+Tut tut!</code></pre>
+<p>Loopen vet inte om det är en hund eller en bil – den vet bara att alla <i>kan</i> låta. Det är <b>polymorfism</b>.</p>
+</details>
+
+<!-- ================= EXTRA ================= -->
+<h3>Extra: Två interface</h3>
+<p>Skapa ett interface <code>IMovable</code> med metoden <code>void Move()</code>. Låt <code>Dog</code> och <code>Car</code> implementera det (katten är lat). Gör en <code>List&lt;IMovable&gt;</code> och anropa <code>Move()</code> på alla.</p>
+<details>
+<summary>Visa facit</summary>
+<pre><code>interface IMovable
+{
+    void Move();
+}
+
+class Dog : ISound, IMovable
+{
+    public string MakeSound() => "Voff!";
+    public void Move() => Console.WriteLine("Hunden springer");
+}
+
+class Car : ISound, IMovable
+{
+    public string MakeSound() => "Tut tut!";
+    public void Move() => Console.WriteLine("Bilen kör");
+}
+
+// I Program.cs
+List&lt;IMovable&gt; movables = new List&lt;IMovable&gt; { new Dog(), new Car() };
+
+foreach (IMovable r in movables)
+{
+    r.Move();
+}</code></pre>
+<p>En klass kan implementera <b>flera</b> interface – separera dem med kommatecken.</p>
+</details>
+
+<h3>Klart när</h3>
+<ul>
+  <li>☐ <code>ISound</code> finns och har metoden <code>MakeSound()</code>.</li>
+  <li>☐ Hund, Katt och Bil implementerar <code>ISound</code>.</li>
+  <li>☐ En loop över en <code>List&lt;ISound&gt;</code> skriver ut alla ljud.</li>
+  <li>☐ Du kan förklara skillnaden mellan "är en" (arv) och "kan" (interface).</li>
+</ul>
+
+<!-- ================= ÖVNING 2 ================= -->
+<h2>Övning 2: Figurer</h2>
+<p>Ett interface kan också innehålla en <b>egenskap</b> (property), inte bara metoder.</p>
+<ol>
+  <li>Skapa ett interface <code>IShape</code> med egenskapen <code>string Name { get; }</code> och metoden <code>double Area()</code>.</li>
+  <li>Skapa <code>Circle</code> (har en radie) och <code>Rectangle</code> (har bredd och höjd). Båda implementerar <code>IShape</code>.</li>
+  <li>Lägg en cirkel med radie 2 och en rektangel 3 × 4 i en <code>List&lt;IShape&gt;</code>.</li>
+  <li>Skriv ut namn och area för varje figur, och till sist den totala arean.</li>
+</ol>
+<p class="box"><b>Tips:</b> arean av en cirkel är <code>Math.PI * radius * radius</code>.</p>
+<details>
+<summary>Visa facit</summary>
+<pre><code>interface IShape
+{
+    string Name { get; }
+    double Area();
+}
+
+class Circle : IShape
+{
+    private double radius;
+    public Circle(double radius) { this.radius = radius; }
+
+    public string Name => "Cirkel";
+    public double Area() => Math.PI * radius * radius;
+}
+
+class Rectangle : IShape
+{
+    private double width, height;
+    public Rectangle(double width, double height) { this.width = width; this.height = height; }
+
+    public string Name => "Rektangel";
+    public double Area() => width * height;
+}
+
+// I Program.cs
+List&lt;IShape&gt; shapes = new List&lt;IShape&gt; { new Circle(2), new Rectangle(3, 4) };
+double total = 0;
+
+foreach (IShape f in shapes)
+{
+    Console.WriteLine($"{f.Name}: {f.Area():0.00}");
+    total += f.Area();
+}
+Console.WriteLine($"Total area: {total:0.00}");</code></pre>
+<p>Utskrift:</p>
+<pre><code class="nohighlight">Cirkel: 12,57
+Rektangel: 12,00
+Total area: 24,57</code></pre>
+<p>Varje figur räknar ut sin egen area. Loopen behöver inte veta om det är en cirkel eller en rektangel.</p>
+</details>
+
+<!-- ================= ÖVNING 3 ================= -->
+<h2>Övning 3: Betalsätt</h2>
+<p>Ett interface kan användas som <b>parameter</b> i en metod. Då fungerar metoden för alla klasser som implementerar det.</p>
+<ol>
+  <li>Skapa ett interface <code>IPaymentMethod</code> med metoden <code>string Pay(decimal amount)</code>.</li>
+  <li>Skapa tre klasser: <code>Card</code>, <code>Swish</code> och <code>Cash</code>. Varje klass returnerar en egen text, t.ex. "Swishade 120 kr".</li>
+  <li>Skriv en metod <code>static void Pay(IPaymentMethod method, decimal amount)</code> i <code>Program.cs</code> som skriver ut resultatet.</li>
+  <li>Anropa metoden en gång med varje betalsätt.</li>
+</ol>
+<details>
+<summary>Visa facit</summary>
+<pre><code>interface IPaymentMethod
+{
+    string Pay(decimal amount);
+}
+
+class Card : IPaymentMethod
+{
+    public string Pay(decimal amount) => $"Drog {amount} kr från kortet";
+}
+
+class Swish : IPaymentMethod
+{
+    public string Pay(decimal amount) => $"Swishade {amount} kr";
+}
+
+class Cash : IPaymentMethod
+{
+    public string Pay(decimal amount) => $"Tog emot {amount} kr i kontanter";
+}
+
+// I Program.cs
+Pay(new Card(), 45);
+Pay(new Swish(), 120);
+Pay(new Cash(), 30);
+
+static void Pay(IPaymentMethod method, decimal amount)
+{
+    Console.WriteLine(method.Pay(amount));
+}</code></pre>
+<p>Utskrift:</p>
+<pre><code class="nohighlight">Drog 45 kr från kortet
+Swishade 120 kr
+Tog emot 30 kr i kontanter</code></pre>
+<p>Vill kaféet börja ta emot ett nytt betalsätt behöver vi bara skriva en ny klass. Metoden <code>Pay</code> ändras inte.</p>
+</details>
+
+<!-- ================= ÖVNING 4 ================= -->
+<h2>Övning 4: Hitta felen</h2>
+<p>Koden nedan kompilerar inte. Den innehåller <b>tre fel</b>. Hitta dem och rätta koden.</p>
+<pre><code>interface ILamp
+{
+    void TurnOn();
+    void TurnOff();
+}
+
+class CeilingLamp : ILamp
+{
+    private void TurnOn() { Console.WriteLine("Taklampan lyser"); }
+}
+
+// I Program.cs
+ILamp lamp = new ILamp();
+lamp.TurnOn();</code></pre>
+<details>
+<summary>Visa facit</summary>
+<ol>
+  <li><code>TurnOn()</code> är <code>private</code>. Metoder som implementerar ett interface måste vara <code>public</code>.</li>
+  <li><code>CeilingLamp</code> saknar metoden <code>TurnOff()</code>. Alla metoder i interfacet måste finnas.</li>
+  <li>Man kan inte skriva <code>new ILamp()</code>. Ett interface är bara ett kontrakt – man skapar objekt av en <i>klass</i> som implementerar det.</li>
+</ol>
+<pre><code>class CeilingLamp : ILamp
+{
+    public void TurnOn() { Console.WriteLine("Taklampan lyser"); }
+    public void TurnOff() { Console.WriteLine("Taklampan är släckt"); }
+}
+
+// I Program.cs
+ILamp lamp = new CeilingLamp();
+lamp.TurnOn();
+lamp.TurnOff();</code></pre>
+<p>Variabeln får gärna vara av typen <code>ILamp</code>, men objektet måste vara en <code>CeilingLamp</code>.</p>
+</details>
+
+<!-- ================= ÖVNING 5 ================= -->
+<h2>Övning 5: Smarta hemmet (designa själv)</h2>
+<p>Nu designar du själv. Börja med att <b>rita ett UML-diagram</b> innan du kodar.</p>
+<p class="box"><i>"I ett smart hem finns en lampa, en högtalare och en kaffebryggare. Alla prylar har ett namn och kan slås på. Hemmet håller reda på alla prylar och kan slå på allt med ett kommando."</i></p>
+<ol>
+  <li>Stryk under substantiv (klasser), egenskaper (attribut) och verb (metoder).</li>
+  <li>Vad har alla prylar gemensamt? Det blir ditt interface.</li>
+  <li>Rita diagrammet. Glöm inte relationen mellan hemmet och prylarna.</li>
+  <li>Skriv koden och testa att <code>TurnOnAll()</code> fungerar.</li>
+</ol>
+<details>
+<summary>Visa facit</summary>
+<pre class="mermaid">
+classDiagram
+  class ISmartDevice {
+    &lt;&lt;interface&gt;&gt;
+    +Name: string
+    +TurnOn()
+  }
+  class Home {
+    -devices: List~ISmartDevice~
+    +Add(device: ISmartDevice)
+    +TurnOnAll()
+  }
+  ISmartDevice <|.. Lamp
+  ISmartDevice <|.. Speaker
+  ISmartDevice <|.. CoffeeMaker
+  Home "1" --> "0..*" ISmartDevice : har
+</pre>
+<pre><code>interface ISmartDevice
+{
+    string Name { get; }
+    void TurnOn();
+}
+
+class Lamp : ISmartDevice
+{
+    public string Name => "Lampan";
+    public void TurnOn() => Console.WriteLine("Lampan lyser");
+}
+
+class Speaker : ISmartDevice
+{
+    public string Name => "Högtalaren";
+    public void TurnOn() => Console.WriteLine("Högtalaren spelar musik");
+}
+
+class CoffeeMaker : ISmartDevice
+{
+    public string Name => "Kaffebryggaren";
+    public void TurnOn() => Console.WriteLine("Kaffebryggaren brygger kaffe");
+}
+
+class Home
+{
+    private List&lt;ISmartDevice&gt; devices = new List&lt;ISmartDevice&gt;();
+
+    public void Add(ISmartDevice device) => devices.Add(device);
+
+    public void TurnOnAll()
+    {
+        foreach (ISmartDevice device in devices)
+        {
+            Console.Write($"{device.Name}: ");
+            device.TurnOn();
+        }
+    }
+}
+
+// I Program.cs
+Home home = new Home();
+home.Add(new Lamp());
+home.Add(new Speaker());
+home.Add(new CoffeeMaker());
+home.TurnOnAll();</code></pre>
+<p>Utskrift:</p>
+<pre><code class="nohighlight">Lampan: Lampan lyser
+Högtalaren: Högtalaren spelar musik
+Kaffebryggaren: Kaffebryggaren brygger kaffe</code></pre>
+<p><code>Home</code> känner bara till <code>ISmartDevice</code>. Köper vi en robotdammsugare skriver vi en ny klass – <code>Home</code> behöver inte ändras.</p>
+</details>
+
+</main>
+<script type="module">
+  import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.esm.min.mjs";
+  mermaid.initialize({ startOnLoad: false, theme: "neutral" });
+  mermaid.run({ querySelector: "main > pre.mermaid, details[open] pre.mermaid" });
+  // Diagram i facit ritas först när facit öppnas
+  document.querySelectorAll("details").forEach(d => d.addEventListener("toggle", () => mermaid.run({ nodes: d.querySelectorAll("pre.mermaid") })));
+</script>
+<script src="vs.js"></script>
+</body>
+</html>

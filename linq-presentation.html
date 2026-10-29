@@ -1,0 +1,383 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="claude:viewport-fit-sides" content="cover">
+<title>LINQ presentation</title>
+<link rel="stylesheet" href="style.css">
+<style>
+  /* Bildspel: en bild i taget, stor text */
+  .slides { min-height: 60vh; display: flex; flex-direction: column; justify-content: center; }
+  .slide { display: none; font-size: 1.25rem; }
+  .slide.active { display: block; }
+  .slide h1 { font-size: clamp(2.2rem, 7vw, 3.6rem); margin: 0 0 8px; }
+  .slide h2 { margin-top: 0; font-size: clamp(1.6rem, 4.5vw, 2.2rem); }
+  .slide pre { font-size: clamp(14px, 2.4vw, 19px); }
+  .big { font-size: clamp(1.4rem, 4vw, 2rem); text-align: center; }
+  .controls { display: flex; align-items: center; justify-content: space-between; gap: 12px; border-top: 1px solid var(--line); padding-top: 12px; margin-top: 24px; }
+  .controls button { font: inherit; font-weight: 600; background: var(--card); color: var(--ink); border: 1px solid var(--line); border-radius: 8px; padding: 8px 16px; cursor: pointer; }
+  .controls button:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
+  .controls button:disabled { opacity: .4; cursor: default; }
+  .counter { color: var(--muted); font-variant-numeric: tabular-nums; }
+  .hint { color: var(--muted); font-size: .9rem; text-align: center; }
+  :fullscreen main { max-width: 1100px; }
+  :fullscreen { background: var(--bg); overflow: auto; }
+</style>
+</head>
+<body>
+<nav><a href="vecka43.html">Lektioner vecka 5</a><a href="vecka44.html" aria-current="true">Lektioner vecka 6</a><a href="index.html">Lektioner vecka 7</a></nav>
+<nav class="undermeny"><a href="linq-presentation.html" aria-current="page">Presentation: LINQ</a><a href="vecka44.html">LINQ</a><a href="generics-presentation.html">Presentation: Generics</a><a href="generics.html">Generics</a></nav>
+<main id="show">
+
+<div class="slides">
+
+<section class="slide">
+  <h1>LINQ</h1>
+  <p class="lead">Ställ frågor till listor – filtrera, sortera och räkna med en rad kod.</p>
+</section>
+
+<section class="slide">
+  <h2>Uppgift: alla tal större än 5</h2>
+  <pre><code>List&lt;int&gt; numbers = new List&lt;int&gt; { 5, 12, 3, 8, 20, 1 };
+List&lt;int&gt; bigNumbers = new List&lt;int&gt;();
+
+foreach (int x in numbers)
+{
+    if (x &gt; 5)
+    {
+        bigNumbers.Add(x);
+    }
+}</code></pre>
+  <p>Sju rader för att plocka ut några tal.</p>
+</section>
+
+<section class="slide">
+  <h2>Samma sak med LINQ</h2>
+  <pre><code>List&lt;int&gt; bigNumbers = numbers.Where(x =&gt; x &gt; 5).ToList();   // 12, 8, 20</code></pre>
+  <p class="box">Loopen säger <b>hur</b>. LINQ säger <b>vad</b> du vill ha.</p>
+  <p><code>using System.Linq;</code> – finns redan med i nya konsolprojekt.</p>
+</section>
+
+<section class="slide">
+  <h2>Lambda: <code>x =&gt; x &gt; 5</code></h2>
+  <p class="big"><code>x</code> &nbsp;<b>går till</b>&nbsp; <code>x &gt; 5</code></p>
+  <ul>
+    <li><code>x</code> = ett element i listan i taget</li>
+    <li>till höger = vad som ska räknas ut</li>
+    <li>namnet väljer du själv: <code>x</code> för tal, <code>p</code> för produkt</li>
+  </ul>
+</section>
+
+<section class="slide">
+  <h2>En lambda är en metod utan namn</h2>
+  <pre><code>static bool IsLarge(int x)
+{
+    return x &gt; 5;
+}
+
+numbers.Where(IsLarge);       // fungerar också
+numbers.Where(x =&gt; x &gt; 5);    // men lambdan är kortare</code></pre>
+</section>
+
+<section class="slide">
+  <h2>Where – välj ut</h2>
+  <pre><code>numbers.Where(x =&gt; x &lt; 5)                // 3, 1
+numbers.Where(x =&gt; x == 8)               // 8
+numbers.Where(x =&gt; x % 2 == 0)           // 12, 8, 20
+numbers.Where(x =&gt; x != 3)               // 5, 12, 8, 20, 1
+numbers.Where(x =&gt; x &gt;= 5 &amp;&amp; x &lt;= 12)   // 5, 12, 8</code></pre>
+  <p>Behåller de element där lambdan ger <code>true</code>.</p>
+</section>
+
+<section class="slide">
+  <h2>Select – gör om varje</h2>
+  <pre><code>numbers.Select(x =&gt; x + 1)        // 6, 13, 4, 9, 21, 2
+numbers.Select(x =&gt; x * x)        // 25, 144, 9, 64, 400, 1
+numbers.Select(x =&gt; "Tal " + x)   // "Tal 5", "Tal 12", …
+numbers.Select(x =&gt; x &gt; 5)        // false, true, false, true, true, false</code></pre>
+  <p>6 in, 6 ut – alltid lika många.</p>
+</section>
+
+<section class="slide">
+  <h2>Where eller Select?</h2>
+  <div class="scroll"><table>
+    <tr><th></th><th><code>Where</code></th><th><code>Select</code></th></tr>
+    <tr><td>Gör</td><td>Väljer ut element</td><td>Gör om varje element</td></tr>
+    <tr><td>Antal ut</td><td>Färre eller lika många</td><td>Alltid lika många</td></tr>
+    <tr><td>Lambdan ger</td><td><code>true</code> eller <code>false</code></td><td>Det nya värdet</td></tr>
+  </table></div>
+</section>
+
+<section class="slide">
+  <h2>En lista av personer</h2>
+  <pre><code>List&lt;Person&gt; people = new List&lt;Person&gt;
+{
+    new Person("Ada", 17, 1, "Stockholm"),
+    new Person("Linus", 19, 2, "Göteborg"),
+    new Person("Grace", 16, 1, "Malmö"),
+    new Person("Bjarne", 18, 2, "Stockholm"),
+    new Person("Ola", 20, 1, "Göteborg"),
+    new Person("Margaret", 17, 2, "Uppsala")
+};</code></pre>
+  <p><code>Person</code> har <code>Name</code>, <code>Age</code>, <code>ClassId</code> och <code>City</code>. Nu är <code>p</code> en hel person.</p>
+</section>
+
+<section class="slide">
+  <h2>Where på personer</h2>
+  <pre><code>people.Where(p =&gt; p.Age &lt; 18)                  // Ada, Grace, Margaret
+people.Where(p =&gt; p.City == "Stockholm")       // Ada, Bjarne
+people.Where(p =&gt; p.ClassId == 2)              // Linus, Bjarne, Margaret
+people.Where(p =&gt; p.City != "Göteborg")        // Ada, Grace, Bjarne, Margaret
+people.Where(p =&gt; p.Age &gt;= 17 &amp;&amp; p.Age &lt;= 18)  // Ada, Bjarne, Margaret</code></pre>
+  <p>Ut kommer <b>hela personer</b> – bara färre.</p>
+</section>
+
+<section class="slide">
+  <h2>Select på personer</h2>
+  <pre><code>people.Select(p =&gt; p.Name)                 // "Ada", "Linus", "Grace", …
+people.Select(p =&gt; p.Age + 1)              // 18, 20, 17, 19, 21, 18
+people.Select(p =&gt; p.City.ToUpper())       // "STOCKHOLM", "GÖTEBORG", …
+people.Select(p =&gt; $"{p.Name} ({p.Age})")  // "Ada (17)", "Linus (19)", …
+people.Select(p =&gt; p.Age &gt;= 18)            // false, true, false, true, true, false</code></pre>
+  <p class="box">6 in, 6 ut – men inte längre personer. <b>Select kan byta typ.</b></p>
+</section>
+
+<section class="slide">
+  <h2>Sortera</h2>
+  <pre><code>numbers.OrderBy(x =&gt; x)            // 1, 3, 5, 8, 12, 20
+numbers.OrderByDescending(x =&gt; x)  // 20, 12, 8, 5, 3, 1</code></pre>
+</section>
+
+<section class="slide">
+  <h2>Hämta ett element</h2>
+  <pre><code>numbers.First()                       // 5
+numbers.First(x =&gt; x &gt; 10)            // 12
+numbers.Last()                        // 1
+numbers.FirstOrDefault(x =&gt; x &gt; 100)  // 0 – inget hittades
+numbers.First(x =&gt; x &gt; 100)           // KRASCHAR</code></pre>
+  <p class="box">Osäker på om något hittas? Använd <code>FirstOrDefault</code>.</p>
+</section>
+
+<section class="slide">
+  <h2>Ja/nej-frågor</h2>
+  <pre><code>numbers.Any(x =&gt; x &gt; 15)   // true – finns det något?
+numbers.All(x =&gt; x &gt; 0)    // true – stämmer det för alla?
+numbers.Contains(8)        // true – finns just 8?</code></pre>
+</section>
+
+<section class="slide">
+  <h2>Räkna</h2>
+  <pre><code>numbers.Count()             // 6
+numbers.Count(x =&gt; x &gt; 5)   // 3
+numbers.Sum()               // 49
+numbers.Min()               // 1
+numbers.Max()               // 20
+numbers.Average()           // 8,1666…</code></pre>
+</section>
+
+<section class="slide">
+  <h2>Från fråga till lista</h2>
+  <pre><code>IEnumerable&lt;int&gt; query = numbers.Where(x =&gt; x &gt; 5);
+List&lt;int&gt;        list  = numbers.Where(x =&gt; x &gt; 5).ToList();</code></pre>
+  <p><code>Where</code>, <code>Select</code> och <code>OrderBy</code> ger en <code>IEnumerable&lt;T&gt;</code> – ett generiskt interface. Vill du ha en lista: <code>.ToList()</code>.</p>
+</section>
+
+<section class="slide">
+  <h2>LINQ på egna objekt</h2>
+  <pre><code>List&lt;Product&gt; menu = new List&lt;Product&gt;
+{
+    new Product("Kaffe", 30, "Dryck"),
+    new Product("Te", 25, "Dryck"),
+    new Product("Ostsmörgås", 55, "Smörgås"),
+    new Product("Skinksmörgås", 60, "Smörgås"),
+    new Product("Kanelbulle", 35, "Bakverk"),
+    new Product("Croissant", 30, "Bakverk")
+};</code></pre>
+  <p><code>Product</code> har egenskaperna <code>Name</code>, <code>Price</code> och <code>Category</code>.</p>
+</section>
+
+<section class="slide">
+  <h2>Frågor till menyn</h2>
+  <pre><code>menu.Where(p =&gt; p.Price &lt; 40)          // Kaffe, Te, Kanelbulle, Croissant
+menu.Where(p =&gt; p.Category == "Dryck")  // Kaffe, Te
+menu.Select(p =&gt; p.Name)               // bara namnen
+menu.OrderBy(p =&gt; p.Price)             // Te först
+menu.Sum(p =&gt; p.Price)                  // 235</code></pre>
+  <p>Nu är <code>p</code> en hel produkt – med punkt når du egenskaperna.</p>
+</section>
+
+<section class="slide">
+  <h2>Kedja ihop</h2>
+  <pre><code>List&lt;string&gt; cheapNames = menu
+    .Where(p =&gt; p.Price &lt; 40)    // 1. välj billiga
+    .OrderBy(p =&gt; p.Price)       // 2. sortera
+    .Select(p =&gt; p.Name)         // 3. ta bara namnen
+    .ToList();                   // 4. gör en lista
+// Te, Kaffe, Croissant, Kanelbulle</code></pre>
+  <p class="box"><b>Ordningen spelar roll.</b> Efter <code>Select(p =&gt; p.Name)</code> finns inget pris kvar.</p>
+</section>
+
+<section class="slide">
+  <h2>Gruppera: GroupBy</h2>
+  <pre><code>foreach (var group in menu.GroupBy(p =&gt; p.Category))
+{
+    Console.WriteLine($"{group.Key}: {group.Count()} st");
+}</code></pre>
+  <pre><code class="nohighlight">Dryck: 2 st
+Smörgås: 2 st
+Bakverk: 2 st</code></pre>
+</section>
+
+<section class="slide">
+  <h2>Take och Skip</h2>
+  <pre><code>numbers.Take(3)                             // 5, 12, 3
+numbers.Skip(3)                             // 8, 20, 1
+numbers.Skip(2).Take(2)                     // 3, 8
+numbers.OrderByDescending(x =&gt; x).Take(3)   // 20, 12, 8 – topp 3</code></pre>
+  <p>Sidor i en webbshop: sida 2 med 10 per sida = <code>Skip(10).Take(10)</code>.</p>
+</section>
+
+<section class="slide">
+  <h2>Distinct – ta bort dubbletter</h2>
+  <pre><code>List&lt;int&gt; dice = new List&lt;int&gt; { 3, 6, 3, 1, 6, 6 };
+dice.Distinct()                            // 3, 6, 1
+
+menu.Select(p =&gt; p.Category).Distinct()    // Dryck, Smörgås, Bakverk</code></pre>
+</section>
+
+<section class="slide">
+  <h2>ThenBy – sortera på två saker</h2>
+  <pre><code>menu.OrderBy(p =&gt; p.Price)     // 1. sortera på pris
+    .ThenBy(p =&gt; p.Name)       // 2. samma pris? sortera på namn
+// Te, Croissant, Kaffe, Kanelbulle, Ostsmörgås, Skinksmörgås</code></pre>
+  <p>Kaffe och Croissant kostar båda 30 kr – namnet avgör.</p>
+</section>
+
+<section class="slide">
+  <h2>MaxBy och MinBy</h2>
+  <pre><code>menu.Max(p =&gt; p.Price)     // 60            – bara värdet
+menu.MaxBy(p =&gt; p.Price)   // Skinksmörgås  – hela produkten
+menu.MinBy(p =&gt; p.Price)   // Te</code></pre>
+</section>
+
+<section class="slide">
+  <h2>ToDictionary – slå upp med nyckel</h2>
+  <pre><code>Dictionary&lt;string, decimal&gt; prices = menu.ToDictionary(p =&gt; p.Name, p =&gt; p.Price);
+
+Console.WriteLine(prices["Kaffe"]);   // 30</code></pre>
+  <p>Första lambdan = <b>nyckel</b>, andra = <b>värde</b>.</p>
+</section>
+
+<section class="slide">
+  <h2>Enumerable.Range – skapa tal</h2>
+  <pre><code>Enumerable.Range(1, 10)                          // 1, 2, 3 … 10
+Enumerable.Range(1, 10).Where(x =&gt; x % 2 == 0)   // 2, 4, 6, 8, 10
+Enumerable.Range(1, 5).Select(x =&gt; x * x)        // 1, 4, 9, 16, 25</code></pre>
+  <p>(start, <b>hur många</b>) – inte (start, slut).</p>
+</section>
+
+<section class="slide">
+  <h2>Jämför två listor</h2>
+  <pre><code>List&lt;string&gt; programming = new List&lt;string&gt; { "Ada", "Linus", "Grace" };
+List&lt;string&gt; math        = new List&lt;string&gt; { "Grace", "Ola", "Ada" };
+
+programming.Concat(math)      // Ada, Linus, Grace, Grace, Ola, Ada
+programming.Union(math)       // Ada, Linus, Grace, Ola
+programming.Intersect(math)   // Ada, Grace – i båda
+programming.Except(math)      // Linus      – bara i första</code></pre>
+</section>
+
+<section class="slide">
+  <h2>Query-syntax</h2>
+  <pre><code>// Metodsyntax
+var a = menu.Where(p =&gt; p.Price &lt; 40).OrderBy(p =&gt; p.Price).Select(p =&gt; p.Name);
+
+// Query-syntax – liknar SQL
+var b = from p in menu
+        where p.Price &lt; 40
+        orderby p.Price
+        select p.Name;</code></pre>
+  <p>Samma resultat. Lär dig metodsyntaxen först.</p>
+</section>
+
+<section class="slide">
+  <h2>Se upp: frågan körs först när den används</h2>
+  <pre><code>List&lt;int&gt; numbers = new List&lt;int&gt; { 1, 2, 3 };
+
+var query = numbers.Where(x =&gt; x &gt; 1);            // ingenting händer än
+var list  = numbers.Where(x =&gt; x &gt; 1).ToList();   // körs nu: 2, 3
+
+numbers.Add(10);
+
+Console.WriteLine(query.Count());   // 3 – 10 kom med
+Console.WriteLine(list.Count);      // 2 – en kopia från innan</code></pre>
+</section>
+
+<section class="slide">
+  <h2>Sammanfattning</h2>
+  <div class="scroll"><table>
+    <tr><th>Metod</th><th>Gör</th></tr>
+    <tr><td><code>Where</code></td><td>Filtrerar</td></tr>
+    <tr><td><code>Select</code></td><td>Omvandlar</td></tr>
+    <tr><td><code>OrderBy</code> / <code>ThenBy</code></td><td>Sorterar</td></tr>
+    <tr><td><code>First</code> / <code>Last</code> / <code>MaxBy</code></td><td>Hämtar ett element</td></tr>
+    <tr><td><code>Any</code> / <code>All</code> / <code>Contains</code></td><td>Ja/nej-fråga</td></tr>
+    <tr><td><code>Count</code> / <code>Sum</code> / <code>Average</code></td><td>Räknar</td></tr>
+    <tr><td><code>Take</code> / <code>Skip</code> / <code>Distinct</code></td><td>Plockar ut en del</td></tr>
+    <tr><td><code>GroupBy</code></td><td>Grupperar</td></tr>
+    <tr><td><code>Union</code> / <code>Intersect</code> / <code>Except</code></td><td>Jämför två listor</td></tr>
+    <tr><td><code>ToList</code> / <code>ToDictionary</code></td><td>Kör frågan</td></tr>
+  </table></div>
+</section>
+
+<section class="slide">
+  <h1>Nu: övningar</h1>
+  <p class="lead">Öppna <a href="vecka44.html">LINQ-sidan</a>, läs exemplen och gör övningarna. Börja med övning 1 – de blir svårare.</p>
+</section>
+
+</div>
+
+<div class="controls">
+  <button id="prev" type="button">← Föregående</button>
+  <span class="counter" id="counter"></span>
+  <button id="next" type="button">Nästa →</button>
+</div>
+<p class="hint">Piltangenterna byter bild · <button id="fs" type="button" style="font:inherit;background:none;border:0;color:var(--accent);cursor:pointer;padding:0">Helskärm (F)</button></p>
+
+</main>
+<script src="vs.js"></script>
+<script>
+  const slides = [...document.querySelectorAll(".slide")];
+  const prev = document.getElementById("prev"), next = document.getElementById("next");
+  let current = 0;
+
+  function show(i) {
+    current = Math.max(0, Math.min(slides.length - 1, i));
+    slides.forEach((s, n) => s.classList.toggle("active", n === current));
+    document.getElementById("counter").textContent = `${current + 1} / ${slides.length}`;
+    prev.disabled = current === 0;
+    next.disabled = current === slides.length - 1;
+    history.replaceState(null, "", "#" + (current + 1));
+  }
+
+  function fullscreen() {
+    try {
+      if (document.fullscreenElement) document.exitFullscreen();
+      else document.getElementById("show").requestFullscreen();
+    } catch (e) { }
+  }
+
+  prev.onclick = () => show(current - 1);
+  next.onclick = () => show(current + 1);
+  document.getElementById("fs").onclick = fullscreen;
+  document.addEventListener("keydown", e => {
+    if (e.key === "ArrowRight" || e.key === " " || e.key === "PageDown") { e.preventDefault(); show(current + 1); }
+    if (e.key === "ArrowLeft" || e.key === "PageUp") { e.preventDefault(); show(current - 1); }
+    if (e.key === "f" || e.key === "F") fullscreen();
+  });
+
+  show((parseInt(location.hash.slice(1)) || 1) - 1);
+</script>
+</body>
+</html>

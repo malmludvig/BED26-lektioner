@@ -1,0 +1,234 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="claude:viewport-fit-sides" content="cover">
+<title>Git branching strategies</title>
+<link rel="stylesheet" href="style.css">
+<style>
+  /* Bildspel: en bild i taget, stor text */
+  .slides { min-height: 60vh; display: flex; flex-direction: column; justify-content: center; }
+  .slide { display: none; font-size: 1.25rem; }
+  .slide.active { display: block; }
+  .slide h1 { font-size: clamp(2.2rem, 7vw, 3.6rem); margin: 0 0 8px; }
+  .slide h2 { margin-top: 0; font-size: clamp(1.6rem, 4.5vw, 2.2rem); }
+  .slide pre { font-size: clamp(14px, 2.4vw, 19px); }
+  .controls { display: flex; align-items: center; justify-content: space-between; gap: 12px; border-top: 1px solid var(--line); padding-top: 12px; margin-top: 24px; }
+  .controls button { font: inherit; font-weight: 600; background: var(--card); color: var(--ink); border: 1px solid var(--line); border-radius: 8px; padding: 8px 16px; cursor: pointer; }
+  .controls button:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
+  .controls button:disabled { opacity: .4; cursor: default; }
+  .counter { color: var(--muted); font-variant-numeric: tabular-nums; }
+  .hint { color: var(--muted); font-size: .9rem; text-align: center; }
+  :fullscreen main { max-width: 1100px; }
+  :fullscreen { background: var(--bg); overflow: auto; }
+
+  /* Diagram ritas först när bilden visas */
+  .slide .mermaid { margin-block: 12px; }
+
+  /* Steg i en rad med pilar emellan */
+  .steps { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 8px; margin-block: 16px; }
+  .steps > div { background: var(--card); border: 2px solid var(--accent); border-radius: 10px; padding: 10px 14px; text-align: center; font-weight: 600; }
+  .steps small { display: block; font-weight: 400; color: var(--muted); font-size: .8rem; }
+  .steps > span { color: var(--muted); font-size: 1.4rem; }
+
+  /* Bild i en slide */
+  .pic { margin: 8px 0 12px; background: var(--code); border: 1px solid var(--code); border-radius: 10px; padding: 12px; text-align: center; }
+  .pic img { display: block; margin: 0 auto; max-width: 100%; max-height: 52vh; height: auto; }
+</style>
+</head>
+<body>
+<nav><a href="vecka43.html">Lektioner vecka 5</a><a href="vecka44.html">Lektioner vecka 6</a><a href="index.html" aria-current="true">Lektioner vecka 7</a></nav>
+<nav class="undermeny"><a href="git-presentation.html">Presentation: Git</a><a href="index.html">Git</a><a href="git-branches-presentation.html">Presentation: Git branches</a><a href="merge-conflicts-presentation.html">Presentation: Merge conflicts</a><a href="branching-strategies-presentation.html" aria-current="page">Presentation: Git branching strategies</a><a href="lab-git-branching.html">Övning: Git branching</a></nav>
+<main id="show">
+
+<div class="slides">
+
+<section class="slide">
+  <h1>Git branching strategies</h1>
+  <p class="lead">Hur jobbar vi med branches i en grupp – utan att trampa på varandra?</p>
+</section>
+
+<section class="slide">
+  <h2>Vad är en branchstrategi?</h2>
+  <p>En <b>överenskommelse</b> i gruppen om hur ni använder branches:</p>
+  <ul>
+    <li>Vilka branches finns?</li>
+    <li>Vad ska de heta?</li>
+    <li>Hur kommer koden in i <code>main</code>?</li>
+  </ul>
+  <p class="box">Det viktiga är inte vilken strategi ni väljer – utan att <b>alla gör likadant</b>.</p>
+</section>
+
+<section class="slide">
+  <h2>Tre vanliga strategier</h2>
+  <div class="scroll"><table>
+    <tr><th>Strategi</th><th>Kort</th><th>Passar för</th></tr>
+    <tr><td><b>Bara main</b></td><td>Alla committar direkt på <code>main</code></td><td>Små egna övningar</td></tr>
+    <tr><td><b>Feature branch workflow</b></td><td><code>main</code> + en branch per uppgift</td><td>Grupparbeten</td></tr>
+    <tr><td><b>Git Flow</b></td><td><code>main</code> + <code>dev</code> + feature branches</td><td>Större projekt med versioner</td></tr>
+  </table></div>
+  <p class="box">Vi använder <b>feature branch workflow</b>.</p>
+</section>
+
+<section class="slide">
+  <h2>Feature branch workflow</h2>
+  <p><code>main</code> fungerar alltid. Allt nytt görs på en egen <b>feature branch</b>.</p>
+  <pre class="mermaid">
+gitGraph
+  commit id: "Start"
+  branch feature/meny
+  commit id: "Meny"
+  commit id: "Meny klar"
+  checkout main
+  merge feature/meny
+  branch feature/kvitto
+  commit id: "Kvitto"
+  checkout main
+  merge feature/kvitto
+  </pre>
+  <p>En branch per uppgift → klar → in i <code>main</code> → nästa uppgift.</p>
+</section>
+
+<section class="slide">
+  <h2>Namnge med <code>feature/</code></h2>
+  <p>Alla feature branches börjar med <code>feature/</code> följt av vad den gör:</p>
+  <pre><code class="nohighlight">feature/meny
+feature/kvitto
+feature/studentrabatt</code></pre>
+  <ul>
+    <li>Alla ser direkt att det är en <b>ny funktion</b>.</li>
+    <li>Små bokstäver, inga mellanslag, inga å/ä/ö.</li>
+    <li><code>/</code> är bara en del av namnet – det grupperar branches i Visual Studio och på GitHub.</li>
+  </ul>
+</section>
+
+<section class="slide">
+  <h2>Vad är en Pull Request?</h2>
+  <p>En <b>Pull Request</b> (PR) är en <b>fråga</b> du ställer på GitHub:</p>
+  <p class="box" style="text-align:center;font-size:1.3em"><i>"Får jag merga min branch in i <code>main</code>?"</i></p>
+  <p>Precis som att lämna in ett utkast till läraren innan det blir det riktiga arbetet – någon tittar först, <b>sedan</b> godkänns det.</p>
+</section>
+
+<section class="slide">
+  <h2>Varför Pull Requests?</h2>
+  <ul>
+    <li>Gruppen ser <b>exakt</b> vilka rader du har ändrat.</li>
+    <li>Man kan kommentera och be om ändringar innan något händer.</li>
+    <li>Ingen kod kommer in i <code>main</code> utan att någon har tittat på den.</li>
+    <li>Mergen görs <b>på GitHub</b> – med en knapp.</li>
+  </ul>
+  <p class="box">En PR skyddar <code>main</code>, så att den alltid fungerar.</p>
+</section>
+
+<section class="slide">
+  <h2>Så skapar du en Pull Request</h2>
+  <ol>
+    <li>Pusha din branch: <code>git push -u origin feature/meny</code></li>
+    <li>Gå till repot på GitHub → <i>Compare &amp; pull request</i></li>
+    <li>Skriv en kort titel och vad du har gjort → <i>Create pull request</i></li>
+    <li>En kompis granskar och kommenterar.</li>
+    <li>När alla är nöjda: <i>Merge pull request</i>.</li>
+  </ol>
+  <p class="hint">Syns inte knappen? <i>Pull requests → New pull request</i> → välj din branch.</p>
+</section>
+
+<section class="slide">
+  <h2>Flödet steg för steg</h2>
+  <pre><code class="nohighlight">git switch main
+git pull                          # 1. börja från senaste versionen
+git switch -c feature/meny        # 2. ny branch för uppgiften
+# ... koda, add, commit – ofta ...
+git push -u origin feature/meny   # 3. skicka upp branchen
+# 4. skapa en Pull Request på GitHub
+# 5. någon granskar → Merge
+git switch main
+git pull                          # 6. hämta den mergade koden
+git branch -d feature/meny        # 7. städa</code></pre>
+</section>
+
+<section class="slide">
+  <h2>Från din dator till <code>main</code> på GitHub</h2>
+  <figure class="pic">
+    <img src="push-pull-request.png" alt="Din dator och GitHub, båda med branches main och feature. Den lokala feature-branchen pushas till GitHub. På GitHub går en streckad pil märkt PR från feature till main.">
+  </figure>
+  <p>Du pushar din <code>feature/…</code> och ber på GitHub om att få merga in den i <code>main</code>. Gruppen tittar – sedan <b>Merge</b>.</p>
+</section>
+
+<section class="slide">
+  <h2>Reglerna i gruppen</h2>
+  <ol>
+    <li>Ingen committar direkt på <code>main</code>.</li>
+    <li>En <code>feature/…</code>-branch per uppgift.</li>
+    <li>Håll branchen liten – merga ofta.</li>
+    <li>Allt kommer in i <code>main</code> via en Pull Request.</li>
+    <li>Ta bort branchen när den är mergad.</li>
+  </ol>
+</section>
+
+<section class="slide">
+  <h2>Sammanfattning</h2>
+  <div class="steps">
+    <div><code>git switch -c feature/meny</code><small>ny branch</small></div>
+    <span>→</span>
+    <div>Commit, commit<small>koda</small></div>
+    <span>→</span>
+    <div><code>git push</code><small>till GitHub</small></div>
+    <span>→</span>
+    <div>Pull Request<small>granska och merga</small></div>
+  </div>
+  <p class="box"><code>main</code> fungerar alltid – allt nytt görs på <code>feature/…</code>.</p>
+</section>
+
+</div>
+
+<div class="controls">
+  <button id="prev" type="button">← Föregående</button>
+  <span class="counter" id="counter"></span>
+  <button id="next" type="button">Nästa →</button>
+</div>
+<p class="hint">Piltangenterna byter bild · <button id="fs" type="button" style="font:inherit;background:none;border:0;color:var(--accent);cursor:pointer;padding:0">Helskärm (F)</button></p>
+
+</main>
+<script src="vs.js"></script>
+<script src="cli.js"></script>
+<script type="module">
+  import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.esm.min.mjs";
+  mermaid.initialize({ startOnLoad: false, theme: "neutral", gitGraph: { mainBranchName: "main" } });
+
+  const slides = [...document.querySelectorAll(".slide")];
+  const prev = document.getElementById("prev"), next = document.getElementById("next");
+  let current = 0;
+
+  function show(i) {
+    current = Math.max(0, Math.min(slides.length - 1, i));
+    slides.forEach((s, n) => s.classList.toggle("active", n === current));
+    document.getElementById("counter").textContent = `${current + 1} / ${slides.length}`;
+    prev.disabled = current === 0;
+    next.disabled = current === slides.length - 1;
+    history.replaceState(null, "", "#" + (current + 1));
+    // Diagram kan bara ritas när bilden syns
+    const diagrams = slides[current].querySelectorAll("pre.mermaid:not([data-processed])");
+    if (diagrams.length) mermaid.run({ nodes: diagrams });
+  }
+
+  function fullscreen() {
+    try {
+      if (document.fullscreenElement) document.exitFullscreen();
+      else document.getElementById("show").requestFullscreen();
+    } catch (e) { }
+  }
+
+  prev.onclick = () => show(current - 1);
+  next.onclick = () => show(current + 1);
+  document.getElementById("fs").onclick = fullscreen;
+  document.addEventListener("keydown", e => {
+    if (e.key === "ArrowRight" || e.key === " " || e.key === "PageDown") { e.preventDefault(); show(current + 1); }
+    if (e.key === "ArrowLeft" || e.key === "PageUp") { e.preventDefault(); show(current - 1); }
+    if (e.key === "f" || e.key === "F") fullscreen();
+  });
+
+  show((parseInt(location.hash.slice(1)) || 1) - 1);
+</script>
+</body>
+</html>

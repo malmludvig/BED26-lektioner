@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="claude:viewport-fit-sides" content="cover">
+<title>Merge conflicts presentation</title>
+<link rel="stylesheet" href="style.css">
+<style>
+  /* Bildspel: en bild i taget, stor text */
+  .slides { min-height: 60vh; display: flex; flex-direction: column; justify-content: center; }
+  .slide { display: none; font-size: 1.25rem; }
+  .slide.active { display: block; }
+  .slide h1 { font-size: clamp(2.2rem, 7vw, 3.6rem); margin: 0 0 8px; }
+  .slide h2 { margin-top: 0; font-size: clamp(1.6rem, 4.5vw, 2.2rem); }
+  .slide pre { font-size: clamp(14px, 2.4vw, 19px); }
+  .big { font-size: clamp(1.4rem, 4vw, 2rem); text-align: center; }
+  .controls { display: flex; align-items: center; justify-content: space-between; gap: 12px; border-top: 1px solid var(--line); padding-top: 12px; margin-top: 24px; }
+  .controls button { font: inherit; font-weight: 600; background: var(--card); color: var(--ink); border: 1px solid var(--line); border-radius: 8px; padding: 8px 16px; cursor: pointer; }
+  .controls button:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
+  .controls button:disabled { opacity: .4; cursor: default; }
+  .counter { color: var(--muted); font-variant-numeric: tabular-nums; }
+  .hint { color: var(--muted); font-size: .9rem; text-align: center; }
+  :fullscreen main { max-width: 1100px; }
+  :fullscreen { background: var(--bg); overflow: auto; }
+
+  /* Diagram ritas först när bilden visas */
+  .slide .mermaid { margin-block: 12px; }
+  .cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(260px, 100%), 1fr)); gap: 16px; }
+  .cols > div { min-width: 0; }
+
+  /* Konfliktmarkeringar: varje del i filen med en förklaring bredvid */
+  .conflict { border-radius: 8px; overflow: hidden; border: 1px solid var(--line); margin-block: 12px; font-size: clamp(14px, 2.2vw, 18px); }
+  .conflict > div { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 4px 16px; padding: 8px 14px; border-left: 6px solid; }
+  .conflict code { white-space: pre-wrap; overflow-wrap: anywhere; }
+  .conflict span { font-family: system-ui, sans-serif; font-size: .85em; color: var(--muted); }
+  .c-mark { background: rgba(127, 127, 127, .12); border-color: #8a8a8a; }
+  .c-mark code { color: var(--muted); }
+  .c-ours { background: rgba(87, 166, 74, .14); border-color: #57a64a; }
+  .c-theirs { background: rgba(86, 156, 214, .14); border-color: #569cd6; }
+
+  /* Steg i en rad med pilar emellan */
+  .steps { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 8px; margin-block: 16px; }
+  .steps > div { background: var(--card); border: 2px solid var(--accent); border-radius: 10px; padding: 10px 14px; text-align: center; font-weight: 600; }
+  .steps small { display: block; font-weight: 400; color: var(--muted); font-size: .8rem; }
+  .steps > span { color: var(--muted); font-size: 1.4rem; }
+
+  /* Videotips: skärmbild som länk */
+  .video { display: block; max-width: 760px; margin: 16px auto 0; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; background: #fff; }
+  .video img { display: block; width: 100%; height: auto; }
+  .video:hover { border-color: var(--accent); }
+</style>
+</head>
+<body>
+<nav><a href="vecka43.html">Lektioner vecka 5</a><a href="vecka44.html">Lektioner vecka 6</a><a href="index.html" aria-current="true">Lektioner vecka 7</a></nav>
+<nav class="undermeny"><a href="git-presentation.html">Presentation: Git</a><a href="index.html">Git</a><a href="git-branches-presentation.html">Presentation: Git branches</a><a href="merge-conflicts-presentation.html" aria-current="page">Presentation: Merge conflicts</a><a href="branching-strategies-presentation.html">Presentation: Git branching strategies</a><a href="lab-git-branching.html">Övning: Git branching</a></nav>
+<main id="show">
+
+<div class="slides">
+
+<section class="slide">
+  <h1>Merge conflicts</h1>
+  <p class="lead">När två branches har ändrat samma rad – så läser du konflikten, löser den eller ångrar dig.</p>
+</section>
+
+<section class="slide">
+  <h2>Merge-konflikt</h2>
+  <p>Båda branches har ändrat <b>samma rad</b>. Git kan inte välja åt dig:</p>
+  <pre><code class="nohighlight">git merge meny
+<samp>CONFLICT (content): Merge conflict in Program.cs</samp></code></pre>
+  <pre><code class="nohighlight">&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD
+Console.WriteLine("Välkommen!");
+=======
+Console.WriteLine("Välkommen till Kaffekoppen!");
+&gt;&gt;&gt;&gt;&gt;&gt;&gt; meny</code></pre>
+</section>
+
+<section class="slide">
+  <h2>Läs konflikten</h2>
+  <p>Git skriver in <b>båda</b> versionerna i filen och märker ut dem:</p>
+  <div class="conflict">
+    <div class="c-mark"><code>&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD</code><span>Start på konflikten</span></div>
+    <div class="c-ours"><code>Console.WriteLine("Välkommen!");</code><span>Din version – branchen du står på (<b>main</b>)</span></div>
+    <div class="c-mark"><code>=======</code><span>Skiljelinje</span></div>
+    <div class="c-theirs"><code>Console.WriteLine("Välkommen till Kaffekoppen!");</code><span>Den andra versionen – från <b>meny</b></span></div>
+    <div class="c-mark"><code>&gt;&gt;&gt;&gt;&gt;&gt;&gt; meny</code><span>Slut på konflikten</span></div>
+  </div>
+  <p>Du bestämmer vad som ska stå kvar. Tre vanliga val:</p>
+  <div class="cols">
+    <div>
+      <p><b>Behåll din</b></p>
+      <pre><code>Console.WriteLine("Välkommen!");</code></pre>
+    </div>
+    <div>
+      <p><b>Behåll den andra</b></p>
+      <pre><code>Console.WriteLine("Välkommen till Kaffekoppen!");</code></pre>
+    </div>
+    <div>
+      <p><b>Behåll båda</b></p>
+      <pre><code>Console.WriteLine("Välkommen!");
+Console.WriteLine("Välkommen till Kaffekoppen!");</code></pre>
+    </div>
+  </div>
+  <p class="box">De grå raderna – <code>&lt;&lt;&lt;&lt;&lt;&lt;&lt;</code>, <code>=======</code> och <code>&gt;&gt;&gt;&gt;&gt;&gt;&gt;</code> – ska <b>alltid</b> bort. Annars bygger inte programmet.</p>
+</section>
+
+<section class="slide">
+  <h2>Lös konflikten</h2>
+  <ol>
+    <li>Öppna filen. <code>HEAD</code> = din branch, nederst = den andra.</li>
+    <li>Skriv det som ska stå kvar. Ta bort <code>&lt;&lt;&lt;&lt;&lt;&lt;&lt;</code>, <code>=======</code>, <code>&gt;&gt;&gt;&gt;&gt;&gt;&gt;</code>.</li>
+    <li>Bygg och testa.</li>
+  </ol>
+  <pre><code class="nohighlight">git add Program.cs
+git commit -m "Slå ihop meny"</code></pre>
+  <p class="box">Konflikter är normala – inte ett fel. Små, täta merges ger små konflikter.</p>
+</section>
+
+<section class="slide">
+  <h2>Ångra dig: <code>git merge --abort</code></h2>
+  <p>Blev det en konflikt du inte vill lösa just nu? <b>Du kan alltid backa.</b></p>
+  <pre><code class="nohighlight">git merge --abort     # ångra – tillbaka till innan merge</code></pre>
+  <div class="steps">
+    <div>Innan <code>git merge</code><small>allt fungerar</small></div>
+    <span>→</span>
+    <div>Konflikt<small>filer fulla av &lt;&lt;&lt; === &gt;&gt;&gt;</small></div>
+    <span>→</span>
+    <div><code>git merge --abort</code><small>tillbaka till start</small></div>
+  </div>
+  <ul>
+    <li>Filerna blir <b>exakt</b> som de var innan du skrev <code>git merge</code>.</li>
+    <li>Inget försvinner – branchen <code>meny</code> och alla dess commits finns kvar.</li>
+    <li>Du kan försöka merga igen senare, när du är redo.</li>
+  </ul>
+  <p class="box">Fungerar medan mergen <b>pågår</b> – alltså innan du har gjort <code>git commit</code>. Osäker? Kör <code>git status</code>: står det <i>"You have unmerged paths"</i> pågår en merge.</p>
+</section>
+
+<section class="slide">
+  <h2>Video: lös merge-konflikter</h2>
+  <a class="video" href="https://www.youtube.com/watch?v=xNVM5UxlFSA&amp;list=PLkEZWD8wbltmcZQaA0ism9k2E6MGRnHZ7&amp;index=8" target="_blank" rel="noopener">
+    <img src="merge-conflict-video.png" alt="YouTube: How to resolve merge conflicts in Git (6:36)">
+  </a>
+  <p class="hint"><a href="https://www.youtube.com/watch?v=xNVM5UxlFSA&amp;list=PLkEZWD8wbltmcZQaA0ism9k2E6MGRnHZ7&amp;index=8" target="_blank" rel="noopener">Öppna videon på YouTube ↗</a></p>
+</section>
+
+<section class="slide">
+  <h2>Sammanfattning</h2>
+  <div class="scroll"><table>
+    <tr><th>Steg</th><th>Gör</th></tr>
+    <tr><td>1. Konflikt</td><td><code>git merge</code> säger <i>CONFLICT</i> – Git har skrivit in båda versionerna i filen</td></tr>
+    <tr><td>2. Läs</td><td>Överst (<code>HEAD</code>) = din branch, nederst = den andra</td></tr>
+    <tr><td>3. Lös</td><td>Behåll det som ska vara kvar, ta bort <code>&lt;&lt;&lt;&lt;&lt;&lt;&lt;</code>, <code>=======</code>, <code>&gt;&gt;&gt;&gt;&gt;&gt;&gt;</code></td></tr>
+    <tr><td>4. Spara</td><td><code>git add</code> och <code>git commit</code></td></tr>
+    <tr><td>Ångra</td><td><code>git merge --abort</code> – tillbaka till innan merge</td></tr>
+  </table></div>
+  <p class="box">Nu: <a href="index.html">Git-sidan</a> – gör övning 5, "Skapa en konflikt (och lös den)".</p>
+</section>
+
+</div>
+
+<div class="controls">
+  <button id="prev" type="button">← Föregående</button>
+  <span class="counter" id="counter"></span>
+  <button id="next" type="button">Nästa →</button>
+</div>
+<p class="hint">Piltangenterna byter bild · <button id="fs" type="button" style="font:inherit;background:none;border:0;color:var(--accent);cursor:pointer;padding:0">Helskärm (F)</button></p>
+
+</main>
+<script src="vs.js"></script>
+<script src="cli.js"></script>
+<script type="module">
+  import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.esm.min.mjs";
+  mermaid.initialize({ startOnLoad: false, theme: "neutral", gitGraph: { mainBranchName: "main" } });
+
+  const slides = [...document.querySelectorAll(".slide")];
+  const prev = document.getElementById("prev"), next = document.getElementById("next");
+  let current = 0;
+
+  function show(i) {
+    current = Math.max(0, Math.min(slides.length - 1, i));
+    slides.forEach((s, n) => s.classList.toggle("active", n === current));
+    document.getElementById("counter").textContent = `${current + 1} / ${slides.length}`;
+    prev.disabled = current === 0;
+    next.disabled = current === slides.length - 1;
+    history.replaceState(null, "", "#" + (current + 1));
+    // Diagram kan bara ritas när bilden syns
+    const diagrams = slides[current].querySelectorAll("pre.mermaid:not([data-processed])");
+    if (diagrams.length) mermaid.run({ nodes: diagrams });
+  }
+
+  function fullscreen() {
+    try {
+      if (document.fullscreenElement) document.exitFullscreen();
+      else document.getElementById("show").requestFullscreen();
+    } catch (e) { }
+  }
+
+  prev.onclick = () => show(current - 1);
+  next.onclick = () => show(current + 1);
+  document.getElementById("fs").onclick = fullscreen;
+  document.addEventListener("keydown", e => {
+    if (e.key === "ArrowRight" || e.key === " " || e.key === "PageDown") { e.preventDefault(); show(current + 1); }
+    if (e.key === "ArrowLeft" || e.key === "PageUp") { e.preventDefault(); show(current - 1); }
+    if (e.key === "f" || e.key === "F") fullscreen();
+  });
+
+  show((parseInt(location.hash.slice(1)) || 1) - 1);
+</script>
+</body>
+</html>

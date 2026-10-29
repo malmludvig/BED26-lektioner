@@ -1,0 +1,419 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Git vecka 7</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<nav><a href="vecka43.html">Lektioner vecka 5</a><a href="vecka44.html">Lektioner vecka 6</a><a href="index.html" aria-current="true">Lektioner vecka 7</a></nav>
+<nav class="undermeny"><a href="git-presentation.html">Presentation: Git</a><a href="index.html" aria-current="page">Git</a><a href="git-branches-presentation.html">Presentation: Git branches</a><a href="merge-conflicts-presentation.html">Presentation: Merge conflicts</a><a href="branching-strategies-presentation.html">Presentation: Git branching strategies</a><a href="lab-git-branching.html">Övning: Git branching</a></nav>
+<main>
+
+<h1>Git vecka 7</h1>
+<p class="lead">Spara versioner av din kod, ångra misstag och samarbeta – utan filer som heter <code>Program_final_v2_NY.cs</code>.</p>
+
+<div class="box">
+<p><b>Dagens plan</b></p>
+<ol>
+  <li>Varför Git? Vad är versionshantering?</li>
+  <li>De tre platserna: arbetsmapp, staging och repository</li>
+  <li>Installera och ställ in Git</li>
+  <li>Ditt första repo: <code>init</code>, <code>status</code>, <code>add</code>, <code>commit</code></li>
+  <li>Titta i historiken och ångra</li>
+  <li>Branches och merge</li>
+  <li>GitHub: <code>push</code>, <code>pull</code> och <code>clone</code></li>
+  <li>Git i Visual Studio</li>
+  <li>Övningar</li>
+</ol>
+</div>
+
+<!-- ================= VARFÖR ================= -->
+<h2>1. Varför Git?</h2>
+<p><b>Git</b> är ett program för <b>versionshantering</b>. Det sparar ögonblicksbilder av ditt projekt så att du alltid kan gå tillbaka.</p>
+<div class="scroll"><table>
+  <tr><th>Utan Git</th><th>Med Git</th></tr>
+  <tr><td><code>Kaffekoppen_kopia.zip</code>, <code>Kaffekoppen_FUNKAR.zip</code> …</td><td>En mapp – hela historiken finns inuti</td></tr>
+  <tr><td>"Vad ändrade jag igår?" – ingen aning</td><td><code>git diff</code> visar exakt vilka rader</td></tr>
+  <tr><td>Skickar filer fram och tillbaka på mejl</td><td>Alla jobbar i samma repo på GitHub</td></tr>
+  <tr><td>Råkar radera något → borta</td><td>Hämta tillbaka från en tidigare commit</td></tr>
+</table></div>
+<p class="box"><b>Git</b> är programmet på din dator. <b>GitHub</b> är en webbplats där du kan lägga upp dina Git-repon och dela dem. Man kan använda Git helt utan GitHub.</p>
+
+<!-- ================= BEGREPP ================= -->
+<h2>2. De tre platserna</h2>
+<p>En fil i ett Git-projekt kan befinna sig på tre platser. Det här är det viktigaste att förstå:</p>
+<pre class="mermaid">
+flowchart LR
+  A["Arbetsmapp<br/>(dina filer)"] -- "git add" --> B["Staging<br/>(redo att sparas)"]
+  B -- "git commit" --> C["Repository<br/>(historiken)"]
+  C -- "git push" --> D["GitHub<br/>(remote)"]
+  D -- "git pull" --> A
+</pre>
+<div class="scroll"><table>
+  <tr><th>Begrepp</th><th>Betyder</th><th>Liknelse</th></tr>
+  <tr><td><b>Repository (repo)</b></td><td>Projektmappen + hela historiken (i den dolda mappen <code>.git</code>)</td><td>Ett fotoalbum</td></tr>
+  <tr><td><b>Arbetsmapp</b></td><td>Filerna du ser och ändrar i Visual Studio</td><td>Det du har framför dig just nu</td></tr>
+  <tr><td><b>Staging</b></td><td>Ändringar du valt ut till nästa commit</td><td>Personerna som ställer sig i bild</td></tr>
+  <tr><td><b>Commit</b></td><td>En sparad ögonblicksbild med ett meddelande</td><td>Ett foto i albumet</td></tr>
+  <tr><td><b>Branch</b></td><td>En egen spår av commits</td><td>Ett sidospår där du provar något</td></tr>
+  <tr><td><b>Remote</b></td><td>En kopia av repot på en server, t.ex. GitHub</td><td>En kopia av albumet hos en kompis</td></tr>
+</table></div>
+
+<!-- ================= INSTALLERA ================= -->
+<h2>3. Installera och ställ in Git</h2>
+<p>Ladda ner Git från <a href="https://git-scm.com/downloads" target="_blank" rel="noopener">git-scm.com</a> (Windows: kör installationen med standardvalen). Öppna sedan en terminal – till exempel <b>Git Bash</b> eller terminalen i Visual Studio (<i>View → Terminal</i>).</p>
+<pre><code class="nohighlight">git --version
+<samp>git version 2.47.0.windows.1</samp></code></pre>
+<p>Berätta för Git vem du är. Det görs <b>en gång</b> per dator och syns på alla dina commits:</p>
+<pre><code class="nohighlight">git config --global user.name "Ada Lovelace"
+git config --global user.email "ada@exempel.se"
+git config --global init.defaultBranch main</code></pre>
+<p class="box">Rader som börjar med ett <b>gult</b> kommando skriver du själv. Text efter <code>#</code> är kommentarer. Vanlig vit text är det som terminalen skriver ut.</p>
+
+<!-- ================= FÖRSTA REPOT ================= -->
+<h2>4. Ditt första repo</h2>
+<h3>Skapa ett projekt och ett repo</h3>
+<pre><code class="nohighlight">mkdir GitDemo
+cd GitDemo
+dotnet new console      # skapar Program.cs och GitDemo.csproj
+dotnet new gitignore    # skapar .gitignore för C#-projekt
+git init                # gör mappen till ett Git-repo
+<samp>Initialized empty Git repository in C:/Users/Ada/GitDemo/.git/</samp></code></pre>
+
+<h3>.gitignore – filer Git ska strunta i</h3>
+<p>När du bygger projektet skapas mapparna <code>bin/</code> och <code>obj/</code>. De går alltid att bygga om och ska <b>inte</b> sparas i Git. Filen <code>.gitignore</code> listar sådant:</p>
+<pre><code class="nohighlight">bin/
+obj/
+.vs/</code></pre>
+
+<h3>git status – vad har hänt?</h3>
+<p>Kör <code>git status</code> ofta. Den berättar vilka filer som är ändrade och vad som ligger i staging.</p>
+<pre><code class="nohighlight">git status
+<samp>On branch main
+
+No commits yet
+
+Untracked files:
+  (use "git add &lt;file&gt;..." to include in what will be committed)
+        .gitignore
+        GitDemo.csproj
+        Program.cs
+
+nothing added to commit but untracked files present (use "git add" to track)</samp></code></pre>
+
+<h3>git add – välj vad som ska sparas</h3>
+<pre><code class="nohighlight">git add Program.cs     # en fil
+git add .              # alla ändrade filer i mappen</code></pre>
+
+<h3>git commit – spara en ögonblicksbild</h3>
+<pre><code class="nohighlight">git commit -m "Skapa konsolprojekt"
+<samp>[main (root-commit) 3f2a1c9] Skapa konsolprojekt</samp>
+<samp> 3 files changed, 512 insertions(+)</samp></code></pre>
+<p>Siffrorna <code>3f2a1c9</code> är commitens <b>id</b> (en hash). Varje commit får ett unikt id.</p>
+
+<h3>Arbetsflödet – om och om igen</h3>
+<div class="box">
+<ol>
+  <li>Ändra kod i Visual Studio</li>
+  <li><code>git status</code> – vad har ändrats?</li>
+  <li><code>git add .</code></li>
+  <li><code>git commit -m "Beskriv vad du gjorde"</code></li>
+</ol>
+</div>
+
+<h3>Bra commit-meddelanden</h3>
+<div class="scroll"><table>
+  <tr><th>Dåligt</th><th>Bra</th></tr>
+  <tr><td><code>fix</code></td><td><code>Rätta studentrabatten när summan är över 200 kr</code></td></tr>
+  <tr><td><code>asdf</code></td><td><code>Lägg till klassen Pastry med bäst före-datum</code></td></tr>
+  <tr><td><code>massa ändringar</code></td><td>Dela upp i flera commits – en per sak</td></tr>
+</table></div>
+<p class="box">Tumregel: meddelandet ska fortsätta meningen <i>"Den här commiten kommer att …"</i>. Commita ofta – små commits är lätta att förstå och ångra.</p>
+
+<!-- ================= HISTORIK ================= -->
+<h2>5. Titta i historiken</h2>
+<pre><code class="nohighlight">git log --oneline        # en rad per commit, nyast överst
+<samp>a81d4e2 Lägg till klassen Drink</samp>
+<samp>7c90b13 Lägg till basklassen Product</samp>
+<samp>3f2a1c9 Skapa konsolprojekt</samp>
+
+git diff                 # vad har ändrats sedan senaste commit (ej i staging)
+git diff --staged        # vad ligger i staging just nu
+git show a81d4e2         # visa en specifik commit</code></pre>
+<p>Så här ser <code>git diff</code> ut. Rader med <b>−</b> har tagits bort, rader med <b>+</b> har lagts till:</p>
+<pre><code class="nohighlight">-    public virtual decimal CalculatePrice() { return 0; }
++    public virtual decimal CalculatePrice() { return basePrice; }</code></pre>
+
+<!-- ================= ÅNGRA ================= -->
+<h2>6. Ångra</h2>
+<div class="scroll"><table>
+  <tr><th>Situation</th><th>Kommando</th></tr>
+  <tr><td>Jag har ändrat en fil och vill ha tillbaka hur den såg ut vid senaste commit</td><td><code>git restore Program.cs</code></td></tr>
+  <tr><td>Jag la en fil i staging men vill ta bort den därifrån (ändringen finns kvar)</td><td><code>git restore --staged Program.cs</code></td></tr>
+  <tr><td>Jag skrev fel i senaste commit-meddelandet (inte pushat än)</td><td><code>git commit --amend -m "Nytt meddelande"</code></td></tr>
+  <tr><td>En gammal commit var fel – skapa en ny commit som tar bort ändringen</td><td><code>git revert a81d4e2</code></td></tr>
+</table></div>
+<p class="box"><b>Se upp:</b> <code>git restore</code> på en fil slänger dina osparade ändringar för gott. Ändringar som är <i>commitade</i> går däremot nästan alltid att få tillbaka.</p>
+
+<!-- ================= BRANCHES ================= -->
+<h2>7. Branches och merge</h2>
+<p>En <b>branch</b> är ett eget spår där du kan prova något nytt utan att förstöra <code>main</code>. När det fungerar slår du ihop (<b>merge</b>) det med <code>main</code>.</p>
+<pre class="mermaid">
+gitGraph
+  commit id: "Skapa projekt"
+  commit id: "Product"
+  branch studentrabatt
+  checkout studentrabatt
+  commit id: "IsStudent"
+  commit id: "Discount()"
+  checkout main
+  commit id: "Rätta stavfel"
+  merge studentrabatt
+  commit id: "Kvitto"
+</pre>
+<pre><code class="nohighlight">git branch                     # lista branches – * visar var du är
+git switch -c studentrabatt    # skapa en ny branch och gå dit
+# ... ändra kod, add, commit ...
+git switch main                # gå tillbaka till main
+git merge studentrabatt        # hämta in ändringarna i main
+git branch -d studentrabatt    # ta bort branchen när den är klar</code></pre>
+
+<h3>Merge-konflikt</h3>
+<p>Om två branches har ändrat <b>samma rad</b> kan Git inte välja åt dig. Då blir det en <b>konflikt</b> och Git markerar raden i filen:</p>
+<pre><code class="nohighlight">&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD
+            return basePrice + 5;
+=======
+            return basePrice + 8;
+&gt;&gt;&gt;&gt;&gt;&gt;&gt; studentrabatt</code></pre>
+<div class="box">
+<p><b>Så löser du en konflikt</b></p>
+<ol>
+  <li>Öppna filen. Överst (<code>HEAD</code>) är din version, nederst den andra branchens.</li>
+  <li>Bestäm vad som ska stå kvar och ta bort markeringarna <code>&lt;&lt;&lt;&lt;&lt;&lt;&lt;</code>, <code>=======</code> och <code>&gt;&gt;&gt;&gt;&gt;&gt;&gt;</code>.</li>
+  <li>Kontrollera att programmet bygger.</li>
+  <li><code>git add .</code> och <code>git commit</code> – klart!</li>
+</ol>
+</div>
+<p>Visual Studio har ett eget verktyg för konflikter: klicka på filen i <i>Git Changes</i> och välj vilken sida du vill behålla.</p>
+
+<!-- ================= GITHUB ================= -->
+<h2>8. GitHub: dela ditt repo</h2>
+<p>Skapa ett konto på <a href="https://github.com" target="_blank" rel="noopener">github.com</a> och ett nytt, <b>tomt</b> repository (bocka inte i README eller .gitignore). GitHub visar då en sida med <i>Quick setup</i> och de kommandon du behöver:</p>
+<figure class="shot">
+  <img src="github-new-repo.webp" alt="GitHub-sidan för ett nytt, tomt repo: adressen till repot under Quick setup, och kommandon för att skapa ett nytt repo eller pusha ett befintligt från terminalen." loading="lazy">
+  <figcaption>Ett nytt, tomt repo på GitHub. Kopiera adressen (HTTPS) eller ett helt kommandoblock med kopieringsknappen till höger.</figcaption>
+</figure>
+
+<h3>Kommandona från GitHub</h3>
+<p><b>…or create a new repository on the command line</b> – du har inget lokalt repo än:</p>
+<pre><code class="nohighlight">echo "# testtest" &gt;&gt; README.md   # skapa en README-fil
+git init                          # gör mappen till ett repo
+git add README.md
+git commit -m "first commit"
+git branch -M main                # döp branchen till main
+git remote add origin https://github.com/malmludvig/testtest.git
+git push -u origin main           # skicka upp och koppla ihop</code></pre>
+<p><b>…or push an existing repository from the command line</b> – du har redan gjort <code>git init</code> och commits:</p>
+<pre><code class="nohighlight">git remote add origin https://github.com/malmludvig/testtest.git
+git branch -M main
+git push -u origin main</code></pre>
+<p class="box">Byt <code>malmludvig/testtest</code> mot ditt eget användarnamn och repo. Har du följt avsnitt 4 har du redan ett repo – då är det det andra blocket du ska använda.</p>
+
+<p>För projektet <code>GitDemo</code> från avsnitt 4 blir det alltså:</p>
+<pre><code class="nohighlight">git remote add origin https://github.com/ditt-namn/GitDemo.git
+git push -u origin main      # första gången: -u kopplar ihop main med origin/main
+git push                     # sedan räcker det så här</code></pre>
+<div class="scroll"><table>
+  <tr><th>Kommando</th><th>Gör</th></tr>
+  <tr><td><code>git clone &lt;url&gt;</code></td><td>Laddar ner ett repo från GitHub – med hela historiken</td></tr>
+  <tr><td><code>git push</code></td><td>Skickar dina commits <b>upp</b> till GitHub</td></tr>
+  <tr><td><code>git pull</code></td><td>Hämtar <b>ner</b> andras commits från GitHub</td></tr>
+</table></div>
+<p class="box"><b>Jobba i grupp:</b> börja alltid med <code>git pull</code> innan du börjar koda, och <code>git push</code> när du är klar. Då blir det färre konflikter.</p>
+<p>Första gången du pushar frågar Git efter inloggning. På Windows öppnas ett fönster där du loggar in på GitHub i webbläsaren.</p>
+
+<!-- ================= VISUAL STUDIO ================= -->
+<h2>9. Git i Visual Studio</h2>
+<p>Allt ovan går också att göra med knappar i Visual Studio:</p>
+<div class="scroll"><table>
+  <tr><th>Terminal</th><th>Visual Studio</th></tr>
+  <tr><td><code>git init</code></td><td><i>Git → Create Git Repository…</i> (kan också skapa repot på GitHub direkt)</td></tr>
+  <tr><td><code>git status</code> / <code>git diff</code></td><td>Fönstret <i>Git Changes</i> (<i>View → Git Changes</i>). Dubbelklicka en fil för att se ändringarna.</td></tr>
+  <tr><td><code>git add</code></td><td>Plustecknet <b>+</b> vid filen (<i>Stage</i>)</td></tr>
+  <tr><td><code>git commit -m</code></td><td>Skriv meddelandet och klicka <i>Commit Staged</i> (eller <i>Commit All</i>)</td></tr>
+  <tr><td><code>git push</code> / <code>git pull</code></td><td>Pilarna ↑ och ↓ överst i <i>Git Changes</i></td></tr>
+  <tr><td><code>git switch -c</code></td><td>Branch-namnet längst ner till höger → <i>New Branch</i></td></tr>
+  <tr><td><code>git log</code></td><td><i>Git → View Branch History</i></td></tr>
+</table></div>
+<p class="box">Det är bra att kunna kommandona – då förstår du vad knapparna gör, och kan använda Git i alla program och på alla datorer.</p>
+
+<!-- ================= ÖVNINGAR ================= -->
+<h2>10. Övningar</h2>
+<p>Gör övningarna i en terminal. Försök själv först – öppna facit när du är klar.</p>
+
+<h3>Övning 1: Första commiten</h3>
+<ol>
+  <li>Skapa en ny mapp <code>GitOvning</code> med ett konsolprojekt och en <code>.gitignore</code>.</li>
+  <li>Gör mappen till ett Git-repo.</li>
+  <li>Kör <code>git status</code>. Varför syns inte <code>bin/</code> och <code>obj/</code>?</li>
+  <li>Lägg alla filer i staging och gör en commit med meddelandet "Skapa projekt".</li>
+</ol>
+<details>
+<summary>Visa facit</summary>
+<pre><code class="nohighlight">mkdir GitOvning
+cd GitOvning
+dotnet new console
+dotnet new gitignore
+git init
+git status
+git add .
+git commit -m "Skapa projekt"</code></pre>
+<p><code>bin/</code> och <code>obj/</code> syns inte eftersom de står i <code>.gitignore</code>. (Om du inte har byggt projektet än finns de inte heller.)</p>
+</details>
+
+<h3>Övning 2: Ändra, titta, spara</h3>
+<ol>
+  <li>Ändra <code>Program.cs</code> så att programmet skriver ut ditt namn.</li>
+  <li>Kör <code>git status</code> och <code>git diff</code>. Vad visar de?</li>
+  <li>Commita ändringen med ett bra meddelande.</li>
+  <li>Gör två ändringar till, med en commit för varje. Visa historiken på en rad per commit.</li>
+</ol>
+<details>
+<summary>Visa facit</summary>
+<pre><code class="nohighlight">git status                # Program.cs står som "modified"
+git diff                  # visar raden som togs bort (-) och lades till (+)
+git add Program.cs
+git commit -m "Skriv ut mitt namn"
+# ... två ändringar till ...
+git log --oneline
+<samp>c4e1a90 Fråga efter användarens ålder</samp>
+<samp>9b2f7d3 Skriv ut dagens datum</samp>
+<samp>51aa0e6 Skriv ut mitt namn</samp>
+<samp>2d8c3f1 Skapa projekt</samp></code></pre>
+</details>
+
+<h3>Övning 3: Ångra en ändring</h3>
+<ol>
+  <li>Radera allt innehåll i <code>Program.cs</code> och spara filen. (Ja, verkligen!)</li>
+  <li>Kör <code>git status</code>.</li>
+  <li>Få tillbaka filen som den var vid senaste commit.</li>
+</ol>
+<details>
+<summary>Visa facit</summary>
+<pre><code class="nohighlight">git status
+<samp>        modified:   Program.cs</samp>
+git restore Program.cs
+git status
+<samp>nothing to commit, working tree clean</samp></code></pre>
+<p>Filen är tillbaka eftersom den fanns i en commit. Därför ska man commita ofta!</p>
+</details>
+
+<h3>Övning 4: En branch</h3>
+<ol>
+  <li>Skapa en branch <code>meny</code> och gå till den.</li>
+  <li>Lägg till en enkel meny i <code>Program.cs</code> och commita.</li>
+  <li>Gå tillbaka till <code>main</code>. Titta i <code>Program.cs</code> – vart tog menyn vägen?</li>
+  <li>Merga in <code>meny</code> i <code>main</code> och ta bort branchen.</li>
+</ol>
+<details>
+<summary>Visa facit</summary>
+<pre><code class="nohighlight">git switch -c meny
+# ... skriv menyn ...
+git add .
+git commit -m "Lägg till meny"
+git switch main          # menyn är borta – den finns bara på branchen meny
+git merge meny           # nu finns menyn i main också
+git branch -d meny</code></pre>
+<p>Filerna i arbetsmappen byts ut när du byter branch. Inget är borta – det ligger på en annan branch.</p>
+</details>
+
+<h3>Övning 5: Skapa en konflikt (och lös den)</h3>
+<ol>
+  <li>Skapa en branch <code>halsning</code>. Ändra raden med <code>Console.WriteLine</code> till "Hej från branchen!" och commita.</li>
+  <li>Gå till <code>main</code>. Ändra <b>samma rad</b> till "Hej från main!" och commita.</li>
+  <li>Merga <code>halsning</code> in i <code>main</code>. Vad händer?</li>
+  <li>Lös konflikten så att programmet skriver ut <i>båda</i> raderna.</li>
+</ol>
+<details>
+<summary>Visa facit</summary>
+<pre><code class="nohighlight">git switch -c halsning
+# ändra raden, sedan:
+git commit -am "Hälsning från branchen"
+git switch main
+# ändra samma rad, sedan:
+git commit -am "Hälsning från main"
+git merge halsning
+<samp>CONFLICT (content): Merge conflict in Program.cs</samp></code></pre>
+<p>Öppna <code>Program.cs</code>, ta bort markeringarna och behåll båda raderna:</p>
+<pre><code>Console.WriteLine("Hej från main!");
+Console.WriteLine("Hej från branchen!");</code></pre>
+<pre><code class="nohighlight">git add Program.cs
+git commit -m "Slå ihop hälsningarna"</code></pre>
+<p><code>-am</code> är en genväg för <code>git add</code> + <code>git commit -m</code> på filer som Git redan känner till.</p>
+</details>
+
+<h3>Övning 6: Upp på GitHub</h3>
+<ol>
+  <li>Skapa ett tomt repository på GitHub som heter <code>GitOvning</code>.</li>
+  <li>Koppla ihop ditt lokala repo med det och pusha.</li>
+  <li>Ladda om sidan på GitHub – syns dina commits?</li>
+  <li><b>Med en kompis:</b> klona varandras repon, gör en ändring, pusha. Hämta sedan kompisens ändring i ditt eget repo.</li>
+</ol>
+<details>
+<summary>Visa facit</summary>
+<pre><code class="nohighlight">git remote add origin https://github.com/ditt-namn/GitOvning.git
+git push -u origin main
+
+# Kompisen:
+git clone https://github.com/ditt-namn/GitOvning.git
+cd GitOvning
+# ... ändra ...
+git commit -am "Ändring från kompisen"
+git push
+
+# Du:
+git pull</code></pre>
+<p>För att kompisen ska få pusha till ditt repo behöver du bjuda in hen: <i>Settings → Collaborators → Add people</i> på GitHub.</p>
+</details>
+
+<h3>Extra: Lägg upp Kaffekoppen</h3>
+<p>Öppna ditt Kaffekoppen-projekt från <a href="kaffekoppen.html">vecka 5</a> i Visual Studio. Använd <i>Git → Create Git Repository…</i> för att skapa ett repo och lägga upp det på GitHub – helt utan terminalen. Gör sedan en ändring och commita och pusha från fönstret <i>Git Changes</i>.</p>
+
+<!-- ================= SAMMANFATTNING ================= -->
+<h2>11. Sammanfattning</h2>
+<div class="scroll"><table>
+  <tr><th>Kommando</th><th>Gör</th></tr>
+  <tr><td><code>git init</code></td><td>Skapar ett nytt repo i mappen</td></tr>
+  <tr><td><code>git status</code></td><td>Visar vad som har ändrats</td></tr>
+  <tr><td><code>git add .</code></td><td>Lägger ändringar i staging</td></tr>
+  <tr><td><code>git commit -m "…"</code></td><td>Sparar en ögonblicksbild</td></tr>
+  <tr><td><code>git log --oneline</code></td><td>Visar historiken</td></tr>
+  <tr><td><code>git diff</code></td><td>Visar exakt vad som ändrats</td></tr>
+  <tr><td><code>git restore &lt;fil&gt;</code></td><td>Ångrar ändringar sedan senaste commit</td></tr>
+  <tr><td><code>git switch -c &lt;namn&gt;</code></td><td>Skapar och byter till en ny branch</td></tr>
+  <tr><td><code>git merge &lt;namn&gt;</code></td><td>Slår ihop en branch med den du står på</td></tr>
+  <tr><td><code>git clone &lt;url&gt;</code></td><td>Laddar ner ett repo</td></tr>
+  <tr><td><code>git push</code> / <code>git pull</code></td><td>Skickar upp / hämtar ner commits</td></tr>
+</table></div>
+
+<h3>Klart när</h3>
+<ul>
+  <li>☐ Du kan förklara skillnaden mellan arbetsmapp, staging och repository.</li>
+  <li>☐ Du kan skapa ett repo och göra commits med bra meddelanden.</li>
+  <li>☐ Du vet varför <code>bin/</code> och <code>obj/</code> står i <code>.gitignore</code>.</li>
+  <li>☐ Du kan ångra en ändring med <code>git restore</code>.</li>
+  <li>☐ Du kan skapa en branch, merga den och lösa en enkel konflikt.</li>
+  <li>☐ Du har pushat ett repo till GitHub.</li>
+</ul>
+
+</main>
+<script type="module">
+  import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.esm.min.mjs";
+  mermaid.initialize({ startOnLoad: true, theme: "neutral" });
+</script>
+<script src="vs.js"></script>
+<script src="cli.js"></script>
+</body>
+</html>

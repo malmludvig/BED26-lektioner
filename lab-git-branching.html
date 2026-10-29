@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="claude:viewport-fit-sides" content="cover">
+<title>Övning: Git branching</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<nav><a href="vecka43.html">Lektioner vecka 5</a><a href="vecka44.html">Lektioner vecka 6</a><a href="index.html" aria-current="true">Lektioner vecka 7</a></nav>
+<nav class="undermeny"><a href="git-presentation.html">Presentation: Git</a><a href="index.html">Git</a><a href="git-branches-presentation.html">Presentation: Git branches</a><a href="merge-conflicts-presentation.html">Presentation: Merge conflicts</a><a href="branching-strategies-presentation.html">Presentation: Git branching strategies</a><a href="lab-git-branching.html" aria-current="page">Övning: Git branching</a></nav>
+<main>
+
+<h1>Övning – Git branching</h1>
+<p class="lead">Branches, switch och merge</p>
+
+<h2>Mål</h2>
+<p>Efter övningen ska du kunna:</p>
+<ul>
+  <li>Förklara vad en branch är.</li>
+  <li>Skapa en ny branch.</li>
+  <li>Byta mellan branches.</li>
+  <li>Göra commits på en branch utan att påverka <code>main</code>.</li>
+  <li>Merga in en branch i <code>main</code>.</li>
+  <li>Lösa en enkel merge-konflikt.</li>
+</ul>
+<p>När du arbetar med branches ska du tänka på att varje branch är ett <b>eget spår</b> av commits.</p>
+<p><code>main</code> innehåller det som fungerar. En ny branch används för att prova eller bygga något nytt, utan att <code>main</code> påverkas.</p>
+<p>När arbetet på branchen är klart slår du ihop den med <code>main</code> med en <b>merge</b>.</p>
+<p>Målet är att kunna jobba på flera saker samtidigt och alltid ha en version som fungerar.</p>
+<p class="box">Alla uppgifter görs i terminalen med vanliga textfiler – du behöver inte skriva någon kod. Kör <code>git status</code> och <code>git branch</code> ofta för att se var du står.</p>
+
+<!-- ================= UPPGIFT 1 ================= -->
+<h2>Uppgift 1 – Inköpslistan</h2>
+<h3>Scenario</h3>
+<p>Du har en inköpslista i en textfil. Du vill lägga till några saker till helgen, men vill inte ändra den vanliga listan förrän du är säker.</p>
+<h3>Instruktioner</h3>
+<p>Skapa ett repo med en inköpslista. Skapa därefter en branch och gör ändringen där.</p>
+<h3>Krav</h3>
+<p>Repot ska innehålla:</p>
+<ul>
+  <li>En fil <code>inkop.txt</code> med tre saker, till exempel mjölk, bröd och ägg.</li>
+  <li>En första commit på <code>main</code>.</li>
+</ul>
+<p>Skapa därefter en branch som heter:</p>
+<ul>
+  <li><code>helg</code>.</li>
+</ul>
+<p>På branchen <code>helg</code> ska du:</p>
+<ul>
+  <li>Lägga till två saker i <code>inkop.txt</code>.</li>
+  <li>Göra en commit.</li>
+</ul>
+<p>Byt tillbaka till <code>main</code> och öppna <code>inkop.txt</code>. Listan ska bara ha de tre första sakerna.</p>
+
+<!-- ================= UPPGIFT 2 ================= -->
+<h2>Uppgift 2 – Slå ihop listan</h2>
+<h3>Scenario</h3>
+<p>Helgens saker är bestämda. Nu ska de in i den vanliga listan.</p>
+<h3>Instruktioner</h3>
+<p>Fortsätt i repot från uppgift 1. Merga in branchen <code>helg</code> i <code>main</code>.</p>
+<h3>Krav</h3>
+<ul>
+  <li>Du står på <code>main</code> när du mergar.</li>
+  <li><code>inkop.txt</code> på <code>main</code> innehåller alla fem sakerna.</li>
+  <li>Branchen <code>helg</code> är borttagen efteråt.</li>
+  <li><code>git branch</code> visar bara <code>main</code>.</li>
+</ul>
+
+<!-- ================= UPPGIFT 3 ================= -->
+<h2>Uppgift 3 – Två branches</h2>
+<h3>Scenario</h3>
+<p>Du planerar en fest. Du vill skriva gästlistan och menyn var för sig.</p>
+<h3>Instruktioner</h3>
+<p>Skapa ett nytt repo. Skapa två branches – en för varje del – och merga in båda i <code>main</code>.</p>
+<h3>Krav</h3>
+<p>Repot ska innehålla:</p>
+<ul>
+  <li>En fil <code>fest.txt</code> med rubriken "Fest" och en commit på <code>main</code>.</li>
+</ul>
+<p>Skapa följande branches:</p>
+<p><b>gaster</b></p>
+<ul>
+  <li>En ny fil <code>gaster.txt</code> med minst tre namn.</li>
+</ul>
+<p><b>meny</b></p>
+<ul>
+  <li>En ny fil <code>meny.txt</code> med minst två rätter.</li>
+</ul>
+<p>Båda branches ska mergas in i <code>main</code>. Visa till sist historiken med <code>git log --oneline --graph --all</code>.</p>
+
+<!-- ================= UPPGIFT 4 ================= -->
+<h2>Uppgift 4 – Merge-konflikt</h2>
+<h3>Scenario</h3>
+<p>Du och en kompis har båda ändrat tiden för festen – på samma rad. Git kan inte veta vilken tid som gäller.</p>
+<h3>Instruktioner</h3>
+<p>Skapa en konflikt med flit, och lös den.</p>
+<h3>Krav</h3>
+<ul>
+  <li>Filen <code>tid.txt</code> på <code>main</code> innehåller raden <code>Start: 18.00</code>.</li>
+  <li>På en branch <code>ny-tid</code> ändras raden till <code>Start: 19.00</code> och commitas.</li>
+  <li>På <code>main</code> ändras samma rad till <code>Start: 17.00</code> och commitas.</li>
+  <li>När du mergar <code>ny-tid</code> in i <code>main</code> ska det bli en konflikt.</li>
+</ul>
+<p>Lös konflikten:</p>
+<ul>
+  <li>Välj en av tiderna.</li>
+  <li>Ta bort raderna <code>&lt;&lt;&lt;&lt;&lt;&lt;&lt;</code>, <code>=======</code> och <code>&gt;&gt;&gt;&gt;&gt;&gt;&gt;</code>.</li>
+  <li>Avsluta mergen med en commit.</li>
+</ul>
+
+<!-- ================= UPPGIFT 5 ================= -->
+<h2>Uppgift 5 – Ångra en merge</h2>
+<h3>Scenario</h3>
+<p>Du har mergat och fått en konflikt – men har inte tid att lösa den just nu.</p>
+<h3>Instruktioner</h3>
+<p>Skapa en ny konflikt på samma sätt som i uppgift 4. Ångra den här gången mergen i stället för att lösa den.</p>
+<h3>Krav</h3>
+<ul>
+  <li>Det blir en konflikt när du mergar.</li>
+  <li>Du ångrar mergen med <code>git merge --abort</code>.</li>
+  <li><code>git status</code> visar att inget pågår: <i>nothing to commit, working tree clean</i>.</li>
+  <li>Filen ser ut precis som innan du mergade.</li>
+  <li>Branchen du försökte merga finns kvar.</li>
+</ul>
+
+<!-- ================= UPPGIFT 6 ================= -->
+<h2>Uppgift 6 – Skapa ditt eget branch-flöde</h2>
+<h3>Scenario</h3>
+<p>Du ska själv välja ett litet projekt med textfiler, där det finns minst två saker att jobba på var för sig.</p>
+<p>Exempel på områden:</p>
+<ul>
+  <li>Receptsamling.</li>
+  <li>Resplan.</li>
+  <li>Träningsschema.</li>
+  <li>Spellista.</li>
+  <li>Läxplanering.</li>
+  <li>Filmtips.</li>
+</ul>
+<h3>Instruktioner</h3>
+<p>Skapa ett repo och arbeta med en egen branch för varje del. Fundera på vad varje branch ska heta så att namnet säger vad den gör.</p>
+<h3>Krav</h3>
+<p>Din lösning ska innehålla:</p>
+<ul>
+  <li>Ett repo med minst en commit på <code>main</code>.</li>
+  <li>Minst två branches med bra namn, till exempel <code>feature-frukost</code>.</li>
+  <li>Minst två commits på varje branch.</li>
+  <li>Bra commit-meddelanden.</li>
+  <li>Alla branches mergade in i <code>main</code>.</li>
+  <li>Branches som är klara ska vara borttagna.</li>
+  <li>Historiken visad med <code>git log --oneline --graph --all</code>.</li>
+</ul>
+
+</main>
+</body>
+</html>

@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="claude:viewport-fit-sides" content="cover">
+<title>Interfaces och OOP repetition</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<nav><a href="vecka43.html" aria-current="true">Lektioner vecka 5</a><a href="vecka44.html">Lektioner vecka 6</a><a href="index.html">Lektioner vecka 7</a></nav>
+<nav class="undermeny"><a href="vecka43.html" aria-current="page">Interfaces</a><a href="kaffekoppen.html">Övning: Från UML till C#</a><a href="interface.html">Övning: Interface</a><a href="smarthem.html">Övning: Smarta hemmet</a></nav>
+<main>
+
+<h1>Interfaces och OOP repetition</h1>
+<p class="lead">Repetition av förra veckan, sedan interface.</p>
+
+<div class="box">
+<p><b>Dagens plan</b></p>
+<ol>
+  <li>Repetition: arv, <code>virtual</code>/<code>override</code>, polymorfism, UML</li>
+  <li>Genomgång av övningen <a href="kaffekoppen.html">Från UML till C#</a></li>
+  <li>Interface och flera implementationer – <a href="interface.html">övning</a></li>
+  <li>Övning: <a href="smarthem.html">Smarta hemmet</a></li>
+</ol>
+</div>
+
+<!-- ================= REPETITION ================= -->
+<h2>1. Repetition: arv och polymorfism</h2>
+<p><b>Arv</b> = en klass bygger vidare på en annan. Läs det som <i>"är en"</i>: en Hund <i>är ett</i> Djur.</p>
+<p><b>virtual</b> i basklassen betyder "får skrivas om". <b>override</b> i subklassen skriver om den.</p>
+<pre><code>class Animal
+{
+    protected string name;
+    public Animal(string name) { this.name = name; }
+
+    public virtual string Sound() { return "..."; }
+}
+
+class Dog : Animal
+{
+    public Dog(string name) : base(name) { }
+    public override string Sound() { return "Voff!"; }
+}
+
+class Cat : Animal
+{
+    public Cat(string name) : base(name) { }
+    public override string Sound() { return "Mjau!"; }
+}</code></pre>
+
+<p><b>Polymorfism</b> = samma anrop, olika beteende. Loopen vet inte vilket djur det är – varje objekt svarar själv.</p>
+<pre><code>List&lt;Animal&gt; animals = new List&lt;Animal&gt; { new Dog("Fido"), new Cat("Misse") };
+
+foreach (Animal d in animals)
+{
+    Console.WriteLine(d.Sound());   // Voff!  Mjau!
+}</code></pre>
+
+<p>I UML ritas arv med en <b>heldragen linje och ofylld triangel</b> mot basklassen:</p>
+<pre class="mermaid">
+classDiagram
+  class Animal {
+    #name: string
+    +Sound() string
+  }
+  class Dog { +Sound() string }
+  class Cat { +Sound() string }
+  Animal <|-- Dog
+  Animal <|-- Cat
+</pre>
+
+<!-- ================= INTERFACE ================= -->
+<h2>2. Interface</h2>
+<p>Ett <b>interface</b> är ett <b>kontrakt</b>: en lista över vad en klass <i>kan göra</i>, utan att säga <i>hur</i>.
+Läs det som <i>"kan"</i>: en Bil <i>kan</i> köras.</p>
+
+<pre><code>interface IVehicle
+{
+    string Name { get; }
+    void Drive();              // ingen kropp – bara löftet
+}</code></pre>
+
+<p>Klasser som <b>implementerar</b> interfacet måste skriva alla metoder:</p>
+<pre><code>class Car : IVehicle
+{
+    public string Name { get; } = "Bil";
+    public void Drive() { Console.WriteLine("Brum brum"); }
+}
+
+class Bicycle : IVehicle
+{
+    public string Name { get; } = "Cykel";
+    public void Drive() { Console.WriteLine("Trampar..."); }
+}</code></pre>
+
+<h3>Flera implementationer = polymorfism igen</h3>
+<pre><code>List&lt;IVehicle&gt; vehicles = new List&lt;IVehicle&gt; { new Car(), new Bicycle() };
+
+foreach (IVehicle f in vehicles)
+{
+    f.Drive();
+}</code></pre>
+
+<h3>En klass kan ha flera interface</h3>
+<p>Man kan bara ärva från <b>en</b> klass, men implementera <b>hur många interface som helst</b>.</p>
+<pre><code>interface IFlying { void Fly(); }
+
+class FlyingCar : IVehicle, IFlying
+{
+    public string Name { get; } = "Flygbil";
+    public void Drive()  { Console.WriteLine("Kör på vägen"); }
+    public void Fly() { Console.WriteLine("Lyfter!"); }
+}</code></pre>
+
+<p>I UML markeras interfacet med <code>«interface»</code> och implementation ritas med <b>streckad linje och ofylld triangel</b>:</p>
+<pre class="mermaid">
+classDiagram
+  class IVehicle {
+    &lt;&lt;interface&gt;&gt;
+    +Name: string
+    +Drive()
+  }
+  class IFlying {
+    &lt;&lt;interface&gt;&gt;
+    +Fly()
+  }
+  IVehicle <|.. Car
+  IVehicle <|.. Bicycle
+  IVehicle <|.. FlyingCar
+  IFlying <|.. FlyingCar
+</pre>
+
+<h3>Basklass eller interface?</h3>
+<div class="scroll"><table>
+  <tr><th></th><th>Basklass (arv)</th><th>Interface</th></tr>
+  <tr><td>Läses som</td><td>"är en"</td><td>"kan"</td></tr>
+  <tr><td>Kod/fält</td><td>Ja, delad kod och data</td><td>Nej, bara löften</td></tr>
+  <tr><td>Hur många?</td><td>En</td><td>Många</td></tr>
+  <tr><td>Namn</td><td><code>Animal</code></td><td><code>IVehicle</code> (börjar med I)</td></tr>
+</table></div>
+<p class="box">Tumregel: delar klasserna <b>kod</b> → basklass. Delar de bara <b>förmåga</b> → interface.</p>
+
+<h3>Övning: Skapa ett objekt</h3>
+<div class="box">
+<p>Använd <code>IVehicle</code> och <code>Car</code> från exemplet ovan.</p>
+<ol>
+  <li>Skapa ett objekt av <code>Car</code> och spara det i en variabel av typen <code>IVehicle</code>.</li>
+  <li>Skriv ut fordonets namn.</li>
+  <li>Anropa <code>Drive()</code>.</li>
+</ol>
+<details>
+<summary>Visa facit</summary>
+<pre><code>IVehicle vehicle = new Car();
+
+Console.WriteLine(vehicle.Name);
+vehicle.Drive();</code></pre>
+<p>Utskrift:</p>
+<pre><code class="nohighlight">Bil
+Brum brum</code></pre>
+<p>Variabeln är av typen <code>IVehicle</code>, men objektet är en <code>Car</code>. Man kan aldrig skriva <code>new IVehicle()</code> – ett interface är bara ett kontrakt.</p>
+</details>
+</div>
+
+<!-- ================= SAMMANFATTNING ================= -->
+<h2>3. Hur allt hänger ihop</h2>
+<div class="scroll"><table>
+  <tr><th>Begrepp</th><th>Kort</th><th>Nyckelord</th></tr>
+  <tr><td>Inkapsling</td><td>Göm data, visa metoder</td><td><code>private</code>, <code>public</code></td></tr>
+  <tr><td>Arv</td><td>"är en" – återanvänd kod</td><td><code>: Basklass</code>, <code>base</code></td></tr>
+  <tr><td>Polymorfism</td><td>Samma anrop, olika beteende</td><td><code>virtual</code>, <code>override</code></td></tr>
+  <tr><td>Interface</td><td>"kan" – ett kontrakt</td><td><code>interface</code></td></tr>
+</table></div>
+
+
+</main>
+<script type="module">
+  import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.esm.min.mjs";
+  mermaid.initialize({ startOnLoad: true, theme: "neutral" });
+</script>
+<script src="vs.js"></script>
+</body>
+</html>

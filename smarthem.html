@@ -1,0 +1,412 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="claude:viewport-fit-sides" content="cover">
+<title>Smarta hemmet</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<nav><a href="vecka43.html" aria-current="true">Lektioner vecka 5</a><a href="vecka44.html">Lektioner vecka 6</a><a href="index.html">Lektioner vecka 7</a></nav>
+<nav class="undermeny"><a href="vecka43.html">Interfaces</a><a href="kaffekoppen.html">Övning: Från UML till C#</a><a href="interface.html">Övning: Interface</a><a href="smarthem.html" aria-current="page">Övning: Smarta hemmet</a></nav>
+<main>
+
+<h1>Övning: Smarta hemmet</h1>
+<p class="lead">Lägenhet 4B – ett konsolprogram som styr taklampa, högtalare och termostat. Vi går från kravtext → klassdiagram → kod.</p>
+
+<!-- ================= STEG 1 ================= -->
+<h2>Steg 1: Stryk under orden i kraven</h2>
+<p>Den här gången letar vi särskilt efter <b>förmågor</b> – det som blir interface.</p>
+<div class="scroll"><table>
+  <tr><th>Ordtyp</th><th>Blir</th><th>I Smarta hemmet</th></tr>
+  <tr><td>Substantiv</td><td>klasser</td><td>taklampa, högtalare, termostat, enhet</td></tr>
+  <tr><td>Egenskaper</td><td>attribut</td><td>namn, rum, på/av, värde, intervall, måttenhet</td></tr>
+  <tr><td>"Kan …"</td><td>interface</td><td><i>kan slås på och av</i> → <code>ISwitchable</code> · <i>kan justeras</i> → <code>IAdjustable</code></td></tr>
+  <tr><td>Verb</td><td>metoder</td><td>slå på, stänga av, justera, visa status</td></tr>
+</table></div>
+
+<h3>Värdena för varje enhet</h3>
+<div class="scroll"><table>
+  <tr><th>Enhet</th><th>Rum</th><th>Justerar</th><th>Intervall</th><th>Startvärde</th></tr>
+  <tr><td>Taklampa</td><td>Vardagsrummet</td><td>ljusstyrka</td><td>1–100 %</td><td>100</td></tr>
+  <tr><td>Högtalare</td><td>Vardagsrummet</td><td>volym</td><td>0–50</td><td>10</td></tr>
+  <tr><td>Termostat</td><td>Hallen</td><td>temperatur</td><td>10–30 °C</td><td>20</td></tr>
+</table></div>
+
+<!-- ================= STEG 2 ================= -->
+<h2>Steg 2: Behövs en basklass?</h2>
+<p>Kraven säger att förmågorna ska vara interface. Men titta på vad enheterna <i>gör</i>: alla tre slås på och av på exakt samma sätt, och alla tre kontrollerar sitt intervall på exakt samma sätt. Det enda som skiljer är <b>siffrorna</b>.</p>
+<p class="box">Tumregel från lektionen: delar klasserna <b>kod</b> → basklass. Delar de bara <b>förmåga</b> → interface. Här gäller båda! Vi skriver koden en gång i en abstrakt basklass <code>SmartDevice</code>, och låter den implementera båda interfacen. Då gör alla subklasser det också.</p>
+<p>Utan basklass hade vi behövt skriva <code>TurnOn</code>, <code>TurnOff</code> och <code>Adjust</code> tre gånger – en gång i varje klass.</p>
+
+<!-- ================= STEG 3 ================= -->
+<h2>Steg 3: Rita klassdiagrammet</h2>
+<pre class="mermaid">
+classDiagram
+  class ISwitchable {
+    &lt;&lt;interface&gt;&gt;
+    +Name: string
+    +IsOn: bool
+    +TurnOn()
+    +TurnOff()
+  }
+  class IAdjustable {
+    &lt;&lt;interface&gt;&gt;
+    +Name: string
+    +Quantity: string
+    +Min: int
+    +Max: int
+    +Value: int
+    +Unit: string
+    +Adjust(newValue: int) bool
+  }
+  class SmartDevice {
+    &lt;&lt;abstract&gt;&gt;
+    +Name: string
+    +Room: string
+    +IsOn: bool
+    +Quantity: string
+    +Min: int
+    +Max: int
+    +Value: int
+    +Unit: string
+    +TurnOn()
+    +TurnOff()
+    +Adjust(newValue: int) bool
+  }
+  ISwitchable <|.. SmartDevice
+  IAdjustable <|.. SmartDevice
+  SmartDevice <|-- CeilingLamp
+  SmartDevice <|-- Speaker
+  SmartDevice <|-- Thermostat
+</pre>
+<div class="box">
+<p><b>Så läser du diagrammet</b></p>
+<ul>
+  <li><b>Streckad linje + ofylld triangel</b> = implementerar ett interface. <code>SmartDevice</code> <i>kan</i> slås på och av, och <i>kan</i> justeras.</li>
+  <li><b>Heldragen linje + ofylld triangel</b> = arv. En taklampa <i>är en</i> smart enhet.</li>
+  <li><b>«abstract»</b> = man kan inte skriva <code>new SmartDevice(…)</code>, bara skapa någon av subklasserna.</li>
+  <li><code>Name</code> finns i båda interfacen, så att menyn kan skriva ut namnet oavsett vilket interface den har framför sig. En enda egenskap i klassen uppfyller båda.</li>
+</ul>
+</div>
+
+<!-- ================= STEG 4 ================= -->
+<h2>Steg 4: Från diagram till C#</h2>
+
+<h3>Interfacen – förmågorna</h3>
+<pre><code>interface ISwitchable
+{
+    string Name { get; }
+    bool IsOn { get; }
+    void TurnOn();
+    void TurnOff();
+}
+
+interface IAdjustable
+{
+    string Name { get; }
+    string Quantity { get; }      // "ljusstyrka", "volym", "temperatur"
+    int Min { get; }
+    int Max { get; }
+    int Value { get; }
+    string Unit { get; }    // "%", "°C" eller "" om det inte finns någon
+    bool Adjust(int newValue);
+}</code></pre>
+
+<h3>SmartEnhet – den gemensamma koden</h3>
+<p>Egenskaperna har <code>private set</code> på <code>IsOn</code> och <code>Value</code>. Bara klassen själv får ändra dem – via <code>TurnOn</code>, <code>TurnOff</code> och <code>Adjust</code>. Det är <b>inkapsling</b>.</p>
+<pre><code>abstract class SmartDevice : ISwitchable, IAdjustable
+{
+    public string Name { get; }
+    public string Room { get; }
+    public bool IsOn { get; private set; }   // false från början = avstängd
+
+    public string Quantity { get; }
+    public int Min { get; }
+    public int Max { get; }
+    public int Value { get; private set; }
+    public string Unit { get; }
+
+    protected SmartDevice(string name, string room, string quantity, int min, int max, int startValue, string unit)
+    {
+        Name = name;
+        Room = room;
+        Quantity = quantity;
+        Min = min;
+        Max = max;
+        Value = startValue;
+        Unit = unit;
+    }
+
+    public void TurnOn()
+    {
+        IsOn = true;
+    }
+
+    public void TurnOff()
+    {
+        IsOn = false;
+    }
+
+    public bool Adjust(int newValue)
+    {
+        // En avstängd enhet går inte att justera, och värdet måste ligga i intervallet
+        if (!IsOn || newValue &lt; Min || newValue &gt; Max)
+        {
+            return false;
+        }
+        Value = newValue;
+        return true;
+    }
+}</code></pre>
+
+<h3>Taklampa, Högtalare och Termostat</h3>
+<p>Subklasserna skickar bara in sina egna värden till basklassens konstruktor med <code>base(…)</code>.</p>
+<pre><code>class CeilingLamp : SmartDevice
+{
+    public CeilingLamp(string room) : base("Taklampa", room, "ljusstyrka", 1, 100, 100, "%") { }
+}
+
+class Speaker : SmartDevice
+{
+    public Speaker(string room) : base("Högtalare", room, "volym", 0, 50, 10, "") { }
+}
+
+class Thermostat : SmartDevice
+{
+    public Thermostat(string room) : base("Termostat", room, "temperatur", 10, 30, 20, "°C") { }
+}</code></pre>
+
+<h3>Program.cs – menyn</h3>
+<p>Titta noga: <code>CeilingLamp</code>, <code>Speaker</code> och <code>Thermostat</code> nämns <b>bara i listan överst</b>. Resten av programmet pratar med enheterna via <code>ISwitchable</code> och <code>IAdjustable</code>.</p>
+<pre><code>// Det enda stället som känner till de konkreta klasserna
+List&lt;SmartDevice&gt; devices = new List&lt;SmartDevice&gt;
+{
+    new CeilingLamp("Vardagsrummet"),
+    new Speaker("Vardagsrummet"),
+    new Thermostat("Hallen")
+};
+
+while (true)
+{
+    Console.WriteLine();
+    Console.WriteLine("=== Smarta hemmet 4B ===");
+    Console.WriteLine("1. Visa alla enheter");
+    Console.WriteLine("2. Slå på eller av");
+    Console.WriteLine("3. Justera");
+    Console.WriteLine("4. Stäng av alla");
+    Console.WriteLine("5. Avsluta");
+    Console.Write("Val: ");
+    string choice = Console.ReadLine();
+    Console.WriteLine();
+
+    if (choice == "1")
+    {
+        ShowAll(devices);
+    }
+    else if (choice == "2")
+    {
+        SmartDevice device = ChooseDevice(devices, "Enheter:");
+        if (device != null)
+        {
+            Toggle(device);
+        }
+    }
+    else if (choice == "3")
+    {
+        SmartDevice device = ChooseDevice(devices, "Enheter som kan justeras:");
+        if (device != null)
+        {
+            Adjust(device);
+        }
+    }
+    else if (choice == "4")
+    {
+        foreach (ISwitchable e in devices)
+        {
+            e.TurnOff();
+        }
+        Console.WriteLine("Alla enheter är avstängda.");
+    }
+    else if (choice == "5")
+    {
+        break;
+    }
+    else
+    {
+        Console.WriteLine("Ogiltigt val.");
+    }
+}
+
+static void ShowAll(List&lt;SmartDevice&gt; devices)
+{
+    foreach (SmartDevice e in devices)
+    {
+        string state = e.IsOn ? "PÅ" : "AV";
+        string line = $"{e.Room,-14} {e.Name,-14} {state}";
+
+        if (e.IsOn)
+        {
+            line += "   " + WithUnit(e, e.Value.ToString());
+        }
+        Console.WriteLine(line);
+    }
+}
+
+static SmartDevice ChooseDevice(List&lt;SmartDevice&gt; devices, string heading)
+{
+    Console.WriteLine(heading);
+    for (int i = 0; i &lt; devices.Count; i++)
+    {
+        Console.WriteLine($"{i + 1}. {devices[i].Name}");
+    }
+    Console.Write("Välj enhet: ");
+
+    if (int.TryParse(Console.ReadLine(), out int number) &amp;&amp; number &gt;= 1 &amp;&amp; number &lt;= devices.Count)
+    {
+        return devices[number - 1];
+    }
+    Console.WriteLine("Ogiltigt val.");
+    return null;
+}
+
+static void Toggle(ISwitchable device)
+{
+    if (device.IsOn)
+    {
+        device.TurnOff();
+        Console.WriteLine($"{device.Name} är nu avstängd.");
+    }
+    else
+    {
+        device.TurnOn();
+        Console.WriteLine($"{device.Name} är nu på.");
+    }
+}
+
+static void Adjust(IAdjustable device)
+{
+    // Kan enheten också slås av – och är den av just nu?
+    if (device is ISwitchable switchable &amp;&amp; !switchable.IsOn)
+    {
+        Console.WriteLine($"{device.Name} är avstängd. Slå på den först.");
+        return;
+    }
+
+    Console.Write($"Ny {device.Quantity} ({RangeText(device)}): ");
+    if (int.TryParse(Console.ReadLine(), out int value) &amp;&amp; device.Adjust(value))
+    {
+        Console.WriteLine($"{device.Name} är inställd på {WithUnit(device, value.ToString())}.");
+    }
+    else
+    {
+        Console.WriteLine($"Ogiltigt värde. {device.Name} accepterar {RangeText(device)}.");
+    }
+}
+
+// "10-30" blir "10-30 °C", men högtalarens "0-50" får ingen måttenhet
+static string WithUnit(IAdjustable device, string text)
+{
+    if (device.Unit == "")
+    {
+        return text;
+    }
+    return text + " " + device.Unit;
+}
+
+static string RangeText(IAdjustable device)
+{
+    return WithUnit(device, device.Min + "-" + device.Max);
+}</code></pre>
+<p class="box"><b>Lägg märke till parametrarna.</b> <code>Toggle</code> tar en <code>ISwitchable</code> och <code>Adjust</code> tar en <code>IAdjustable</code>. Metoderna vet inte att det finns taklampor – bara att det finns saker som <i>kan</i> slås på och saker som <i>kan</i> justeras. Vi skickar in en <code>SmartDevice</code>, och det fungerar eftersom den implementerar båda.</p>
+
+<!-- ================= STEG 5 ================= -->
+<h2>Steg 5: Kör programmet</h2>
+<p>Taklampan slås på och ställs på 80 %, termostaten slås på och ställs på 22 °C. Sedan visar vi status och provar de två felfallen:</p>
+<pre><code class="nohighlight">Val: 1
+
+Vardagsrummet  Taklampa       PÅ   80 %
+Vardagsrummet  Högtalare      AV
+Hallen         Termostat      PÅ   22 °C
+
+Val: 3
+
+Enheter som kan justeras:
+1. Taklampa
+2. Högtalare
+3. Termostat
+Välj enhet: 2
+Högtalare är avstängd. Slå på den först.
+
+Val: 3
+
+Enheter som kan justeras:
+1. Taklampa
+2. Högtalare
+3. Termostat
+Välj enhet: 3
+Ny temperatur (10-30 °C): 35
+Ogiltigt värde. Termostat accepterar 10-30 °C.
+
+Val: 4
+
+Alla enheter är avstängda.
+
+Val: 1
+
+Vardagsrummet  Taklampa       AV
+Vardagsrummet  Högtalare      AV
+Hallen         Termostat      AV</code></pre>
+
+<!-- ================= KLART NÄR ================= -->
+<h2>Klart när</h2>
+<ul>
+  <li>☑ Alla tre enheter kan slås på och av – <code>Toggle</code> via <code>ISwitchable</code>.</li>
+  <li>☑ En avstängd enhet nekas justering, och ett värde utanför intervallet nekas med besked om rätt intervall.</li>
+  <li>☑ "Stäng av alla" fungerar – en loop över alla som <code>ISwitchable</code>.</li>
+  <li>☑ Menylogiken känner inte till de konkreta enhetsklasserna – de nämns bara där listan skapas.</li>
+</ul>
+
+<!-- ================= UTMANING ================= -->
+<h2>Utmaning: En persienn</h2>
+<p>Lägg till en persienn i sovrummet som kan öppnas 0–100 %, <b>utan att ändra i menyn</b>.</p>
+<details>
+<summary>Visa facit</summary>
+<p>En ny klass:</p>
+<pre><code>class Blind : SmartDevice
+{
+    public Blind(string room) : base("Persienn", room, "öppning", 0, 100, 0, "%") { }
+}</code></pre>
+<p>Och en ny rad där enheterna skapas:</p>
+<pre><code>List&lt;SmartDevice&gt; devices = new List&lt;SmartDevice&gt;
+{
+    new CeilingLamp("Vardagsrummet"),
+    new Speaker("Vardagsrummet"),
+    new Thermostat("Hallen"),
+    new Blind("Sovrummet")      // ny rad – inget annat ändras
+};</code></pre>
+<p>Utskrift av "Visa alla enheter" efter att persiennen slagits på och öppnats till 40 %:</p>
+<pre><code class="nohighlight">Vardagsrummet  Taklampa       AV
+Vardagsrummet  Högtalare      AV
+Hallen         Termostat      AV
+Sovrummet      Persienn       PÅ   40 %</code></pre>
+<p class="box"><b>Varför gick det?</b> Menyn frågar aldrig <i>vad</i> en enhet är, bara vad den <i>kan</i>. Persiennen implementerar <code>ISwitchable</code> och <code>IAdjustable</code> (via <code>SmartDevice</code>), så den uppfyller samma kontrakt som de andra. Loopar, val och kontroller fungerar för den direkt – det är polymorfism genom interface.</p>
+</details>
+
+<h2>Diskutera</h2>
+<ul>
+  <li>Vad händer om familjen köper en dörrklocka som kan slås på och av men <i>inte</i> justeras? Hur skulle du ändra klasserna?</li>
+  <li>Varför har <code>IsOn</code> och <code>Value</code> <code>private set</code>? Vad kunde gå fel annars?</li>
+  <li><code>Adjust</code> i <code>SmartDevice</code> kontrollerar själv att enheten är på, fast menyn redan har kollat. Varför är det ändå bra?</li>
+  <li>Hade vi klarat oss <i>utan</i> basklass? Vad hade vi vunnit och förlorat? → <a href="vecka43.html">Lektioner vecka 5</a></li>
+</ul>
+
+</main>
+<script type="module">
+  import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.esm.min.mjs";
+  mermaid.initialize({ startOnLoad: true, theme: "neutral" });
+</script>
+<script src="vs.js"></script>
+</body>
+</html>

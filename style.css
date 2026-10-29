@@ -1,0 +1,44 @@
+/* En kolumn med kod och diagram – mörka kodblock, diagram på ljus yta i båda teman */
+:root { --bg: #f5f2ec; --card: #fffdf8; --ink: #1c2433; --muted: #5b6474; --accent: #b4530f; --line: #ddd6c8; --code: #1c2433; --code-ink: #ece8df; --diagram: #fffdf8; --diagram-ink: #1c2433; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) { --bg: #151a24; --card: #1e2533; --ink: #ece8df; --muted: #9aa3b2; --accent: #f08a3c; --line: #2e374a; --code: #0e121a; color-scheme: dark; }
+}
+:root[data-theme="dark"] { --bg: #151a24; --card: #1e2533; --ink: #ece8df; --muted: #9aa3b2; --accent: #f08a3c; --line: #2e374a; --code: #0e121a; color-scheme: dark; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 17px/1.6 system-ui, sans-serif; }
+nav { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 20px; background: var(--code); padding-block: 12px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+nav a { color: var(--code-ink); text-decoration: none; font-weight: 600; }
+main { max-width: 860px; margin: 0 auto; padding-block: 16px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+h1 { font-size: 2.2rem; margin-bottom: 0; text-wrap: balance; }
+h2 { margin-top: 3rem; border-bottom: 2px solid var(--accent); padding-bottom: 4px; }
+a { color: var(--accent); }
+.lead { color: var(--muted); font-size: 1.15rem; }
+pre { background: var(--code); color: var(--code-ink); padding: 16px; border-radius: 8px; overflow-x: auto; font-size: 15px; }
+code { font-family: ui-monospace, Consolas, monospace; }
+.box { background: var(--card); border: 1px solid var(--line); border-left: 4px solid var(--accent); padding: 8px 16px; border-radius: 8px; }
+.mermaid { background: var(--diagram); color: var(--diagram-ink); border: 1px solid var(--line); border-radius: 8px; padding: 16px; text-align: center; overflow-x: auto; }
+.scroll { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; background: var(--card); }
+th, td { border: 1px solid var(--line); padding: 6px 10px; text-align: left; }
+th { background: var(--code); color: var(--code-ink); }
+
+/* Färger som i Visual Studio (mörkt tema) */
+pre:has(code) { background: #1e1e1e; color: #dcdcdc; }
+
+/* Lösningar */
+details { margin-block: 8px; }
+summary { cursor: pointer; font-weight: 600; color: var(--accent); }
+
+/* Aktuell vecka och undermeny för veckans sidor */
+nav a[aria-current] { color: var(--accent); }
+.undermeny { background: var(--card); border-bottom: 1px solid var(--line); padding-block: 8px; }
+.undermeny a { color: var(--muted); font-weight: 500; }
+.undermeny a:hover { color: var(--ink); }
+.undermeny a[aria-current] { color: var(--accent); font-weight: 600; }
+
+/* Utskrift från terminalen i kodrutor */
+pre samp { font: inherit; color: inherit; }
+
+/* Skärmbilder i texten */
+.shot { margin: 16px 0; }
+.shot img { display: block; width: 100%; height: auto; border: 1px solid var(--line); border-radius: 8px; }
+.shot figcaption { color: var(--muted); font-size: .9rem; margin-top: 6px; }

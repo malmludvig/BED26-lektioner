@@ -1,0 +1,492 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="claude:viewport-fit-sides" content="cover">
+<title>Generics</title>
+<link rel="stylesheet" href="style.css">
+<style>
+  /* Demo: Box<T> i MyList<T> */
+  .demo-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-block: 12px; }
+  .demo-row input { font: inherit; padding: 6px 10px; border: 1px solid var(--line); border-radius: 8px; background: var(--card); color: var(--ink); min-width: 0; }
+  .demo-row input[type=text] { flex: 1 1 160px; }
+  .demo-row input[type=number] { width: 5em; }
+  .demo-row button { font: inherit; font-weight: 600; padding: 6px 14px; border-radius: 8px; border: 1px solid var(--accent); background: var(--accent); color: #fff; cursor: pointer; }
+  .demo-row button.secondary { background: var(--card); color: var(--ink); border-color: var(--line); }
+  .demo-row button.secondary:hover { border-color: var(--accent); color: var(--accent); }
+  .slots { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px; margin-block: 12px; }
+  .slot { border: 1px dashed var(--line); border-radius: 8px; padding: 6px; min-height: 64px; display: flex; flex-direction: column; gap: 4px; background: var(--card); }
+  .slot .idx { font: 13px ui-monospace, Consolas, monospace; color: var(--muted); }
+  .slot .box-item { border: 2px solid var(--accent); border-radius: 6px; padding: 2px 6px; font-size: .9rem; overflow-wrap: anywhere; }
+  .slot .box-item small { display: block; color: var(--muted); font: 11px ui-monospace, Consolas, monospace; }
+  .slot .empty { color: var(--muted); font: 13px ui-monospace, Consolas, monospace; }
+  .slot.next { border-style: solid; border-color: var(--accent); }
+  .demo-count { font-family: ui-monospace, Consolas, monospace; color: var(--muted); }
+  #demoLog { max-height: 320px; overflow-y: auto; }
+</style>
+</head>
+<body>
+<nav><a href="vecka43.html">Lektioner vecka 5</a><a href="vecka44.html" aria-current="true">Lektioner vecka 6</a><a href="index.html">Lektioner vecka 7</a></nav>
+<nav class="undermeny"><a href="linq-presentation.html">Presentation: LINQ</a><a href="vecka44.html">LINQ</a><a href="generics-presentation.html">Presentation: Generics</a><a href="generics.html" aria-current="page">Generics</a></nav>
+<main>
+
+<h1>Generics</h1>
+<p class="lead">Skriv en klass eller metod en gång – använd den för vilken typ som helst.</p>
+<p class="box">Exemplen bygger på <code>Animal</code>, <code>IVehicle</code> och <code>Car</code> från <a href="vecka43.html">Interfaces</a> i vecka 5.</p>
+
+<h2>Du har redan använt generics</h2>
+<p><code>T</code> i <code>List&lt;T&gt;</code> är en <b>typ-parameter</b> – en plats där du fyller i en typ.</p>
+<pre><code>List&lt;int&gt;    numbers   = new List&lt;int&gt;    { 1, 2, 3 };
+List&lt;string&gt; names  = new List&lt;string&gt; { "Ada", "Linus" };
+List&lt;Animal&gt;   animals  = new List&lt;Animal&gt;();   // fungerar med egna klasser också
+
+numbers.Add("hej");   // FEL – kompilatorn stoppar det. Typsäkert!</code></pre>
+
+<h2>Egen generisk klass</h2>
+<p>Skriv klassen <b>en gång</b> – använd den för vilken typ som helst.</p>
+<pre><code>class Box&lt;T&gt;
+{
+    private T content;
+
+    public void Put(T item) { content = item; }
+    public T Take() { return content; }
+}
+
+Box&lt;int&gt;    numberBox = new Box&lt;int&gt;();
+Box&lt;string&gt; wordBox    = new Box&lt;string&gt;();
+
+numberBox.Put(42);
+wordBox.Put("Hej!");</code></pre>
+
+<h2>Generisk metod</h2>
+<pre><code>static void PrintTwo&lt;T&gt;(T a, T b)
+{
+    Console.WriteLine($"{a} och {b}");
+}
+
+PrintTwo(1, 2);           // T blir int
+PrintTwo("katt", "hund"); // T blir string</code></pre>
+
+<h2>Interface + generics tillsammans</h2>
+<p>Med <code>where</code> kan vi kräva att <code>T</code> uppfyller ett interface. Då vet vi vad T <i>kan</i>.</p>
+<pre><code>class Garage&lt;T&gt; where T : IVehicle
+{
+    private List&lt;T&gt; vehicles = new List&lt;T&gt;();
+
+    public void Park(T f) { vehicles.Add(f); }
+
+    public void DriveAll()
+    {
+        foreach (T f in vehicles)
+        {
+            f.Drive();       // OK – alla T är IVehicle
+        }
+    }
+}
+
+Garage&lt;Car&gt; carGarage = new Garage&lt;Car&gt;();
+carGarage.Park(new Car());
+carGarage.DriveAll();</code></pre>
+
+<!-- ================= GENERISKA LISTOR ================= -->
+<h2>Generiska listor: <code>List&lt;T&gt;</code></h2>
+<p>En <code>List&lt;T&gt;</code> är en lista som <b>växer av sig själv</b> när du lägger till saker, och som bara tar emot <b>en typ</b> – den du skriver mellan <code>&lt; &gt;</code>.</p>
+
+<h3>Skapa och fylla</h3>
+<pre><code>List&lt;string&gt; names = new List&lt;string&gt;();   // tom lista
+names.Add("Ada");
+names.Add("Linus");
+names.Add("Grace");
+
+List&lt;int&gt; numbers = new List&lt;int&gt; { 5, 12, 3 };   // fyll direkt</code></pre>
+
+<h3>De vanligaste metoderna</h3>
+<p>Kommentaren visar hur listan ser ut efter varje rad.</p>
+<pre><code>List&lt;string&gt; names = new List&lt;string&gt; { "Ada", "Linus", "Grace" };
+
+Console.WriteLine(names.Count);              // 3
+Console.WriteLine(names[0]);                 // Ada
+names[1] = "Bjarne";                         // Ada, Bjarne, Grace
+names.Insert(0, "Ola");                      // Ola, Ada, Bjarne, Grace
+names.Remove("Ada");                         // Ola, Bjarne, Grace
+names.RemoveAt(0);                           // Bjarne, Grace
+Console.WriteLine(names.Contains("Grace"));  // True
+Console.WriteLine(names.IndexOf("Grace"));   // 1
+names.Clear();                               // tom lista, Count är 0</code></pre>
+<div class="scroll"><table>
+  <tr><th>Metod</th><th>Gör</th></tr>
+  <tr><td><code>Add(x)</code></td><td>Lägger till sist</td></tr>
+  <tr><td><code>Insert(i, x)</code></td><td>Lägger till på plats <code>i</code></td></tr>
+  <tr><td><code>Remove(x)</code></td><td>Tar bort det första elementet som är lika med <code>x</code></td></tr>
+  <tr><td><code>RemoveAt(i)</code></td><td>Tar bort elementet på plats <code>i</code></td></tr>
+  <tr><td><code>Contains(x)</code></td><td>Finns <code>x</code> i listan? (<code>true</code>/<code>false</code>)</td></tr>
+  <tr><td><code>IndexOf(x)</code></td><td>Var ligger <code>x</code>? (<code>-1</code> om den inte finns)</td></tr>
+  <tr><td><code>Sort()</code></td><td>Sorterar listan</td></tr>
+  <tr><td><code>Clear()</code></td><td>Tömmer listan</td></tr>
+  <tr><td><code>Count</code></td><td>Antal element (en egenskap, inga parenteser)</td></tr>
+  <tr><td><code>list[i]</code></td><td>Läser eller byter elementet på plats <code>i</code></td></tr>
+</table></div>
+<p class="box"><b>Index börjar på 0.</b> En lista med 3 element har platserna 0, 1 och 2. <code>names[3]</code> kraschar programmet med <code>ArgumentOutOfRangeException</code>.</p>
+
+<h3>Loopa igenom en lista</h3>
+<pre><code>List&lt;string&gt; names = new List&lt;string&gt; { "Ada", "Linus", "Grace" };
+
+// foreach – när du bara vill gå igenom alla
+foreach (string name in names)
+{
+    Console.WriteLine(name);
+}
+
+// for – när du också behöver platsen (index)
+for (int i = 0; i &lt; names.Count; i++)
+{
+    Console.WriteLine($"{i}: {names[i]}");
+}</code></pre>
+<p>Utskrift:</p>
+<pre><code class="nohighlight">Ada
+Linus
+Grace
+0: Ada
+1: Linus
+2: Grace</code></pre>
+<p class="box">Du får inte lägga till eller ta bort element i en lista <b>medan</b> du loopar igenom den med <code>foreach</code> – då kraschar programmet.</p>
+
+<h3>Listor med egna objekt</h3>
+<p>Typen mellan <code>&lt; &gt;</code> kan vara en egen klass eller ett interface. En <code>Dog</code> <i>är ett</i> <code>Animal</code>, så den får plats i en <code>List&lt;Animal&gt;</code>.</p>
+<pre><code>List&lt;Animal&gt; animals = new List&lt;Animal&gt;();
+animals.Add(new Dog("Fido"));
+animals.Add(new Cat("Misse"));
+// animals.Add("Fido");   // FEL – en string är inte ett Animal
+
+foreach (Animal a in animals)
+{
+    Console.WriteLine(a.Sound());   // Voff!  Mjau!
+}
+
+List&lt;IVehicle&gt; vehicles = new List&lt;IVehicle&gt; { new Car(), new Bicycle() };   // ett interface går också</code></pre>
+
+<h3>Varför är det bra att listan är generisk?</h3>
+<p>Före generics fanns <code>ArrayList</code>. Den tar emot vad som helst, eftersom allt sparas som <code>object</code>.</p>
+<pre><code>using System.Collections;
+
+ArrayList old = new ArrayList();
+old.Add(5);
+old.Add("hej");                // tillåts – allt är object
+
+int first = (int)old[0];       // du måste själv omvandla till rätt typ
+int second = (int)old[1];      // KRASCHAR först när programmet körs</code></pre>
+<div class="scroll"><table>
+  <tr><th></th><th><code>ArrayList</code></th><th><code>List&lt;T&gt;</code></th></tr>
+  <tr><td>Tar emot</td><td>Allt (<code>object</code>)</td><td>Bara <code>T</code></td></tr>
+  <tr><td>Fel typ upptäcks</td><td>När programmet körs – krasch</td><td>När du kompilerar – rött i Visual Studio</td></tr>
+  <tr><td>Läsa ett element</td><td>Måste typomvandla: <code>(int)old[0]</code></td><td>Direkt: <code>numbers[0]</code></td></tr>
+</table></div>
+<p class="box">Tumregel: använd alltid <code>List&lt;T&gt;</code>. Du kommer nästan aldrig att behöva <code>ArrayList</code>.</p>
+
+<h3>Fler generiska samlingar</h3>
+<p><code>List&lt;T&gt;</code> är vanligast, men det finns fler. Alla fungerar på samma sätt: du väljer typen mellan <code>&lt; &gt;</code>.</p>
+<pre><code>// Dictionary – slå upp ett värde med en nyckel
+Dictionary&lt;string, int&gt; ages = new Dictionary&lt;string, int&gt;();
+ages["Ada"] = 36;
+ages["Linus"] = 21;
+Console.WriteLine(ages["Ada"]);   // 36
+
+// Queue – först in, först ut (som en kö i kassan)
+Queue&lt;string&gt; queue = new Queue&lt;string&gt;();
+queue.Enqueue("Ada");
+queue.Enqueue("Linus");
+Console.WriteLine(queue.Dequeue());   // Ada
+
+// Stack – sist in, först ut (som en trave tallrikar)
+Stack&lt;int&gt; stack = new Stack&lt;int&gt;();
+stack.Push(1);
+stack.Push(2);
+Console.WriteLine(stack.Pop());   // 2</code></pre>
+
+<h3>Bygg en egen generisk lista</h3>
+<p>Hur fungerar <code>List&lt;T&gt;</code> inuti? Här är en enkel egen version, <code>MyList&lt;T&gt;</code>. Den sparar elementen i en <b>array</b>.</p>
+<pre><code>class MyList&lt;T&gt;
+{
+    private T[] items = new T[10];   // plats för 10 element
+    private int count = 0;           // hur många vi har lagt in
+
+    public void Add(T item)
+    {
+        items[count] = item;         // lägg på första lediga plats
+        count++;
+    }
+
+    public T Get(int index)
+    {
+        return items[index];
+    }
+
+    public int Count()
+    {
+        return count;
+    }
+}</code></pre>
+<p>Överallt där det står <code>T</code> fylls typen i när du skapar listan – precis som i <code>Box&lt;T&gt;</code>.</p>
+
+<h3>Använda MyList&lt;T&gt;</h3>
+<pre><code>MyList&lt;string&gt; names = new MyList&lt;string&gt;();
+names.Add("Ada");
+names.Add("Linus");
+names.Add("Grace");
+
+Console.WriteLine(names.Count());   // 3
+Console.WriteLine(names.Get(1));    // Linus
+
+MyList&lt;int&gt; numbers = new MyList&lt;int&gt;();
+numbers.Add(5);
+numbers.Add(12);
+Console.WriteLine(numbers.Get(0));  // 5
+
+// names.Add(5);                    // FEL – names tar bara emot string</code></pre>
+<div class="scroll"><table>
+  <tr><th></th><th><code>MyList&lt;T&gt;</code></th><th><code>List&lt;T&gt;</code></th></tr>
+  <tr><td>Lägga till</td><td><code>names.Add("Ada")</code></td><td><code>names.Add("Ada")</code></td></tr>
+  <tr><td>Läsa</td><td><code>names.Get(1)</code></td><td><code>names[1]</code></td></tr>
+  <tr><td>Antal</td><td><code>names.Count()</code></td><td><code>names.Count</code></td></tr>
+  <tr><td>Hur många får plats?</td><td>Max 10</td><td>Hur många som helst – arrayen görs större när den blir full</td></tr>
+</table></div>
+<p class="box">Klassen är skriven <b>en gång</b> men fungerar för <code>string</code>, <code>int</code>, <code>Animal</code> – vilken typ som helst. Det är hela idén med generics.</p>
+
+<h3>Övningar: generiska listor</h3>
+<div class="box">
+<p><b>Övning 1.</b> Skapa en <code>List&lt;int&gt;</code> med talen 4, 8, 15, 16, 23 och 42. Lägg till 99 sist och ta bort 15. Skriv ut hur många tal listan har, och sedan alla talen.</p>
+<details>
+<summary>Visa facit</summary>
+<pre><code>List&lt;int&gt; numbers = new List&lt;int&gt; { 4, 8, 15, 16, 23, 42 };
+numbers.Add(99);
+numbers.Remove(15);
+
+Console.WriteLine($"Antal: {numbers.Count}");
+Console.WriteLine(string.Join(", ", numbers));</code></pre>
+<p>Utskrift:</p>
+<pre><code class="nohighlight">Antal: 6
+4, 8, 16, 23, 42, 99</code></pre>
+</details>
+</div>
+
+<div class="box">
+<p><b>Övning 2.</b> Skapa en <code>List&lt;string&gt;</code> med tre namn. Fråga användaren efter ett namn. Finns namnet i listan: skriv ut på vilken plats. Annars: lägg till det och skriv ut hela listan.</p>
+<details>
+<summary>Visa facit</summary>
+<pre><code>List&lt;string&gt; names = new List&lt;string&gt; { "Ada", "Linus", "Grace" };
+
+Console.Write("Namn: ");
+string input = Console.ReadLine();
+
+if (names.Contains(input))
+{
+    Console.WriteLine($"{input} finns på plats {names.IndexOf(input)}.");
+}
+else
+{
+    names.Add(input);
+    Console.WriteLine("Tillagd! Listan: " + string.Join(", ", names));
+}</code></pre>
+<p>Utskrift när användaren skriver <code>Grace</code> respektive <code>Ola</code>:</p>
+<pre><code class="nohighlight">Grace finns på plats 2.
+Tillagd! Listan: Ada, Linus, Grace, Ola</code></pre>
+</details>
+</div>
+
+<div class="box">
+<p><b>Övning 3.</b> Skriv en <b>generisk metod</b> <code>Last&lt;T&gt;</code> som tar emot en <code>List&lt;T&gt;</code> och returnerar det sista elementet. Testa den med en lista av tal och en lista av namn.</p>
+<details>
+<summary>Visa facit</summary>
+<pre><code>static T Last&lt;T&gt;(List&lt;T&gt; list)
+{
+    return list[list.Count - 1];   // sista platsen är Count - 1
+}
+
+List&lt;int&gt; numbers = new List&lt;int&gt; { 1, 2, 3 };
+List&lt;string&gt; names = new List&lt;string&gt; { "Ada", "Linus", "Grace" };
+
+Console.WriteLine(Last(numbers));   // 3
+Console.WriteLine(Last(names));     // Grace</code></pre>
+<p>Metoden är skriven <b>en gång</b>, men fungerar för listor av alla typer. <code>T</code> blir <code>int</code> i första anropet och <code>string</code> i andra.</p>
+</details>
+</div>
+
+<!-- ================= DEMO ================= -->
+<h2>Demo: egen generisk klass i egen generisk lista</h2>
+<p>Nu kombinerar vi <code>Box&lt;T&gt;</code> och <code>MyList&lt;T&gt;</code> – samma kod som tidigare på sidan. Listan ska innehålla lådor, så <code>T</code> i listan blir <code>Box&lt;string&gt;</code>.</p>
+<pre><code>class Box&lt;T&gt;
+{
+    private T content;
+
+    public void Put(T item) { content = item; }
+    public T Take() { return content; }
+}
+
+class MyList&lt;T&gt;
+{
+    private T[] items = new T[10];   // plats för 10 element
+    private int count = 0;           // hur många vi har lagt in
+
+    public void Add(T item)
+    {
+        items[count] = item;         // lägg på första lediga plats
+        count++;
+    }
+
+    public T Get(int index)
+    {
+        return items[index];
+    }
+
+    public int Count()
+    {
+        return count;
+    }
+}</code></pre>
+
+<pre><code>MyList&lt;Box&lt;string&gt;&gt; boxes = new MyList&lt;Box&lt;string&gt;&gt;();
+
+Box&lt;string&gt; box1 = new Box&lt;string&gt;();
+box1.Put("Kaffe");
+boxes.Add(box1);
+
+Box&lt;string&gt; box2 = new Box&lt;string&gt;();
+box2.Put("Te");
+boxes.Add(box2);
+
+Console.WriteLine(boxes.Count());         // 2
+Console.WriteLine(boxes.Get(1).Take());   // Te
+
+for (int i = 0; i &lt; boxes.Count(); i++)
+{
+    Console.WriteLine(boxes.Get(i).Take());   // Kaffe, Te
+}</code></pre>
+<div class="scroll"><table>
+  <tr><th>Kod</th><th><code>T</code> blir</th></tr>
+  <tr><td><code>MyList&lt;Box&lt;string&gt;&gt;</code></td><td><code>Box&lt;string&gt;</code> – listan sparar lådor</td></tr>
+  <tr><td><code>Box&lt;string&gt;</code></td><td><code>string</code> – lådan sparar text</td></tr>
+</table></div>
+<p class="box"><code>boxes.Get(1).Take()</code> läses från vänster: <code>Get(1)</code> hämtar <b>lådan</b> på plats 1, <code>Take()</code> tar ut <b>texten</b> ur lådan.</p>
+
+<h3>Prova själv</h3>
+<div class="box" id="demo">
+<p>Skriv något, lägg det i en ny <code>Box&lt;string&gt;</code> och lägg lådan i listan. Rutan under visar arrayen <code>items</code> inuti <code>MyList</code>.</p>
+<div class="demo-row">
+  <input type="text" id="demoText" placeholder="T.ex. Kaffe" maxlength="20" aria-label="Text att lägga i lådan">
+  <button type="button" id="demoAdd">Put + Add</button>
+</div>
+<div class="slots" id="demoSlots" aria-live="polite"></div>
+<p class="demo-count" id="demoCount"></p>
+<div class="demo-row">
+  <label for="demoIndex">Get(</label><input type="number" id="demoIndex" value="0" aria-label="Index"><span>).Take()</span>
+  <button type="button" class="secondary" id="demoGet">Hämta</button>
+  <button type="button" class="secondary" id="demoAll">Skriv ut alla</button>
+  <button type="button" class="secondary" id="demoReset">Börja om</button>
+</div>
+<p><b>Koden som körs:</b></p>
+<pre id="demoLog"><code class="nohighlight"></code></pre>
+</div>
+<p class="box">Prova också: lägg in en elfte låda, eller hämta en plats där det inte ligger någon låda. Vad händer – och varför?</p>
+
+<script>
+  (function () {
+    const size = 10;
+    let items, count, made;
+    const $ = id => document.getElementById(id);
+    const log = $("demoLog").firstChild;
+
+    function write(lines) {
+      log.textContent += lines.join("\n") + "\n\n";
+      $("demoLog").scrollTop = $("demoLog").scrollHeight;
+    }
+
+    function draw() {
+      const slots = $("demoSlots");
+      slots.textContent = "";
+      for (let i = 0; i < size; i++) {
+        const slot = document.createElement("div");
+        slot.className = "slot" + (i === count ? " next" : "");
+        const idx = document.createElement("span");
+        idx.className = "idx";
+        idx.textContent = "items[" + i + "]";
+        slot.append(idx);
+        if (items[i] === null) {
+          const empty = document.createElement("span");
+          empty.className = "empty";
+          empty.textContent = "null";
+          slot.append(empty);
+        } else {
+          const b = document.createElement("div");
+          b.className = "box-item";
+          const label = document.createElement("small");
+          label.textContent = items[i].name;
+          b.append(label, '"' + items[i].content + '"');
+          slot.append(b);
+        }
+        slots.append(slot);
+      }
+      $("demoCount").textContent = "count = " + count + "  (boxes.Count() ger " + count + ")";
+    }
+
+    function reset() {
+      items = new Array(size).fill(null);
+      count = 0;
+      made = 0;
+      log.textContent = "MyList<Box<string>> boxes = new MyList<Box<string>>();\n\n";
+      draw();
+    }
+
+    $("demoAdd").onclick = () => {
+      const text = $("demoText").value.trim().replace(/"/g, "");
+      if (!text) { $("demoText").focus(); return; }
+      made++;
+      const name = "box" + made;
+      const lines = [
+        "Box<string> " + name + " = new Box<string>();",
+        name + '.Put("' + text + '");',
+        "boxes.Add(" + name + ");"
+      ];
+      if (count === size) {
+        lines[2] += "   // KRASCH: IndexOutOfRangeException – items har bara plats för 10";
+      } else {
+        items[count] = { name: name, content: text };
+        count++;
+      }
+      write(lines);
+      draw();
+      $("demoText").value = "";
+      $("demoText").focus();
+    };
+    $("demoText").addEventListener("keydown", e => { if (e.key === "Enter") $("demoAdd").click(); });
+
+    $("demoGet").onclick = () => {
+      const i = parseInt($("demoIndex").value, 10);
+      if (isNaN(i)) return;
+      let result;
+      if (i < 0 || i >= size) result = "// KRASCH: IndexOutOfRangeException – items[" + i + "] finns inte";
+      else if (items[i] === null) result = "// KRASCH: NullReferenceException – Get(" + i + ") ger null, ingen låda att anropa Take() på";
+      else result = "// " + items[i].content + "   (lådan " + items[i].name + ")";
+      write(["Console.WriteLine(boxes.Get(" + i + ").Take());", result]);
+    };
+
+    $("demoAll").onclick = () => {
+      const out = items.slice(0, count).map(b => b.content);
+      write([
+        "for (int i = 0; i < boxes.Count(); i++)",
+        "{",
+        "    Console.WriteLine(boxes.Get(i).Take());",
+        "}",
+        out.length ? "// " + out.join(", ") : "// (ingenting – listan är tom)"
+      ]);
+    };
+
+    $("demoReset").onclick = reset;
+    reset();
+  })();
+</script>
+
+</main>
+<script src="vs.js"></script>
+</body>
+</html>

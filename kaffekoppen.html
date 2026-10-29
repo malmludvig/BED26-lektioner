@@ -1,0 +1,388 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="claude:viewport-fit-sides" content="cover">
+<title>Från UML till C#</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<nav><a href="vecka43.html" aria-current="true">Lektioner vecka 5</a><a href="vecka44.html">Lektioner vecka 6</a><a href="index.html">Lektioner vecka 7</a></nav>
+<nav class="undermeny"><a href="vecka43.html">Interfaces</a><a href="kaffekoppen.html" aria-current="page">Övning: Från UML till C#</a><a href="interface.html">Övning: Interface</a><a href="smarthem.html">Övning: Smarta hemmet</a></nav>
+<main>
+
+<h1>Övning: Från UML till C#</h1>
+<p class="lead">Kaféet Kaffekoppen – ett kassaprogram i konsolen. Vi går från kravtext → klassdiagram → kod.</p>
+
+<!-- ================= STEG 1 ================= -->
+<h2>Steg 1: Stryk under orden i kraven</h2>
+<p>Varje ordtyp blir något i diagrammet.</p>
+<div class="scroll"><table>
+  <tr><th>Ordtyp</th><th>Blir</th><th>I Kaffekoppen</th></tr>
+  <tr><td>Substantiv</td><td>klasser</td><td>produkt, dryck, smörgås, bakverk, beställning</td></tr>
+  <tr><td>Egenskaper</td><td>attribut</td><td>namn, grundpris, storlek, vegetarisk, bäst före, student</td></tr>
+  <tr><td>Verb</td><td>metoder</td><td>räknar ut slutpris, summerar, ger rabatt, skriver kvitto</td></tr>
+  <tr><td>Relationer</td><td>pilar och linjer</td><td>en dryck <i>är en</i> produkt · en beställning <i>innehåller</i> produkter</td></tr>
+</table></div>
+
+<!-- ================= STEG 2 ================= -->
+<h2>Steg 2: Välj datatyper (krav 5)</h2>
+<div class="scroll"><table>
+  <tr><th>Uppgift</th><th>Typ</th><th>Varför?</th></tr>
+  <tr><td>Pris</td><td><code>decimal</code></td><td>Exakt för pengar. <code>double</code> ger avrundningsfel (0,1 + 0,2 ≠ 0,3).</td></tr>
+  <tr><td>Bäst före</td><td><code>DateTime</code></td><td>Ett datum. Kan jämföras med dagens datum, <code>DateTime.Today</code>.</td></tr>
+  <tr><td>Storlek</td><td><code>string</code></td><td>Texten "liten", "mellan" eller "stor".</td></tr>
+  <tr><td>Vegetarisk / student</td><td><code>bool</code></td><td>Ja/nej-frågor.</td></tr>
+  <tr><td>Produkterna i en beställning</td><td><code>List&lt;Product&gt;</code></td><td>Valfritt antal (krav 7).</td></tr>
+</table></div>
+
+<!-- ================= STEG 3 ================= -->
+<h2>Steg 3: Rita klassdiagrammet</h2>
+<pre class="mermaid">
+classDiagram
+  class Product {
+    #name: string
+    #basePrice: decimal
+    +CalculatePrice() decimal
+    +CanBeSold() bool
+    +Description() string
+  }
+  class Drink {
+    -size: string
+    +CalculatePrice() decimal
+    +Description() string
+  }
+  class Sandwich {
+    -isVegetarian: bool
+    +Description() string
+  }
+  class Pastry {
+    -bestBefore: DateTime
+    +CalculatePrice() decimal
+    +CanBeSold() bool
+    +Description() string
+  }
+  class Order {
+    -products: List~Product~
+    +IsStudent: bool
+    +Add(product: Product) bool
+    +Subtotal() decimal
+    +Discount() decimal
+    +Total() decimal
+    +PrintReceipt()
+  }
+  Product <|-- Drink
+  Product <|-- Sandwich
+  Product <|-- Pastry
+  Order "1" --> "0..*" Product : innehåller
+</pre>
+<div class="box">
+<p><b>Så läser du diagrammet</b></p>
+<ul>
+  <li><b>Ofylld triangel</b> = arv. Dryck, Smörgås och Bakverk <i>är</i> produkter.</li>
+  <li><b>1 → 0..*</b> = en beställning innehåller noll eller flera produkter → blir en <code>List&lt;Product&gt;</code>.</li>
+  <li><b>#</b> = <code>protected</code> så att subklasserna kommer åt namn och pris. <b>-</b> = <code>private</code>. <b>+</b> = <code>public</code>.</li>
+  <li>Subklasserna listar bara de metoder de <b>skriver om</b> (<code>override</code>).</li>
+</ul>
+</div>
+
+<!-- ================= STEG 4 ================= -->
+<h2>Steg 4: Från diagram till C#</h2>
+
+<h3>Produkt – basklassen</h3>
+<p>Metoderna är <code>virtual</code> så att varje produkttyp kan räkna ut sitt eget pris (krav 6).</p>
+<pre><code>class Product
+{
+    protected string name;
+    protected decimal basePrice;
+
+    public Product(string productName, decimal price)
+    {
+        name = productName;
+        basePrice = price;
+    }
+
+    public virtual decimal CalculatePrice()
+    {
+        return basePrice;
+    }
+
+    public virtual bool CanBeSold()
+    {
+        return true;
+    }
+
+    public virtual string Description()
+    {
+        return name;
+    }
+}</code></pre>
+
+<h3>Dryck – pris beror på storlek (krav 2)</h3>
+<pre><code>class Drink : Product
+{
+    private string size;
+
+    public Drink(string productName, decimal price, string chosenSize) : base(productName, price)
+    {
+        size = chosenSize;
+    }
+
+    public override decimal CalculatePrice()
+    {
+        if (size == "mellan")
+        {
+            return basePrice + 5;
+        }
+        if (size == "stor")
+        {
+            return basePrice + 10;
+        }
+        return basePrice;
+    }
+
+    public override string Description()
+    {
+        return name + " (" + size + ")";
+    }
+}</code></pre>
+
+<h3>Smörgås – syns på kvittot om den är vegetarisk (krav 3)</h3>
+<pre><code>class Sandwich : Product
+{
+    private bool isVegetarian;
+
+    public Sandwich(string productName, decimal price, bool vegetarian) : base(productName, price)
+    {
+        isVegetarian = vegetarian;
+    }
+
+    public override string Description()
+    {
+        if (isVegetarian)
+        {
+            return name + " (vegetarisk)";
+        }
+        return name;
+    }
+}</code></pre>
+
+<h3>Bakverk – halva priset sista dagen, nekas efter (krav 4)</h3>
+<pre><code>class Pastry : Product
+{
+    private DateTime bestBefore;
+
+    public Pastry(string productName, decimal price, DateTime date) : base(productName, price)
+    {
+        bestBefore = date;
+    }
+
+    public override bool CanBeSold()
+    {
+        return bestBefore >= DateTime.Today;
+    }
+
+    public override decimal CalculatePrice()
+    {
+        if (bestBefore == DateTime.Today)
+        {
+            return basePrice / 2;
+        }
+        return basePrice;
+    }
+
+    public override string Description()
+    {
+        if (bestBefore == DateTime.Today)
+        {
+            return name + " (halva priset)";
+        }
+        return name;
+    }
+}</code></pre>
+
+<h3>Beställning – vet inte vilka produkttyper den har (krav 6–8)</h3>
+<pre><code>class Order
+{
+    private List&lt;Product&gt; products = new List&lt;Product&gt;();
+    public bool IsStudent { get; set; }
+
+    public bool Add(Product product)
+    {
+        if (!product.CanBeSold())
+        {
+            return false;
+        }
+        products.Add(product);
+        return true;
+    }
+
+    public decimal Subtotal()
+    {
+        decimal sum = 0;
+        foreach (Product p in products)
+        {
+            sum += p.CalculatePrice();   // Order vet inte vilken typ p är!
+        }
+        return sum;
+    }
+
+    public decimal Discount()
+    {
+        decimal sum = Subtotal();
+        decimal studentDiscount = 0;
+        decimal volumeDiscount = 0;
+
+        if (IsStudent)
+        {
+            studentDiscount = sum / 10;   // 10 %
+        }
+        if (sum > 200)
+        {
+            volumeDiscount = sum / 20;     // 5 %
+        }
+
+        // Rabatterna kan inte kombineras – den största vinner
+        if (studentDiscount > volumeDiscount)
+        {
+            return studentDiscount;
+        }
+        return volumeDiscount;
+    }
+
+    public decimal Total()
+    {
+        return Subtotal() - Discount();
+    }
+
+    public void PrintReceipt()
+    {
+        Console.WriteLine();
+        Console.WriteLine("===== KAFFEKOPPEN =====");
+        foreach (Product p in products)
+        {
+            Console.WriteLine(p.Description() + ": " + p.CalculatePrice() + " kr");
+        }
+        Console.WriteLine("-----------------------");
+        Console.WriteLine("Delsumma: " + Subtotal() + " kr");
+        Console.WriteLine("Rabatt: -" + Discount() + " kr");
+        Console.WriteLine("Att betala: " + Total() + " kr");
+    }
+}</code></pre>
+<p class="box"><b>Det här är polymorfism.</b> <code>p.CalculatePrice()</code> anropar Dryckens, Smörgåsens eller Bakverkets version – beroende på vad <code>p</code> faktiskt är. Lägger vi till en ny produkttyp behöver <code>Order</code> inte ändras alls.</p>
+
+<h3>Program.cs – menyn (krav 9)</h3>
+<pre><code>Order order = new Order();
+
+while (true)
+{
+    Console.WriteLine();
+    Console.WriteLine("1. Kaffe          30 kr");
+    Console.WriteLine("2. Ostsmörgås     55 kr  (vegetarisk)");
+    Console.WriteLine("3. Skinksmörgås   60 kr");
+    Console.WriteLine("4. Kanelbulle     35 kr  (bäst före idag)");
+    Console.WriteLine("5. Croissant      30 kr  (bäst före igår)");
+    Console.WriteLine("0. Klar");
+    Console.Write("Välj: ");
+    string choice = Console.ReadLine();
+
+    if (choice == "0")
+    {
+        break;
+    }
+
+    Product product;
+
+    if (choice == "1")
+    {
+        Console.Write("Storlek (liten, mellan, stor): ");
+        string size = Console.ReadLine();
+        product = new Drink("Kaffe", 30, size);
+    }
+    else if (choice == "2")
+    {
+        product = new Sandwich("Ostsmörgås", 55, true);
+    }
+    else if (choice == "3")
+    {
+        product = new Sandwich("Skinksmörgås", 60, false);
+    }
+    else if (choice == "4")
+    {
+        product = new Pastry("Kanelbulle", 35, DateTime.Today);
+    }
+    else if (choice == "5")
+    {
+        product = new Pastry("Croissant", 30, DateTime.Today.AddDays(-1));
+    }
+    else
+    {
+        Console.WriteLine("Ogiltigt val.");
+        continue;
+    }
+
+    if (order.Add(product))
+    {
+        Console.WriteLine(product.Description() + " tillagd.");
+    }
+    else
+    {
+        Console.WriteLine(product.Description() + " har gått ut och kan inte säljas.");
+    }
+}
+
+Console.Write("Är kunden student? (j/n): ");
+order.IsStudent = Console.ReadLine() == "j";
+order.PrintReceipt();</code></pre>
+
+<!-- ================= STEG 5 ================= -->
+<h2>Steg 5: Kör programmet</h2>
+<p>Stor kaffe, ostsmörgås, kanelbulle (bäst före idag), försöker med en croissant, student = ja:</p>
+<pre><code class="nohighlight">Välj: 5
+Croissant har gått ut och kan inte säljas.
+...
+===== KAFFEKOPPEN =====
+Kaffe (stor): 40 kr
+Ostsmörgås (vegetarisk): 55 kr
+Kanelbulle (halva priset): 17,5 kr
+-----------------------
+Delsumma: 112,5 kr
+Rabatt: -11,25 kr
+Att betala: 101,25 kr</code></pre>
+
+<!-- ================= KLART NÄR ================= -->
+<h2>Klart när</h2>
+<h3>Rätt rabatt i alla fyra fallen</h3>
+<div class="scroll"><table>
+  <tr><th>Fall</th><th>Delsumma</th><th>Student 10 %</th><th>Över 200 kr 5 %</th><th>Rabatt</th></tr>
+  <tr><td>Bara student</td><td>112,50</td><td>11,25</td><td>–</td><td><b>11,25</b></td></tr>
+  <tr><td>Bara över 200</td><td>205,00</td><td>–</td><td>10,25</td><td><b>10,25</b></td></tr>
+  <tr><td>Båda</td><td>205,00</td><td>20,50</td><td>10,25</td><td><b>20,50</b></td></tr>
+  <tr><td>Ingen</td><td>35,00</td><td>–</td><td>–</td><td><b>0,00</b></td></tr>
+</table></div>
+<p class="box">Lägg märke till: studentrabatten (10 %) är <i>alltid</i> större än mängdrabatten (5 %) när båda gäller. En enkel <code>if</code>-sats väljer ändå den största, utan specialfall.</p>
+
+<ul>
+  <li>☑ Klassdiagrammet är ritat och visar arv och metoder.</li>
+  <li>☑ Alla tre produkttyperna kan beställas och får rätt pris.</li>
+  <li>☑ Bakverk med passerat datum nekas, och bakverk med bäst före idag får halva priset.</li>
+  <li>☑ Rätt rabatt väljs i alla fyra fallen: student, över 200 kr, båda, ingen.</li>
+</ul>
+
+<h2>Diskutera</h2>
+<ul>
+  <li>Varför ligger <code>CanBeSold()</code> i <code>Product</code> och inte bara i <code>Pastry</code>?</li>
+  <li>Vad behöver ändras om kaféet börjar sälja <code>IceCream</code>?</li>
+  <li>Vad händer om användaren skriver "Stor" med stor bokstav? Hur kan man lösa det?</li>
+  <li>Hade <code>Product</code> kunnat vara ett interface istället? Vad hade vi förlorat? → <a href="vecka43.html">Lektion vecka 5</a></li>
+</ul>
+
+</main>
+<script type="module">
+  import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.esm.min.mjs";
+  mermaid.initialize({ startOnLoad: true, theme: "neutral" });
+</script>
+<script src="vs.js"></script>
+</body>
+</html>

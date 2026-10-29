@@ -1,0 +1,445 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="claude:viewport-fit-sides" content="cover">
+<title>Git presentation</title>
+<link rel="stylesheet" href="style.css">
+<style>
+  /* Bildspel: en bild i taget, stor text */
+  .slides { min-height: 60vh; display: flex; flex-direction: column; justify-content: center; }
+  .slide { display: none; font-size: 1.25rem; }
+  .slide.active { display: block; }
+  .slide h1 { font-size: clamp(2.2rem, 7vw, 3.6rem); margin: 0 0 8px; }
+  .slide h2 { margin-top: 0; font-size: clamp(1.6rem, 4.5vw, 2.2rem); }
+  .slide pre { font-size: clamp(14px, 2.4vw, 19px); }
+  .big { font-size: clamp(1.4rem, 4vw, 2rem); text-align: center; }
+  .controls { display: flex; align-items: center; justify-content: space-between; gap: 12px; border-top: 1px solid var(--line); padding-top: 12px; margin-top: 24px; }
+  .controls button { font: inherit; font-weight: 600; background: var(--card); color: var(--ink); border: 1px solid var(--line); border-radius: 8px; padding: 8px 16px; cursor: pointer; }
+  .controls button:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
+  .controls button:disabled { opacity: .4; cursor: default; }
+  .counter { color: var(--muted); font-variant-numeric: tabular-nums; }
+  .hint { color: var(--muted); font-size: .9rem; text-align: center; }
+  :fullscreen main { max-width: 1100px; }
+  :fullscreen { background: var(--bg); overflow: auto; }
+
+  /* De tre platserna och commit-kedjor */
+  .flow { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 8px; margin-block: 16px; }
+  .flow .place { background: var(--card); border: 2px solid var(--accent); border-radius: 10px; padding: 10px 14px; text-align: center; font-weight: 600; }
+  .flow .place small { display: block; font-weight: 400; color: var(--muted); font-size: .8rem; }
+  .flow .arrow { font: 15px ui-monospace, Consolas, monospace; color: var(--muted); text-align: center; }
+  .chain { font: clamp(14px, 2.4vw, 19px) ui-monospace, Consolas, monospace; background: #1e1e1e; color: #dcdcdc; padding: 16px; border-radius: 8px; overflow-x: auto; white-space: pre; line-height: 1.5; }
+  .chain .m { color: #4ec9b0; }
+  .chain .b { color: #d8a0df; }
+
+  /* Loggor för Git och GitHub */
+  .logos { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-block: 16px; }
+  .logos figure { margin: 0; display: flex; flex-direction: column; align-items: center; gap: 8px; background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 16px; }
+  .logos svg { width: clamp(64px, 14vw, 120px); height: auto; color: var(--ink); }
+  .logos figcaption { font-weight: 600; }
+
+  /* Platser där man kan använda Git */
+  .tools { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; margin-block: 16px; }
+  .tool { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 4px; background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 14px 12px; }
+  .tool svg { width: 48px; height: 48px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; color: var(--accent); margin-bottom: 4px; }
+  .tool span { color: var(--muted); font-size: .9rem; line-height: 1.4; }
+
+  /* GIF och cheat sheet */
+  .gif { margin: 0; text-align: center; }
+  .gif img { max-height: 68vh; width: auto; max-width: 100%; border-radius: 8px; }
+  .gif figcaption { color: var(--muted); font-size: .85rem; margin-top: 6px; }
+  .cheat { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr)); gap: 0 24px; font-size: .85rem; line-height: 1.4; }
+  .cheat > div { min-width: 0; }
+  .cheat h3 { font-size: 1rem; margin: 14px 0 6px; color: var(--accent); }
+  .cheat p { margin: 6px 0 2px; }
+  .cheat td:first-child { width: 38%; font-weight: 600; }
+  .cheat code { overflow-wrap: anywhere; }
+  .cheat td { padding: 4px 8px; vertical-align: top; }
+  .cheat pre { font-size: 13px; padding: 8px 12px; margin: 4px 0; }
+
+  /* Två kolumner bredvid varandra */
+  .cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr)); gap: 16px; }
+  .cols > div { min-width: 0; }
+  .cols pre { font-size: clamp(13px, 1.9vw, 16px); }
+
+  /* Videotips: skärmbild som länk */
+  .video { display: block; max-width: 900px; margin: 16px auto 0; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; background: #fff; }
+  .video img { display: block; width: 100%; height: auto; }
+  .video:hover { border-color: var(--accent); }
+</style>
+</head>
+<body>
+<nav><a href="vecka43.html">Lektioner vecka 5</a><a href="vecka44.html">Lektioner vecka 6</a><a href="index.html" aria-current="true">Lektioner vecka 7</a></nav>
+<nav class="undermeny"><a href="git-presentation.html" aria-current="page">Presentation: Git</a><a href="index.html">Git</a><a href="git-branches-presentation.html">Presentation: Git branches</a><a href="merge-conflicts-presentation.html">Presentation: Merge conflicts</a><a href="branching-strategies-presentation.html">Presentation: Git branching strategies</a><a href="lab-git-branching.html">Övning: Git branching</a></nav>
+<main id="show">
+
+<div class="slides">
+
+<section class="slide">
+  <h1>Git</h1>
+  <p class="lead">Spara versioner av din kod, ångra misstag och samarbeta.</p>
+</section>
+
+<section class="slide">
+  <h2>Känns det här igen?</h2>
+  <pre><code class="nohighlight">Kaffekoppen.zip
+Kaffekoppen_kopia.zip
+Kaffekoppen_FUNKAR.zip
+Kaffekoppen_FUNKAR_final.zip
+Kaffekoppen_FUNKAR_final_v2_NY.zip</code></pre>
+  <p class="box">Git löser det här: <b>en</b> mapp, och hela historiken finns inuti.</p>
+</section>
+
+<section class="slide">
+  <h2>Git och GitHub</h2>
+  <div class="logos">
+    <figure>
+      <svg role="img" aria-label="Git" viewBox="0 0 24 24" fill="#f05032"><path d="M23.546 10.93L13.067.452c-.604-.603-1.582-.603-2.188 0L8.708 2.627l2.76 2.76c.645-.215 1.379-.07 1.889.441.516.515.658 1.258.438 1.9l2.658 2.66c.645-.223 1.387-.078 1.9.435.721.72.721 1.884 0 2.604-.719.719-1.881.719-2.6 0-.539-.541-.674-1.337-.404-1.996L12.86 8.955v6.525c.176.086.342.203.488.348.713.721.713 1.883 0 2.6-.719.721-1.889.721-2.609 0-.719-.719-.719-1.879 0-2.598.182-.18.387-.316.605-.406V8.835c-.217-.091-.424-.222-.6-.401-.545-.545-.676-1.342-.396-2.009L7.636 3.7.45 10.881c-.6.605-.6 1.584 0 2.189l10.48 10.477c.604.604 1.582.604 2.186 0l10.43-10.43c.605-.603.605-1.582 0-2.187"/></svg>
+      <figcaption>Git</figcaption>
+    </figure>
+    <figure>
+      <svg role="img" aria-label="GitHub" viewBox="0 0 24 24" fill="currentColor"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.070 3.633 17.700 3.633 17.700c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.070 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.760-1.605-2.665-.3-5.466-1.332-5.466-5.930 0-1.310.465-2.380 1.235-3.220-.135-.303-.540-1.523.105-3.176 0 0 1.005-.322 3.300 1.230.960-.267 1.980-.399 3-.405 1.020.006 2.040.138 3 .405 2.280-1.552 3.285-1.230 3.285-1.230.645 1.653.240 2.873.120 3.176.765.840 1.230 1.910 1.230 3.220 0 4.610-2.805 5.625-5.475 5.920.420.360.810 1.096.810 2.220 0 1.606-.015 2.896-.015 3.286 0 .315.210.690.825.570C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
+      <figcaption>GitHub</figcaption>
+    </figure>
+  </div>
+  <div class="scroll"><table>
+    <tr><th>Git</th><th>GitHub</th></tr>
+    <tr><td>Ett program på din dator</td><td>En webbplats</td></tr>
+    <tr><td>Sparar historiken för ditt projekt</td><td>Lagrar och delar Git-repon</td></tr>
+    <tr><td>Fungerar utan internet</td><td>Där man samarbetar</td></tr>
+  </table></div>
+</section>
+
+<section class="slide">
+  <h2>Olika platser du kan jobba med Git</h2>
+  <div class="tools">
+    <div class="tool">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M6 9l3 3-3 3M11 15h6"/></svg>
+      <b>Terminalen</b>
+      <span>Git Bash, PowerShell – skriv kommandona själv</span>
+    </div>
+    <div class="tool">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M2 8h20"/><text x="12" y="17" text-anchor="middle" font-size="7.5" font-weight="700" fill="currentColor" stroke="none">C#</text></svg>
+      <b>Visual Studio</b>
+      <span>Fönstret <i>Git Changes</i> – det vi använder i kursen</span>
+    </div>
+    <div class="tool">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M9 9l-3 3 3 3M15 9l3 3-3 3"/></svg>
+      <b>VS Code</b>
+      <span>Fliken <i>Source Control</i> i sidomenyn</span>
+    </div>
+    <div class="tool">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><ellipse cx="12" cy="12" rx="4" ry="9"/><path d="M3 12h18"/></svg>
+      <b>GitHub-hemsidan</b>
+      <span>Läs kod, historik och ändra filer direkt i webbläsaren</span>
+    </div>
+    <div class="tool">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="3" width="20" height="13" rx="2"/><path d="M8 21h8M12 16v5"/><circle cx="9" cy="7" r="1.3"/><circle cx="9" cy="12.5" r="1.3"/><circle cx="15" cy="9" r="1.3"/><path d="M9 8.3v2.9M15 10.3c0 1.5-2.5 1.8-4.8 2"/></svg>
+      <b>GitHub Desktop</b>
+      <span>Ett eget program med knappar – bra för att komma igång</span>
+    </div>
+  </div>
+  <p class="box">Det är <b>samma Git</b> överallt. Ett repo du committar i Visual Studio kan du pusha från terminalen.</p>
+</section>
+
+<section class="slide">
+  <h2>En commit = ett foto</h2>
+  <p>En <b>commit</b> är en sparad ögonblicksbild av hela projektet, med ett meddelande.</p>
+  <div class="chain"><span class="m">●</span> Skapa projekt  →  <span class="m">●</span> Product  →  <span class="m">●</span> Drink  →  <span class="m">●</span> Kvitto</div>
+  <p>Du kan alltid titta på – eller gå tillbaka till – vilket foto som helst.</p>
+</section>
+
+<section class="slide">
+  <h2>De tre platserna</h2>
+  <div class="flow">
+    <div class="place">Arbetsmapp<small>dina filer</small></div>
+    <div class="arrow">git add<br>→</div>
+    <div class="place">Staging<small>redo att sparas</small></div>
+    <div class="arrow">git commit<br>→</div>
+    <div class="place">Repository<small>historiken</small></div>
+  </div>
+  <p class="box">Staging = du väljer <b>vilka</b> ändringar som ska med på nästa foto.</p>
+</section>
+
+<section class="slide">
+  <h2>Git workflow</h2>
+  <figure class="gif">
+    <img src="git-workflow.gif" alt="Animation: git add, commit, push, fetch, merge, pull och diff flyttar ändringar mellan Working Directory, Staging Area, Local Repository och Remote Repository">
+    <figcaption>Animation: Neo Kim + Framer – <a href="https://www.linkedin.com/feed/update/urn:li:activity:7362807929533603840/" target="_blank" rel="noopener">källa på LinkedIn</a></figcaption>
+  </figure>
+</section>
+
+<section class="slide">
+  <h2>Ställ in Git (en gång)</h2>
+  <pre><code class="nohighlight">git --version
+
+git config --global user.name "Ada Lovelace"
+git config --global user.email "ada@exempel.se"
+git config --global init.defaultBranch main</code></pre>
+</section>
+
+<section class="slide">
+  <h2>Ditt första repo</h2>
+  <pre><code class="nohighlight">mkdir GitDemo
+cd GitDemo
+dotnet new console
+dotnet new gitignore     # bin/ och obj/ ska inte sparas
+git init</code></pre>
+</section>
+
+<section class="slide">
+  <h2>Arbetsflödet</h2>
+  <pre><code class="nohighlight">git status                        # vad har ändrats?
+git add .                         # lägg allt i staging
+git commit -m "Lägg till Drink"   # spara</code></pre>
+  <p class="big">Ändra → status → add → commit</p>
+  <p class="hint">… om och om igen</p>
+</section>
+
+<section class="slide">
+  <h2>Bra commit-meddelanden</h2>
+  <div class="scroll"><table>
+    <tr><th>Dåligt</th><th>Bra</th></tr>
+    <tr><td><code>fix</code></td><td><code>Rätta studentrabatten</code></td></tr>
+    <tr><td><code>asdf</code></td><td><code>Lägg till klassen Pastry</code></td></tr>
+    <tr><td><code>massa ändringar</code></td><td>En commit per sak</td></tr>
+  </table></div>
+  <p class="box">"Den här commiten kommer att … <i>lägga till klassen Pastry</i>."</p>
+</section>
+
+<section class="slide">
+  <h2>Titta i historiken</h2>
+  <pre><code class="nohighlight">git log --oneline
+<samp>a81d4e2 Lägg till klassen Drink</samp>
+<samp>7c90b13 Lägg till basklassen Product</samp>
+<samp>3f2a1c9 Skapa konsolprojekt</samp>
+
+git diff
+<samp>-    return 0;</samp>
+<samp>+    return basePrice;</samp></code></pre>
+</section>
+
+<section class="slide">
+  <h2>Ångra</h2>
+  <div class="scroll"><table>
+    <tr><th>Jag vill …</th><th>Kommando</th></tr>
+    <tr><td>Få tillbaka filen som vid senaste commit</td><td><code>git restore Program.cs</code></td></tr>
+    <tr><td>Ta bort en fil från staging</td><td><code>git restore --staged Program.cs</code></td></tr>
+    <tr><td>Ångra en gammal commit</td><td><code>git revert a81d4e2</code></td></tr>
+  </table></div>
+  <p class="box">Det som är <b>commitat</b> går nästan alltid att få tillbaka. Commita ofta!</p>
+</section>
+
+<section class="slide">
+  <h2>Branches</h2>
+  <p>Ett eget spår där du provar något nytt – utan att förstöra <code>main</code>.</p>
+  <div class="chain"><span class="m">main           ●───●───────●───◆───●</span>
+<span class="b">                    \         /</span>
+<span class="b">studentrabatt        ●───●───</span></div>
+</section>
+
+<section class="slide">
+  <h2>Branch och merge</h2>
+  <pre><code class="nohighlight">git switch -c studentrabatt    # ny branch
+# ... ändra, add, commit ...
+git switch main                # tillbaka
+git merge studentrabatt        # slå ihop
+git branch -d studentrabatt    # städa</code></pre>
+</section>
+
+<section class="slide">
+  <h2>Merge-konflikt</h2>
+  <p>Två branches har ändrat <b>samma rad</b>:</p>
+  <pre><code class="nohighlight">&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD
+            return basePrice + 5;
+=======
+            return basePrice + 8;
+&gt;&gt;&gt;&gt;&gt;&gt;&gt; studentrabatt</code></pre>
+  <p class="box">Välj vad som ska stå kvar, ta bort markeringarna, sedan <code>git add</code> + <code>git commit</code>.</p>
+</section>
+
+<section class="slide">
+  <h2>GitHub</h2>
+  <pre><code class="nohighlight">git remote add origin https://github.com/ditt-namn/GitDemo.git
+git push -u origin main</code></pre>
+  <div class="scroll"><table>
+    <tr><td><code>git clone &lt;url&gt;</code></td><td>Ladda ner ett repo</td></tr>
+    <tr><td><code>git push</code></td><td>Skicka <b>upp</b> dina commits</td></tr>
+    <tr><td><code>git pull</code></td><td>Hämta <b>ner</b> andras commits</td></tr>
+  </table></div>
+</section>
+
+<section class="slide">
+  <h2>Ett nytt repo på GitHub</h2>
+  <p>När du skapar ett <b>tomt</b> repo visar GitHub en sida med <i>Quick setup</i> – och kommandona du behöver.</p>
+  <figure class="gif">
+    <img src="github-new-repo.webp" alt="GitHub-sidan för ett nytt, tomt repo: adressen till repot under Quick setup, och kommandon för att skapa ett nytt repo eller pusha ett befintligt från terminalen.">
+    <figcaption>Kopiera adressen (HTTPS) eller hela kommandoblocket med kopieringsknappen till höger.</figcaption>
+  </figure>
+</section>
+
+<section class="slide">
+  <h2>Kommandona från GitHub</h2>
+  <div class="cols">
+    <div>
+      <p><b>Inget repo än</b> – skapa ett nytt</p>
+      <pre><code class="nohighlight">echo "# testtest" &gt;&gt; README.md   # skapa en README
+git init                          # gör mappen till ett repo
+git add README.md
+git commit -m "first commit"
+git branch -M main                # döp branchen till main
+git remote add origin https://github.com/malmludvig/testtest.git
+git push -u origin main           # skicka upp och koppla ihop</code></pre>
+    </div>
+    <div>
+      <p><b>Har redan ett repo</b> – pusha det</p>
+      <pre><code class="nohighlight">git remote add origin https://github.com/malmludvig/testtest.git
+git branch -M main
+git push -u origin main</code></pre>
+    </div>
+  </div>
+  <p class="box">Har du redan gjort <code>git init</code> och commits? Då räcker de <b>tre raderna</b> till höger. Byt <code>malmludvig/testtest</code> mot ditt eget namn och repo.</p>
+</section>
+
+<section class="slide">
+  <h2>Git i Visual Studio</h2>
+  <div class="scroll"><table>
+    <tr><th>Kommando</th><th>I Visual Studio</th></tr>
+    <tr><td><code>git init</code></td><td><i>Git → Create Git Repository…</i></td></tr>
+    <tr><td><code>git status</code></td><td>Fönstret <i>Git Changes</i></td></tr>
+    <tr><td><code>git add</code></td><td><b>+</b> vid filen</td></tr>
+    <tr><td><code>git commit</code></td><td><i>Commit Staged</i></td></tr>
+    <tr><td><code>git push</code> / <code>pull</code></td><td>Pilarna ↑ ↓</td></tr>
+  </table></div>
+</section>
+
+<section class="slide">
+  <h2>Git i terminalen – cheat sheet</h2>
+  <div class="cheat">
+    <div>
+      <h3>Viktigaste Git-kommandona</h3>
+      <table>
+        <tr><td><code>git init</code></td><td>Starta ett nytt lokalt Git-repo</td></tr>
+        <tr><td><code>git status</code></td><td>Kolla Git-status</td></tr>
+        <tr><td><code>git add .</code></td><td>Lägg till alla ändringar till staging (här läggs allting till innan en commit)</td></tr>
+        <tr><td><code>git commit -m "new commit"</code></td><td>Skapa en ny version (commit) med allt som är tillagt i staging</td></tr>
+        <tr><td><code>git log</code></td><td>Visa commit-historik<br><code>git log --graph --oneline --all</code></td></tr>
+      </table>
+
+      <h3>Jobba mot remote repo (GitHub)</h3>
+      <table>
+        <tr><td><code>git pull</code></td><td>Hämta remote-versionen och merga koden</td></tr>
+        <tr><td><code>git push</code></td><td>Ladda upp lokalt repo till remote repo</td></tr>
+        <tr><td><code>git clone</code></td><td>Används första gången man hämtar ett remote repo<br><code>git clone https://github.com/username/repo.git</code></td></tr>
+        <tr><td><code>git fetch</code></td><td>Hämta remote-versionen men gör ingen merge</td></tr>
+      </table>
+
+      <h3>Alltid vid nytt GitHub-repo</h3>
+      <pre><code class="nohighlight">git remote add origin https://github.com/username/repo.git
+git branch -M main
+git push -u origin main</code></pre>
+    </div>
+    <div>
+      <h3>Navigera filsystem</h3>
+      <table>
+        <tr><td><code>ls</code></td><td>Visa mappar och filer</td></tr>
+        <tr><td><code>cd</code></td><td>Byt mapp: <code>cd Desktop</code><br><code>cd ..</code> går uppåt/bakåt i filsystemet</td></tr>
+        <tr><td><code>mkdir</code></td><td>Skapa ny mapp: <code>mkdir nyMapp</code></td></tr>
+      </table>
+
+      <h3>Konfiguration</h3>
+      <p>Ställ in användaren (vilket namn som helst):</p>
+      <pre><code class="nohighlight">git config --global user.name "Ludvig M"
+git config --global user.email "m@mail.se"
+git config --global --list</code></pre>
+      <p>Kolla vilket remote repo du är kopplad till:</p>
+      <pre><code class="nohighlight">git remote -v</code></pre>
+      <p>Byt Git-editor till VS Code (Vim är standard):</p>
+      <pre><code class="nohighlight">git config --global core.editor "code --wait"
+git config --global core.editor</code></pre>
+
+      <h3>Branches och merge + git diff</h3>
+      <table>
+        <tr><td><code>git branch</code></td><td>Visa vilka branches som finns och vilken du står i<br><code>git branch -a</code> listar även remote-branches</td></tr>
+        <tr><td><code>git branch dev-branch</code></td><td>Skapa en ny branch som heter dev-branch</td></tr>
+        <tr><td><code>git checkout</code></td><td>Byt branch: <code>git checkout dev-branch</code>, <code>git checkout main</code></td></tr>
+        <tr><td><code>git switch</code></td><td>Byt branch (nyare och tydligare än checkout): <code>git switch dev-branch</code><br><code>git switch -c dev-branch</code> skapar en ny branch och byter till den</td></tr>
+        <tr><td><code>git merge</code></td><td>Merga ihop branchen du står i med den du skriver: <code>git merge dev-branch</code></td></tr>
+        <tr><td><code>git merge --abort</code></td><td>Avbryt en merge</td></tr>
+        <tr><td><code>git diff</code></td><td>Visa ändringar mellan arbetsmappen och staging</td></tr>
+      </table>
+    </div>
+  </div>
+  <p class="hint">2025, Ludvig Malm, ZoCom</p>
+</section>
+
+<section class="slide">
+  <h2>Video: komplett nybörjarguide</h2>
+  <a class="video" href="https://www.youtube.com/watch?v=G5CcDH-5j7w" target="_blank" rel="noopener">
+    <img src="git-tutorial-video.png" alt="YouTube: The Only Git Tutorial You'll Ever Need (Complete Beginner's Guide), Professor Patterns (16:20)">
+  </a>
+  <p class="hint"><a href="https://www.youtube.com/watch?v=G5CcDH-5j7w" target="_blank" rel="noopener">Öppna videon på YouTube ↗</a></p>
+</section>
+
+<section class="slide">
+  <h2>Sammanfattning</h2>
+  <div class="scroll"><table>
+    <tr><th>Kommando</th><th>Gör</th></tr>
+    <tr><td><code>git init</code></td><td>Nytt repo</td></tr>
+    <tr><td><code>git status</code></td><td>Vad har ändrats?</td></tr>
+    <tr><td><code>git add .</code></td><td>Till staging</td></tr>
+    <tr><td><code>git commit -m "…"</code></td><td>Spara en ögonblicksbild</td></tr>
+    <tr><td><code>git log --oneline</code></td><td>Historiken</td></tr>
+    <tr><td><code>git switch -c</code> / <code>merge</code></td><td>Branch / slå ihop</td></tr>
+    <tr><td><code>git push</code> / <code>pull</code></td><td>Upp / ner till GitHub</td></tr>
+  </table></div>
+  <p class="box">Nu: <a href="index.html">Git-sidan</a> – läs exemplen och gör övningarna.</p>
+</section>
+
+</div>
+
+<div class="controls">
+  <button id="prev" type="button">← Föregående</button>
+  <span class="counter" id="counter"></span>
+  <button id="next" type="button">Nästa →</button>
+</div>
+<p class="hint">Piltangenterna byter bild · <button id="fs" type="button" style="font:inherit;background:none;border:0;color:var(--accent);cursor:pointer;padding:0">Helskärm (F)</button></p>
+
+</main>
+<script src="vs.js"></script>
+<script src="cli.js"></script>
+<script>
+  const slides = [...document.querySelectorAll(".slide")];
+  const prev = document.getElementById("prev"), next = document.getElementById("next");
+  let current = 0;
+
+  function show(i) {
+    current = Math.max(0, Math.min(slides.length - 1, i));
+    slides.forEach((s, n) => s.classList.toggle("active", n === current));
+    document.getElementById("counter").textContent = `${current + 1} / ${slides.length}`;
+    prev.disabled = current === 0;
+    next.disabled = current === slides.length - 1;
+    history.replaceState(null, "", "#" + (current + 1));
+  }
+
+  function fullscreen() {
+    try {
+      if (document.fullscreenElement) document.exitFullscreen();
+      else document.getElementById("show").requestFullscreen();
+    } catch (e) { }
+  }
+
+  prev.onclick = () => show(current - 1);
+  next.onclick = () => show(current + 1);
+  document.getElementById("fs").onclick = fullscreen;
+  document.addEventListener("keydown", e => {
+    if (e.key === "ArrowRight" || e.key === " " || e.key === "PageDown") { e.preventDefault(); show(current + 1); }
+    if (e.key === "ArrowLeft" || e.key === "PageUp") { e.preventDefault(); show(current - 1); }
+    if (e.key === "f" || e.key === "F") fullscreen();
+  });
+
+  show((parseInt(location.hash.slice(1)) || 1) - 1);
+</script>
+</body>
+</html>

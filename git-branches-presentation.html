@@ -1,0 +1,528 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="claude:viewport-fit-sides" content="cover">
+<title>Git branches presentation</title>
+<link rel="stylesheet" href="style.css">
+<style>
+  /* Bildspel: en bild i taget, stor text */
+  .slides { min-height: 60vh; display: flex; flex-direction: column; justify-content: center; }
+  .slide { display: none; font-size: 1.25rem; }
+  .slide.active { display: block; }
+  .slide h1 { font-size: clamp(2.2rem, 7vw, 3.6rem); margin: 0 0 8px; }
+  .slide h2 { margin-top: 0; font-size: clamp(1.6rem, 4.5vw, 2.2rem); }
+  .slide pre { font-size: clamp(14px, 2.4vw, 19px); }
+  .big { font-size: clamp(1.4rem, 4vw, 2rem); text-align: center; }
+  .controls { display: flex; align-items: center; justify-content: space-between; gap: 12px; border-top: 1px solid var(--line); padding-top: 12px; margin-top: 24px; }
+  .controls button { font: inherit; font-weight: 600; background: var(--card); color: var(--ink); border: 1px solid var(--line); border-radius: 8px; padding: 8px 16px; cursor: pointer; }
+  .controls button:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
+  .controls button:disabled { opacity: .4; cursor: default; }
+  .counter { color: var(--muted); font-variant-numeric: tabular-nums; }
+  .hint { color: var(--muted); font-size: .9rem; text-align: center; }
+  :fullscreen main { max-width: 1100px; }
+  :fullscreen { background: var(--bg); overflow: auto; }
+
+  /* Diagram ritas först när bilden visas */
+  .slide .mermaid { margin-block: 12px; }
+  .cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(260px, 100%), 1fr)); gap: 16px; }
+  .cols > div { min-width: 0; }
+
+  /* Konfliktmarkeringar: varje del i filen med en förklaring bredvid */
+  .conflict { border-radius: 8px; overflow: hidden; border: 1px solid var(--line); margin-block: 12px; font-size: clamp(14px, 2.2vw, 18px); }
+  .conflict > div { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 4px 16px; padding: 8px 14px; border-left: 6px solid; }
+  .conflict code { white-space: pre-wrap; overflow-wrap: anywhere; }
+  .conflict span { font-family: system-ui, sans-serif; font-size: .85em; color: var(--muted); }
+  .c-mark { background: rgba(127, 127, 127, .12); border-color: #8a8a8a; }
+  .c-mark code { color: var(--muted); }
+  .c-ours { background: rgba(87, 166, 74, .14); border-color: #57a64a; }
+  .c-theirs { background: rgba(86, 156, 214, .14); border-color: #569cd6; }
+
+  /* Steg i en rad med pilar emellan */
+  .steps { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 8px; margin-block: 16px; }
+  .steps > div { background: var(--card); border: 2px solid var(--accent); border-radius: 10px; padding: 10px 14px; text-align: center; font-weight: 600; }
+  .steps small { display: block; font-weight: 400; color: var(--muted); font-size: .8rem; }
+  .steps > span { color: var(--muted); font-size: 1.4rem; }
+
+  /* Bild i en slide */
+  .pic { margin: 8px 0 12px; background: #fff; border: 1px solid var(--line); border-radius: 10px; padding: 12px; text-align: center; }
+  .pic img { display: block; margin: 0 auto; max-width: 100%; max-height: 52vh; height: auto; }
+
+  .pic-dark { background: var(--code); border-color: var(--code); }
+
+  /* Videotips: skärmbild som länk */
+  .video { display: block; max-width: 760px; margin: 16px auto 0; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; background: #fff; }
+  .video img { display: block; width: 100%; height: auto; }
+  .video:hover { border-color: var(--accent); }
+</style>
+</head>
+<body>
+<nav><a href="vecka43.html">Lektioner vecka 5</a><a href="vecka44.html">Lektioner vecka 6</a><a href="index.html" aria-current="true">Lektioner vecka 7</a></nav>
+<nav class="undermeny"><a href="git-presentation.html">Presentation: Git</a><a href="index.html">Git</a><a href="git-branches-presentation.html" aria-current="page">Presentation: Git branches</a><a href="merge-conflicts-presentation.html">Presentation: Merge conflicts</a><a href="branching-strategies-presentation.html">Presentation: Git branching strategies</a><a href="lab-git-branching.html">Övning: Git branching</a></nav>
+<main id="show">
+
+<div class="slides">
+
+<section class="slide">
+  <h1>Git branches</h1>
+  <p class="lead">Jobba på nya saker i ett eget spår – utan att förstöra det som redan fungerar.</p>
+</section>
+
+<section class="slide">
+  <h2>Problemet</h2>
+  <p>Programmet fungerar. Nu ska du bygga en meny – och mitt i allt kraschar det.</p>
+  <ul>
+    <li>Du vill kunna testa nya idéer utan risk.</li>
+    <li>Du vill kunna jobba på två saker samtidigt.</li>
+    <li>I en grupp vill alla koda samtidigt utan att krocka.</li>
+  </ul>
+  <p class="box">Lösningen: <b>branches</b> (grenar).</p>
+</section>
+
+<section class="slide">
+  <h2>Vad är en branch?</h2>
+  <p>En <b>branch</b> är ett eget spår av commits. <code>main</code> är huvudspåret.</p>
+  <pre class="mermaid">
+gitGraph
+  commit id: "Skapa projekt"
+  commit id: "Product"
+  branch meny
+  checkout meny
+  commit id: "Meny steg 1"
+  commit id: "Meny steg 2"
+  checkout main
+  commit id: "Rätta stavfel"
+  </pre>
+  <p>Commits på <code>meny</code> påverkar inte <code>main</code> – förrän du väljer att slå ihop dem.</p>
+</section>
+
+<section class="slide">
+  <h2>En branch är bara en etikett</h2>
+  <p>Tekniskt är en branch en <b>pekare</b> till en commit. När du committar flyttar pekaren fram.</p>
+  <p><code>HEAD</code> visar vilken branch du står på just nu.</p>
+  <pre><code class="nohighlight">git log --oneline --graph --all
+<samp>* c4e1a90 (HEAD -> meny) Meny steg 2</samp>
+<samp>* 9b2f7d3 Meny steg 1</samp>
+<samp>| * 51aa0e6 (main) Rätta stavfel</samp>
+<samp>|/</samp>
+<samp>* 2d8c3f1 Product</samp></code></pre>
+  <p class="box">Att skapa en branch är gratis och går blixtsnabbt – Git kopierar inga filer.</p>
+</section>
+
+<section class="slide">
+  <h2>Se och skapa branches</h2>
+  <pre><code class="nohighlight">git branch               # lista – * visar var du står
+<samp>  main</samp>
+<samp>* meny</samp>
+
+git branch meny          # skapa (men stanna kvar)
+git switch meny          # byt till meny
+
+git switch -c meny       # skapa OCH byt – samma som de två ovan</code></pre>
+  <p class="hint">Äldre kommando som gör samma sak: <code>git checkout meny</code> och <code>git checkout -b meny</code></p>
+</section>
+
+<section class="slide">
+  <h2><code>git checkout</code> eller <code>git switch</code>?</h2>
+  <p><code>git checkout</code> är det gamla kommandot. Det gör <b>två olika saker</b>: byter branch <i>och</i> återställer filer. Därför delades det upp i två nya kommandon 2019 (Git 2.23):</p>
+  <div class="scroll"><table>
+    <tr><th>Vad du vill göra</th><th>Gammalt</th><th>Nytt</th></tr>
+    <tr><td>Byta branch</td><td><code>git checkout meny</code></td><td><code>git switch meny</code></td></tr>
+    <tr><td>Skapa och byta</td><td><code>git checkout -b meny</code></td><td><code>git switch -c meny</code></td></tr>
+    <tr><td>Ångra ändringar i en fil</td><td><code>git checkout -- Program.cs</code></td><td><code>git restore Program.cs</code></td></tr>
+  </table></div>
+  <p class="box"><b>Båda fungerar.</b> Använd <code>git switch</code> – namnet säger vad det gör, och du kan inte råka slänga ändringar i en fil. <code>git checkout</code> kommer du att se i äldre guider och på Stack Overflow.</p>
+</section>
+
+<section class="slide">
+  <h2>Byt branch = byt filer</h2>
+  <p>När du byter branch byter Git ut filerna i arbetsmappen så att de matchar den branchen.</p>
+  <pre><code class="nohighlight">git switch meny     # Program.cs har menyn
+git switch main     # menyn är "borta" – den finns bara på meny</code></pre>
+  <p class="box"><b>Commita innan du byter branch.</b> Har du osparade ändringar som krockar stoppar Git dig.</p>
+</section>
+
+<section class="slide">
+  <h2>Merge – slå ihop</h2>
+  <p>Stå på den branch som ska <b>ta emot</b> ändringarna, och merga in den andra.</p>
+  <pre><code class="nohighlight">git switch main       # 1. gå till mottagaren
+git merge meny        # 2. hämta in meny
+git branch -d meny    # 3. städa bort branchen</code></pre>
+  <pre class="mermaid">
+gitGraph
+  commit id: "Skapa projekt"
+  branch meny
+  checkout meny
+  commit id: "Meny steg 1"
+  commit id: "Meny steg 2"
+  checkout main
+  commit id: "Rätta stavfel"
+  merge meny id: "Merge meny"
+  </pre>
+</section>
+
+<section class="slide">
+  <h2>Två sorters merge</h2>
+  <div class="cols">
+    <div>
+      <p><b>Fast-forward</b><br>Inget nytt har hänt på <code>main</code>. Git flyttar bara fram pekaren.</p>
+      <pre class="mermaid">
+gitGraph
+  commit id: "A"
+  commit id: "B"
+  commit id: "C (meny)"
+      </pre>
+    </div>
+    <div>
+      <p><b>Merge-commit</b><br>Båda har nya commits. Git gör en ny commit som knyter ihop dem.</p>
+      <pre class="mermaid">
+gitGraph
+  commit id: "A"
+  branch meny
+  commit id: "B"
+  checkout main
+  commit id: "X"
+  merge meny id: "M"
+      </pre>
+    </div>
+  </div>
+</section>
+
+<section class="slide">
+  <h2>Merge-konflikt</h2>
+  <p>Båda branches har ändrat <b>samma rad</b>. Git kan inte välja åt dig:</p>
+  <pre><code class="nohighlight">git merge meny
+<samp>CONFLICT (content): Merge conflict in Program.cs</samp></code></pre>
+  <pre><code class="nohighlight">&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD
+Console.WriteLine("Välkommen!");
+=======
+Console.WriteLine("Välkommen till Kaffekoppen!");
+&gt;&gt;&gt;&gt;&gt;&gt;&gt; meny</code></pre>
+</section>
+
+<section class="slide">
+  <h2>Läs konflikten</h2>
+  <p>Git skriver in <b>båda</b> versionerna i filen och märker ut dem:</p>
+  <div class="conflict">
+    <div class="c-mark"><code>&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD</code><span>Start på konflikten</span></div>
+    <div class="c-ours"><code>Console.WriteLine("Välkommen!");</code><span>Din version – branchen du står på (<b>main</b>)</span></div>
+    <div class="c-mark"><code>=======</code><span>Skiljelinje</span></div>
+    <div class="c-theirs"><code>Console.WriteLine("Välkommen till Kaffekoppen!");</code><span>Den andra versionen – från <b>meny</b></span></div>
+    <div class="c-mark"><code>&gt;&gt;&gt;&gt;&gt;&gt;&gt; meny</code><span>Slut på konflikten</span></div>
+  </div>
+  <p>Du bestämmer vad som ska stå kvar. Tre vanliga val:</p>
+  <div class="cols">
+    <div>
+      <p><b>Behåll din</b></p>
+      <pre><code>Console.WriteLine("Välkommen!");</code></pre>
+    </div>
+    <div>
+      <p><b>Behåll den andra</b></p>
+      <pre><code>Console.WriteLine("Välkommen till Kaffekoppen!");</code></pre>
+    </div>
+    <div>
+      <p><b>Behåll båda</b></p>
+      <pre><code>Console.WriteLine("Välkommen!");
+Console.WriteLine("Välkommen till Kaffekoppen!");</code></pre>
+    </div>
+  </div>
+  <p class="box">De grå raderna – <code>&lt;&lt;&lt;&lt;&lt;&lt;&lt;</code>, <code>=======</code> och <code>&gt;&gt;&gt;&gt;&gt;&gt;&gt;</code> – ska <b>alltid</b> bort. Annars bygger inte programmet.</p>
+</section>
+
+<section class="slide">
+  <h2>Lös konflikten</h2>
+  <ol>
+    <li>Öppna filen. <code>HEAD</code> = din branch, nederst = den andra.</li>
+    <li>Skriv det som ska stå kvar. Ta bort <code>&lt;&lt;&lt;&lt;&lt;&lt;&lt;</code>, <code>=======</code>, <code>&gt;&gt;&gt;&gt;&gt;&gt;&gt;</code>.</li>
+    <li>Bygg och testa.</li>
+  </ol>
+  <pre><code class="nohighlight">git add Program.cs
+git commit -m "Slå ihop meny"</code></pre>
+  <p class="box">Konflikter är normala – inte ett fel. Små, täta merges ger små konflikter.</p>
+</section>
+
+<section class="slide">
+  <h2>Ångra dig: <code>git merge --abort</code></h2>
+  <p>Blev det en konflikt du inte vill lösa just nu? <b>Du kan alltid backa.</b></p>
+  <pre><code class="nohighlight">git merge --abort     # ångra – tillbaka till innan merge</code></pre>
+  <div class="steps">
+    <div>Innan <code>git merge</code><small>allt fungerar</small></div>
+    <span>→</span>
+    <div>Konflikt<small>filer fulla av &lt;&lt;&lt; === &gt;&gt;&gt;</small></div>
+    <span>→</span>
+    <div><code>git merge --abort</code><small>tillbaka till start</small></div>
+  </div>
+  <ul>
+    <li>Filerna blir <b>exakt</b> som de var innan du skrev <code>git merge</code>.</li>
+    <li>Inget försvinner – branchen <code>meny</code> och alla dess commits finns kvar.</li>
+    <li>Du kan försöka merga igen senare, när du är redo.</li>
+  </ul>
+  <p class="box">Fungerar medan mergen <b>pågår</b> – alltså innan du har gjort <code>git commit</code>. Osäker? Kör <code>git status</code>: står det <i>"You have unmerged paths"</i> pågår en merge.</p>
+</section>
+
+<section class="slide">
+  <h2>Video: lös merge-konflikter</h2>
+  <a class="video" href="https://www.youtube.com/watch?v=xNVM5UxlFSA&amp;list=PLkEZWD8wbltmcZQaA0ism9k2E6MGRnHZ7&amp;index=8" target="_blank" rel="noopener">
+    <img src="merge-conflict-video.png" alt="YouTube: How to resolve merge conflicts in Git (6:36)">
+  </a>
+  <p class="hint"><a href="https://www.youtube.com/watch?v=xNVM5UxlFSA&amp;list=PLkEZWD8wbltmcZQaA0ism9k2E6MGRnHZ7&amp;index=8" target="_blank" rel="noopener">Öppna videon på YouTube ↗</a></p>
+</section>
+
+<section class="slide">
+  <h2>Branches på GitHub</h2>
+  <pre><code class="nohighlight">git push -u origin meny    # första gången: skicka upp branchen
+git push                   # sedan räcker det
+
+git fetch                  # hämta info om andras branches
+git branch -a              # visa även remote-branches
+<samp>  main</samp>
+<samp>* meny</samp>
+<samp>  remotes/origin/main</samp>
+<samp>  remotes/origin/meny</samp>
+
+git switch kompis-branch   # hämtar och byter till en kompis branch</code></pre>
+</section>
+
+<section class="slide">
+  <h2>Branchstrategier</h2>
+  <p>En <b>branchstrategi</b> är en överenskommelse i gruppen: <i>vilka branches har vi, och hur kommer koden in i <code>main</code>?</i></p>
+  <div class="scroll"><table>
+    <tr><th>Strategi</th><th>Kort</th><th>Passar för</th></tr>
+    <tr><td><b>Bara main</b></td><td>Alla committar direkt på <code>main</code></td><td>Små egna projekt</td></tr>
+    <tr><td><b>Feature branches</b></td><td><code>main</code> + en branch per uppgift</td><td>Grupparbeten – de flesta projekt</td></tr>
+    <tr><td><b>Git Flow</b></td><td><code>main</code> + <code>dev</code> + feature branches</td><td>Större projekt med versioner</td></tr>
+  </table></div>
+  <p class="box">Det finns inget rätt eller fel – det viktiga är att alla i gruppen gör <b>likadant</b>.</p>
+</section>
+
+<section class="slide">
+  <h2>1. Bara main</h2>
+  <pre class="mermaid">
+gitGraph
+  commit id: "Start"
+  commit id: "Meny"
+  commit id: "Kvitto"
+  commit id: "Rätta bugg"
+  </pre>
+  <ul>
+    <li>➕ Enklast möjliga – inga branches att hålla reda på.</li>
+    <li>➖ Allt du committar hamnar direkt i den "riktiga" koden.</li>
+    <li>➖ Svårt när flera jobbar samtidigt – många konflikter.</li>
+  </ul>
+  <p class="box">Bra när du jobbar <b>ensam</b> med något litet, till exempel en övning.</p>
+</section>
+
+<section class="slide">
+  <h2>2. Feature branches</h2>
+  <p>Kallas också <b>GitHub Flow</b>. <code>main</code> fungerar alltid – allt nytt görs på en egen branch.</p>
+  <pre class="mermaid">
+gitGraph
+  commit id: "Start"
+  branch feature-meny
+  commit id: "Meny"
+  checkout main
+  merge feature-meny
+  branch feature-kvitto
+  commit id: "Kvitto"
+  checkout main
+  merge feature-kvitto
+  </pre>
+  <ul>
+    <li>En branch per uppgift → Pull Request → merge in i <code>main</code>.</li>
+    <li>➕ Enkel att förstå, och <code>main</code> är alltid hel.</li>
+  </ul>
+  <p class="box">Den här använder vi i <b>grupparbeten</b>.</p>
+</section>
+
+<section class="slide">
+  <h2>3. Git Flow</h2>
+  <p>Tre sorters branches: <code>main</code>, <code>dev</code> och feature branches.</p>
+  <ul>
+    <li><code>feature-…</code> mergas in i <code>dev</code>.</li>
+    <li><code>dev</code> mergas in i <code>main</code> när en <b>ny version</b> är klar, till exempel <i>V1.0</i>.</li>
+    <li><code>main</code> innehåller bara släppta versioner.</li>
+  </ul>
+  <ul>
+    <li>➕ Ordning och reda när man släpper versioner.</li>
+    <li>➖ Fler branches och fler merges att hålla reda på.</li>
+  </ul>
+  <p class="box">Vanligt i <b>större projekt</b> och på företag – bra att känna igen.</p>
+</section>
+
+<section class="slide">
+  <h2>Vilken ska vi välja?</h2>
+  <div class="steps">
+    <div>Jobbar du ensam?<small>Bara main</small></div>
+    <span>→</span>
+    <div>Jobbar ni i grupp?<small>Feature branches</small></div>
+    <span>→</span>
+    <div>Släpper ni versioner?<small>Git Flow</small></div>
+  </div>
+  <p class="box">Börja enkelt. Behöver ni mer ordning senare kan ni alltid lägga till en <code>dev</code>-branch.</p>
+</section>
+
+<section class="slide">
+  <h2>Feature branch workflow</h2>
+  <p>Varje ny funktion får en egen branch. <code>main</code> fungerar alltid.</p>
+  <pre class="mermaid">
+gitGraph
+  commit id: "Start"
+  branch dev
+  checkout dev
+  commit id: "Setup"
+  branch feature-meny
+  checkout feature-meny
+  commit id: "Meny"
+  checkout dev
+  branch feature-kvitto
+  checkout feature-kvitto
+  commit id: "Kvitto"
+  checkout dev
+  merge feature-meny
+  merge feature-kvitto
+  checkout main
+  merge dev id: "Release"
+  </pre>
+</section>
+
+<section class="slide">
+  <h2>Main, dev och feature branches</h2>
+  <figure class="pic">
+    <img src="feature-branch-workflow.png" alt="Diagram: main, dev och två feature branches. Dev skapas från main, två feature branches skapas från dev, mergas tillbaka in i dev en i taget, och dev mergas till sist in i main som version V1.0.">
+  </figure>
+  <ul>
+    <li><b>Main</b> – bara färdiga versioner, till exempel <i>V1.0</i>.</li>
+    <li><b>Dev</b> – här samlas allt som är klart men inte släppt än.</li>
+    <li><b>Feature branch</b> – en per uppgift. Mergas in i <code>dev</code> när den är klar.</li>
+  </ul>
+</section>
+
+<section class="slide">
+  <h2>Flödet steg för steg</h2>
+  <pre><code class="nohighlight">git switch main
+git pull                          # 1. börja från senaste versionen
+git switch -c feature-meny        # 2. ny branch för uppgiften
+# ... koda, add, commit – ofta ...
+git push -u origin feature-meny   # 3. skicka upp branchen
+# 4. skapa en Pull Request på GitHub
+# 5. någon granskar → Merge
+git switch main
+git pull                          # 6. hämta den mergade koden
+git branch -d feature-meny        # 7. städa</code></pre>
+</section>
+
+<section class="slide">
+  <h2>Från din dator till <code>main</code> på GitHub</h2>
+  <figure class="pic pic-dark">
+    <img src="push-pull-request.png" alt="Din dator och GitHub, båda med branches main och feature. Den lokala feature-branchen pushas till GitHub. På GitHub går en streckad pil märkt PR från feature till main.">
+  </figure>
+  <ol>
+    <li><b>Push</b> – din lokala <code>feature</code> skickas upp: <code>git push -u origin feature</code></li>
+    <li><b>Pull Request</b> – på GitHub ber du om att få merga <code>feature</code> in i <code>main</code></li>
+    <li>När PR:en är godkänd mergas den <b>på GitHub</b> – inte på din dator</li>
+  </ol>
+</section>
+
+<section class="slide">
+  <h2>Pull Request</h2>
+  <p>En <b>Pull Request</b> (PR) är en fråga på GitHub: <i>"Får jag merga min branch in i main?"</i></p>
+  <ul>
+    <li>Gruppen ser exakt vilka rader som ändrats.</li>
+    <li>Man kan kommentera och be om ändringar.</li>
+    <li>När alla är nöjda: klicka <b>Merge pull request</b>.</li>
+  </ul>
+  <p class="box">På GitHub: <i>Pull requests → New pull request</i> → välj din branch → <i>Create pull request</i>.</p>
+</section>
+
+<section class="slide">
+  <h2>Bra branch-namn</h2>
+  <div class="scroll"><table>
+    <tr><th>Dåligt</th><th>Bra</th></tr>
+    <tr><td><code>test</code></td><td><code>feature-meny</code></td></tr>
+    <tr><td><code>ludvig2</code></td><td><code>fix-studentrabatt</code></td></tr>
+    <tr><td><code>nya grejer</code></td><td><code>feature-kvitto</code></td></tr>
+  </table></div>
+  <p>Kort, utan mellanslag och å/ä/ö. Säg <i>vad</i> branchen gör.</p>
+</section>
+
+<section class="slide">
+  <h2>Branches i Visual Studio</h2>
+  <div class="scroll"><table>
+    <tr><th>Kommando</th><th>I Visual Studio</th></tr>
+    <tr><td><code>git branch</code></td><td>Branch-namnet längst ner till höger</td></tr>
+    <tr><td><code>git switch -c</code></td><td>Branch-namnet → <i>New Branch</i></td></tr>
+    <tr><td><code>git switch</code></td><td>Klicka på en annan branch i listan</td></tr>
+    <tr><td><code>git merge</code></td><td><i>Git → Manage Branches</i> → högerklicka → <i>Merge into …</i></td></tr>
+    <tr><td><code>git log --graph</code></td><td><i>Git → View Branch History</i></td></tr>
+  </table></div>
+</section>
+
+<section class="slide">
+  <h2>Sammanfattning</h2>
+  <div class="scroll"><table>
+    <tr><th>Kommando</th><th>Gör</th></tr>
+    <tr><td><code>git branch</code></td><td>Lista branches</td></tr>
+    <tr><td><code>git switch -c namn</code></td><td>Skapa och byt till ny branch</td></tr>
+    <tr><td><code>git switch namn</code></td><td>Byt branch</td></tr>
+    <tr><td><code>git merge namn</code></td><td>Hämta in en branch i den du står på</td></tr>
+    <tr><td><code>git merge --abort</code></td><td>Avbryt en merge</td></tr>
+    <tr><td><code>git branch -d namn</code></td><td>Ta bort en branch</td></tr>
+    <tr><td><code>git push -u origin namn</code></td><td>Skicka upp branchen till GitHub</td></tr>
+    <tr><td><code>git log --oneline --graph --all</code></td><td>Visa alla branches som ett träd</td></tr>
+  </table></div>
+  <p class="box">Nu: <a href="index.html">Git-sidan</a> – gör övning 4 och 5 om branches och konflikter.</p>
+</section>
+
+</div>
+
+<div class="controls">
+  <button id="prev" type="button">← Föregående</button>
+  <span class="counter" id="counter"></span>
+  <button id="next" type="button">Nästa →</button>
+</div>
+<p class="hint">Piltangenterna byter bild · <button id="fs" type="button" style="font:inherit;background:none;border:0;color:var(--accent);cursor:pointer;padding:0">Helskärm (F)</button></p>
+
+</main>
+<script src="vs.js"></script>
+<script src="cli.js"></script>
+<script type="module">
+  import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.esm.min.mjs";
+  mermaid.initialize({ startOnLoad: false, theme: "neutral", gitGraph: { mainBranchName: "main" } });
+
+  const slides = [...document.querySelectorAll(".slide")];
+  const prev = document.getElementById("prev"), next = document.getElementById("next");
+  let current = 0;
+
+  function show(i) {
+    current = Math.max(0, Math.min(slides.length - 1, i));
+    slides.forEach((s, n) => s.classList.toggle("active", n === current));
+    document.getElementById("counter").textContent = `${current + 1} / ${slides.length}`;
+    prev.disabled = current === 0;
+    next.disabled = current === slides.length - 1;
+    history.replaceState(null, "", "#" + (current + 1));
+    // Diagram kan bara ritas när bilden syns
+    const diagrams = slides[current].querySelectorAll("pre.mermaid:not([data-processed])");
+    if (diagrams.length) mermaid.run({ nodes: diagrams });
+  }
+
+  function fullscreen() {
+    try {
+      if (document.fullscreenElement) document.exitFullscreen();
+      else document.getElementById("show").requestFullscreen();
+    } catch (e) { }
+  }
+
+  prev.onclick = () => show(current - 1);
+  next.onclick = () => show(current + 1);
+  document.getElementById("fs").onclick = fullscreen;
+  document.addEventListener("keydown", e => {
+    if (e.key === "ArrowRight" || e.key === " " || e.key === "PageDown") { e.preventDefault(); show(current + 1); }
+    if (e.key === "ArrowLeft" || e.key === "PageUp") { e.preventDefault(); show(current - 1); }
+    if (e.key === "f" || e.key === "F") fullscreen();
+  });
+
+  show((parseInt(location.hash.slice(1)) || 1) - 1);
+</script>
+</body>
+</html>
