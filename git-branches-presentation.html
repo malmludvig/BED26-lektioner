@@ -98,6 +98,14 @@ gitGraph
 </section>
 
 <section class="slide">
+  <h2>Branches som en bläckfisk</h2>
+  <figure class="pic">
+    <img src="git-branching-blackfiskar.webp" alt="Tecknad bläckfisk på master branch. På en branch får den hjärtglasögon, på en annan en cowboyhatt. När båda branches mergas in i master har bläckfisken både glasögon och hatt.">
+  </figure>
+  <p>Varje branch lägger till en sak var för sig. Efter merge har <code>main</code> båda.</p>
+</section>
+
+<section class="slide">
   <h2>En branch är bara en etikett</h2>
   <p>Tekniskt är en branch en <b>pekare</b> till en commit. När du committar flyttar pekaren fram.</p>
   <p><code>HEAD</code> visar vilken branch du står på just nu.</p>
@@ -387,6 +395,14 @@ gitGraph
 </section>
 
 <section class="slide">
+  <h2>Varje feature byggs för sig</h2>
+  <figure class="pic">
+    <img src="feature-kuber.webp" alt="En blå kub på dev. Tre feature branches – gult block, grön kub och cylinder – byggs var för sig från dev och mergas in en i taget, tills dev har alla tre delarna.">
+  </figure>
+  <p>Alla feature branches utgår från <code>dev</code> och mergas tillbaka en i taget.</p>
+</section>
+
+<section class="slide">
   <h2>Main, dev och feature branches</h2>
   <figure class="pic">
     <img src="feature-branch-workflow.png" alt="Diagram: main, dev och två feature branches. Dev skapas från main, två feature branches skapas från dev, mergas tillbaka in i dev en i taget, och dev mergas till sist in i main som version V1.0.">
@@ -396,6 +412,14 @@ gitGraph
     <li><b>Dev</b> – här samlas allt som är klart men inte släppt än.</li>
     <li><b>Feature branch</b> – en per uppgift. Mergas in i <code>dev</code> när den är klar.</li>
   </ul>
+</section>
+
+<section class="slide">
+  <h2>Från GitHub-repo till server</h2>
+  <figure class="pic pic-dark">
+    <img src="feature-branch-server.png" alt="Feature branch workflow med anteckningar: hela flödet ligger i GitHub-repot. git branch dev skapar en kopia av main. Feature branches som feature/fix-login-page och feature/fix-database-bug mergas in i dev, och dev mergas in i main som V1.0, som läggs ut på servern.">
+  </figure>
+  <p><code>dev</code> är en kopia av <code>main</code>. När en version är klar mergas den in i <code>main</code> – och läggs ut på servern.</p>
 </section>
 
 <section class="slide">
