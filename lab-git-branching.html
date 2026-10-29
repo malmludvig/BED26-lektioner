@@ -31,6 +31,33 @@
 <p>Målet är att kunna jobba på flera saker samtidigt och alltid ha en version som fungerar.</p>
 <p class="box">Alla uppgifter görs i terminalen med vanliga textfiler – du behöver inte skriva någon kod. Kör <code>git status</code> och <code>git branch</code> ofta för att se var du står.</p>
 
+<!-- ================= CHEAT SHEET ================= -->
+<h2>Cheat sheet</h2>
+<p>Det här är allt du behöver för att lösa övningarna.</p>
+<div class="scroll"><table>
+  <tr><th>Kommando</th><th>Gör</th></tr>
+  <tr><td><code>git init</code></td><td>Gör mappen till ett repo</td></tr>
+  <tr><td><code>git status</code></td><td>Visar vilken branch du står på och vad som har ändrats</td></tr>
+  <tr><td><code>git add .</code></td><td>Lägger alla ändringar i staging</td></tr>
+  <tr><td><code>git commit -m "…"</code></td><td>Sparar en commit med ett meddelande</td></tr>
+  <tr><td><code>git branch</code></td><td>Listar branches – <code>*</code> visar var du står</td></tr>
+  <tr><td><code>git switch -c helg</code></td><td>Skapar branchen <code>helg</code> och byter till den</td></tr>
+  <tr><td><code>git switch main</code></td><td>Byter till <code>main</code></td></tr>
+  <tr><td><code>git merge helg</code></td><td>Hämtar in <code>helg</code> i branchen du står på</td></tr>
+  <tr><td><code>git merge --abort</code></td><td>Avbryter en merge med konflikt</td></tr>
+  <tr><td><code>git branch -d helg</code></td><td>Tar bort branchen <code>helg</code> (när den är mergad)</td></tr>
+  <tr><td><code>git log --oneline --graph --all</code></td><td>Visar historiken med alla branches</td></tr>
+</table></div>
+<div class="box">
+<p><b>Merge-konflikt?</b></p>
+<ol>
+  <li>Öppna filen och välj vilken rad som ska stå kvar.</li>
+  <li>Ta bort <code>&lt;&lt;&lt;&lt;&lt;&lt;&lt;</code>, <code>=======</code> och <code>&gt;&gt;&gt;&gt;&gt;&gt;&gt;</code>.</li>
+  <li><code>git add .</code> och <code>git commit -m "Lös konflikt"</code></li>
+</ol>
+</div>
+<p class="box"><b>Kom ihåg:</b> merga alltid från den branch du vill hämta <i>till</i>. Ska <code>helg</code> in i <code>main</code>? Stå på <code>main</code> och kör <code>git merge helg</code>.</p>
+
 <!-- ================= UPPGIFT 1 ================= -->
 <h2>Uppgift 1 – Inköpslistan</h2>
 <h3>Scenario</h3>
