@@ -52,6 +52,10 @@
   .split ul { margin: 0; padding-left: 1.1em; }
   .split li { margin-block: 6px; }
   @media (max-width: 640px) { .split { grid-template-columns: 1fr; } }
+
+  /* Bild i en slide */
+  .pic { margin: 8px 0 0; background: #fff; border: 1px solid var(--line); border-radius: 10px; padding: 12px; text-align: center; }
+  .pic img { display: block; margin: 0 auto; max-width: 100%; max-height: 62vh; height: auto; }
 </style>
 </head>
 <body>
@@ -142,6 +146,13 @@
     <div class="tile cyan"><b>En loop</b><small>gör om och om igen – tills uppgiften är klar</small></div>
   </div>
   <p class="box" style="margin-top:20px">Loopen: <b>tänk</b> → <b>använd ett verktyg</b> → <b>titta på resultatet</b> → tänk igen …</p>
+</section>
+
+<section class="slide">
+  <h2>Det är inte magi</h2>
+  <figure class="pic">
+    <img src="agent-post.png" alt="LinkedIn-inlägg av Hassaan Akbar: en agent är bara en LLM i en loop med verktyg. Verktyg är vanliga Python-funktioner, skills är markdown-filer som laddas vid behov, agentens livslängd är en chattsession, minnet är markdown-filer och ibland en vektordatabas, thinking är modellen som skriver steg för steg, och agentens persona är en markdown-fil som används som systemprompt. Att få allt att låta som en levande varelse gör att det ser mer avancerat ut än det är.">
+  </figure>
 </section>
 
 </div>
