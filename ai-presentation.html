@@ -53,6 +53,18 @@
   .split li { margin-block: 6px; }
   @media (max-width: 640px) { .split { grid-template-columns: 1fr; } }
 
+  /* Nivåer med pil */
+  .levels { display: flex; gap: 16px; margin-block: 8px 16px; }
+  .levels .arrow { flex: 0 0 44px; display: flex; flex-direction: column; align-items: center; }
+  .levels .arrow::before { content: ""; flex: 1; width: 14px; background: #14112a; }
+  .levels .arrow::after { content: ""; border: 22px solid transparent; border-top: 26px solid #14112a; border-bottom: 0; }
+  .levels ol { list-style: none; margin: 0; padding: 0; flex: 1; display: grid; gap: 10px; counter-reset: lvl; }
+  .levels li { counter-increment: lvl; position: relative; border-radius: 14px; padding: 14px 56px 14px 20px; color: #14112a; }
+  .levels li::after { content: counter(lvl); position: absolute; right: 12px; top: 50%; transform: translateY(-50%); width: 32px; height: 32px; border-radius: 50%; background: #fff; color: #14112a; border: 2px solid #14112a; display: grid; place-items: center; font-weight: 700; font-size: 1rem; }
+  .levels li small { display: block; font-size: .8em; opacity: .8; }
+  .levels li.pink { color: #fff; }
+  .mint { background: #8af5c8; }
+
   /* Bild i en slide */
   .pic { margin: 8px 0 0; background: #fff; border: 1px solid var(--line); border-radius: 10px; padding: 12px; text-align: center; }
   .pic img { display: block; margin: 0 auto; max-width: 100%; max-height: 62vh; height: auto; }
@@ -105,6 +117,20 @@
   <div class="dark">
     <p>Målet: använd kraften i <b>AI-verktygen</b> – men se till att det vi bygger är <b>bra och pålitlig</b> mjukvara.</p>
   </div>
+</section>
+
+<section class="slide">
+  <h2>Hur mycket skriver AI:n?</h2>
+  <div class="levels">
+    <div class="arrow" aria-hidden="true"></div>
+    <ol>
+      <li class="lime"><b>Människan skriver all kod</b><small>Ingen AI alls</small></li>
+      <li class="cyan"><b>Människan skriver – AI:n hjälper till</b><small>Förslag, förklaringar, autokomplettering</small></li>
+      <li class="mint"><b>AI:n skriver – människan styr</b><small>Du beskriver, granskar och testar</small></li>
+      <li class="pink"><b>AI:n skriver all kod</b><small>Ingen människa läser koden</small></li>
+    </ol>
+  </div>
+  <p class="box">Ju längre ner, desto viktigare att <b>du</b> förstår och testar koden.</p>
 </section>
 
 <section class="slide">
