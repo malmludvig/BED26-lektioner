@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="claude:viewport-fit-sides" content="cover">
+<title>AI-assisterad kodning</title>
+<link rel="stylesheet" href="style.css">
+<style>
+  /* Bildspel: en bild i taget, stor text */
+  .slides { min-height: 60vh; display: flex; flex-direction: column; justify-content: center; }
+  .slide { display: none; font-size: 1.25rem; }
+  .slide.active { display: block; }
+  .slide h1 { font-size: clamp(2.2rem, 7vw, 3.6rem); margin: 0 0 8px; }
+  .slide h2 { margin-top: 0; font-size: clamp(1.6rem, 4.5vw, 2.2rem); }
+  .controls { display: flex; align-items: center; justify-content: space-between; gap: 12px; border-top: 1px solid var(--line); padding-top: 12px; margin-top: 24px; }
+  .controls button { font: inherit; font-weight: 600; background: var(--card); color: var(--ink); border: 1px solid var(--line); border-radius: 8px; padding: 8px 16px; cursor: pointer; }
+  .controls button:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
+  .controls button:disabled { opacity: .4; cursor: default; }
+  .counter { color: var(--muted); font-variant-numeric: tabular-nums; }
+  .hint { color: var(--muted); font-size: .9rem; text-align: center; }
+  :fullscreen main { max-width: 1100px; }
+  :fullscreen { background: var(--bg); overflow: auto; }
+
+  /* Färgade kort */
+  .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr)); gap: 16px; margin-top: 24px; }
+  .tile { border-radius: 18px; padding: 28px 20px; min-height: 180px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; font-size: clamp(1.15rem, 2.6vw, 1.5rem); line-height: 1.3; color: #14112a; }
+  .tile small { display: block; margin-top: 8px; font-size: .75em; opacity: .8; }
+  .lime { background: #d9f97a; }
+  .pink { background: #ff1a84; color: #fff; }
+  .cyan { background: #3ae9fb; }
+  .white { background: var(--card); border: 1px solid var(--line); color: var(--ink); }
+  .tile b { font-size: 1.05em; }
+  .tiles.four { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .tiles.four .tile { min-height: 130px; }
+  @media (max-width: 560px) { .tiles.four { grid-template-columns: 1fr; } }
+
+  /* För- och nackdelar */
+  .versus { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(260px, 100%), 1fr)); gap: 24px; margin-top: 16px; }
+  .pill { border-radius: 999px; padding: 10px 16px; text-align: center; font-weight: 700; font-size: 1.3em; margin-bottom: 8px; }
+  .pill.cyan { color: #14112a; }
+
+  /* Mörk bild */
+  .dark { background: #14112a; color: #fff; border-radius: 18px; padding: clamp(24px, 6vw, 64px); }
+  .dark p { font-size: clamp(1.5rem, 4.5vw, 2.6rem); line-height: 1.25; margin: 0; }
+  .dark b { color: #d9f97a; font-weight: 600; }
+
+  /* Delad bild: rubrik till vänster, lista till höger */
+  .split { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); border-radius: 18px; overflow: hidden; border: 1px solid var(--line); }
+  .split > div:first-child { background: #14112a; color: #fff; display: flex; align-items: flex-end; padding: 28px 20px; font-size: clamp(1.5rem, 4vw, 2.2rem); font-weight: 700; line-height: 1.2; }
+  .split > div:last-child { background: var(--card); padding: 24px 28px; }
+  .split ul { margin: 0; padding-left: 1.1em; }
+  .split li { margin-block: 6px; }
+  @media (max-width: 640px) { .split { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<nav><a href="vecka43.html">Lektioner vecka 5</a><a href="vecka44.html">Lektioner vecka 6</a><a href="index.html">Lektioner vecka 7</a><a href="ai-presentation.html" aria-current="true">Lektioner vecka 8</a></nav>
+<nav class="undermeny"><a href="ai-presentation.html" aria-current="page">Presentation: AI-assisterad kodning</a></nav>
+<main id="show">
+
+<div class="slides">
+
+<section class="slide">
+  <h1>AI-assisterad kodning</h1>
+  <p class="lead">Vad AI-verktygen kan, vad de inte kan – och hur vi använder dem på rätt sätt.</p>
+</section>
+
+<section class="slide">
+  <h2>Allt går väldigt fort</h2>
+  <div class="tiles">
+    <div class="tile lime">Nya AI-modeller släpps hela tiden</div>
+    <div class="tile pink">Verktygen förändras snabbt</div>
+    <div class="tile cyan">Ingen vet ännu vad som är bäst praxis</div>
+  </div>
+</section>
+
+<section class="slide">
+  <h2>Spännande eller oroande?</h2>
+  <div class="versus">
+    <div>
+      <div class="pill cyan">👍 Fördelar</div>
+      <ul>
+        <li>Utveckla snabbare än någonsin</li>
+        <li>Ge sig på större och svårare uppgifter</li>
+        <li>Spännande nya möjligheter</li>
+      </ul>
+    </div>
+    <div>
+      <div class="pill pink">⚠️ Risker</div>
+      <ul>
+        <li>Kod som <i>ser</i> rätt ut – men inte är det</li>
+        <li>Dolda buggar, säkerhetshål och onödigt krånglig kod</li>
+        <li>AI har verkliga begränsningar</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="dark">
+    <p>Målet: använd kraften i <b>AI-verktygen</b> – men se till att det vi bygger är <b>bra och pålitlig</b> mjukvara.</p>
+  </div>
+</section>
+
+<section class="slide">
+  <h2>Vilka verktyg finns?</h2>
+  <div class="tiles four">
+    <div class="tile white"><b>Från AI-företagen</b><small>t.ex. Claude, Codex, Antigravity</small></div>
+    <div class="tile white"><b>Editorer byggda för AI</b><small>t.ex. Cursor, Windsurf</small></div>
+    <div class="tile white"><b>Öppen källkod</b><small>t.ex. OpenCode</small></div>
+    <div class="tile white"><b>Tillägg i din editor</b><small>t.ex. GitHub Copilot i VS Code</small></div>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="split">
+    <div>Vad gör en kodagent?</div>
+    <div>
+      <ul>
+        <li>Skickar din fråga (prompt) till språkmodellen (LLM)</li>
+        <li>Låter modellen använda <b>verktyg</b>:
+          <ul>
+            <li>läsa och ändra kod</li>
+            <li>köra kommandon i terminalen</li>
+          </ul>
+        </li>
+        <li>Håller reda på vad modellen behöver veta (kontext)</li>
+        <li>Kan byggas ut med nya förmågor</li>
+        <li>Kan dela upp jobb på flera <b>underagenter</b> som jobbar samtidigt</li>
+      </ul>
+    </div>
+  </div>
+  <p class="hint">På engelska kallas programmet runt modellen för en <i>coding harness</i>.</p>
+</section>
+
+</div>
+
+<div class="controls">
+  <button id="prev" type="button">← Föregående</button>
+  <span class="counter" id="counter"></span>
+  <button id="next" type="button">Nästa →</button>
+</div>
+<p class="hint">Piltangenterna byter bild · <button id="fs" type="button" style="font:inherit;background:none;border:0;color:var(--accent);cursor:pointer;padding:0">Helskärm (F)</button></p>
+
+</main>
+<script>
+  const slides = [...document.querySelectorAll(".slide")];
+  const prev = document.getElementById("prev"), next = document.getElementById("next");
+  let current = 0;
+
+  function show(i) {
+    current = Math.max(0, Math.min(slides.length - 1, i));
+    slides.forEach((s, n) => s.classList.toggle("active", n === current));
+    document.getElementById("counter").textContent = `${current + 1} / ${slides.length}`;
+    prev.disabled = current === 0;
+    next.disabled = current === slides.length - 1;
+    history.replaceState(null, "", "#" + (current + 1));
+  }
+
+  function fullscreen() {
+    try {
+      if (document.fullscreenElement) document.exitFullscreen();
+      else document.getElementById("show").requestFullscreen();
+    } catch (e) { }
+  }
+
+  prev.onclick = () => show(current - 1);
+  next.onclick = () => show(current + 1);
+  document.getElementById("fs").onclick = fullscreen;
+  document.addEventListener("keydown", e => {
+    if (e.key === "ArrowRight" || e.key === " " || e.key === "PageDown") { e.preventDefault(); show(current + 1); }
+    if (e.key === "ArrowLeft" || e.key === "PageUp") { e.preventDefault(); show(current - 1); }
+    if (e.key === "f" || e.key === "F") fullscreen();
+  });
+
+  show((parseInt(location.hash.slice(1)) || 1) - 1);
+</script>
+</body>
+</html>
