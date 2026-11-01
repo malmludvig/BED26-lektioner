@@ -51,6 +51,10 @@
   .split > div:last-child { background: var(--card); padding: 24px 28px; }
   .split ul { margin: 0; padding-left: 1.1em; }
   .split li { margin-block: 6px; }
+  .split small { display: block; font-size: .55em; font-weight: 600; color: #d9f97a; text-transform: uppercase; letter-spacing: .06em; margin-bottom: 4px; }
+  .split.light > div:first-child { background: var(--card); color: var(--ink); border-right: 1px solid var(--line); }
+  .split.light > div:last-child { background: var(--bg); }
+  .level-tag { display: inline-block; vertical-align: middle; font-size: .5em; font-weight: 700; background: #14112a; color: #d9f97a; border-radius: 999px; padding: 4px 12px; text-transform: uppercase; letter-spacing: .06em; }
   @media (max-width: 640px) { .split { grid-template-columns: 1fr; } }
 
   /* Nivåer med pil */
@@ -131,6 +135,71 @@
     </ol>
   </div>
   <p class="box">Ju längre ner, desto viktigare att <b>du</b> förstår och testar koden.</p>
+</section>
+
+<section class="slide">
+  <div class="split">
+    <div><span><small>Nivå 1</small>Du skriver all kod</span></div>
+    <div>
+      <ul>
+        <li>Du fattar alla beslut
+          <ul><li>t.ex. vilken teknik och vad saker ska heta</li></ul>
+        </li>
+        <li>Du får en stark förståelse för programmet</li>
+        <li>Att skriva kod själv är fortfarande värt det</li>
+        <li>Lägg tid på att bli en bra programmerare
+          <ul><li>då blir du också bättre på att använda AI-verktygen</li></ul>
+        </li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="slide">
+  <h2><small class="level-tag">Nivå 2</small> AI som assistent</h2>
+  <div class="tiles">
+    <div class="tile lime">"Förklara det här felmeddelandet …"</div>
+    <div class="tile pink">"Hjälp mig välja …"</div>
+    <div class="tile cyan">"Granska den här koden …"</div>
+  </div>
+  <p class="box" style="margin-top:20px">Du skriver koden. AI:n svarar på frågor – som en kunnig kompis bredvid dig.</p>
+</section>
+
+<section class="slide">
+  <div class="split light">
+    <div><span>Parprogrammering</span></div>
+    <div>
+      <ul>
+        <li>Kommer från <i>Extreme Programming</i> (Kent Beck)</li>
+        <li><b>Föraren</b> (driver) har tangentbordet och skriver</li>
+        <li><b>Navigatören</b> (navigator) tittar, tänker och ger feedback</li>
+        <li>Två som jobbar tillsammans gör bättre kod</li>
+        <li>Med AI har du alltid en kunnig partner till hands</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="split">
+    <div><span><small>Nivå 3</small>AI:n skriver, du styr</span></div>
+    <div>
+      <ul>
+        <li>AI:n är <b>föraren</b> i parprogrammeringen
+          <ul>
+            <li>AI:n skriver koden</li>
+            <li>Du är navigatören: följer med, ställer frågor och styr om</li>
+          </ul>
+        </li>
+        <li>Du bestämmer över de <b>viktiga</b> besluten
+          <ul>
+            <li>Små beslut kan du lämna över</li>
+            <li>t.ex. vad testmetoderna ska heta</li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+  </div>
 </section>
 
 <section class="slide">
