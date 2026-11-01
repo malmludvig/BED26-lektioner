@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Grupparbete med Git</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<nav><a href="vecka43.html">Lektioner vecka 5</a><a href="vecka44.html">Lektioner vecka 6</a><a href="index.html">Lektioner vecka 7</a><a href="ai-presentation.html" aria-current="true">Lektioner vecka 8</a></nav>
+<nav class="undermeny"><a href="ai-presentation.html">Presentation: AI-assisterad kodning</a><a href="grupparbete.html" aria-current="page">Grupparbete med Git</a></nav>
+<main>
+
+<h1>Grupparbete med Git</h1>
+<p class="lead">Så kommer ni igång snabbt – och så jobbar ni med Git i projektet utan att trampa på varandra.</p>
+
+<div class="box">
+<p><b>Kort version</b></p>
+<ol>
+  <li>En person skapar repot på GitHub och bjuder in resten.</li>
+  <li>Alla klonar repot.</li>
+  <li>Allt nytt görs på en egen <code>feature/…</code>-branch.</li>
+  <li>Allt kommer in i <code>main</code> via en Pull Request.</li>
+</ol>
+</div>
+
+<!-- ================= KOM IGÅNG ================= -->
+<h2>1. Kom igång – en person</h2>
+<p>Bestäm vem som gör det här. Det tar fem minuter, och resten av gruppen väntar under tiden.</p>
+<ol>
+  <li>Gå till <b>github.com → New repository</b>.</li>
+  <li>Ge repot ett namn, till exempel <code>Kaffekoppen</code>.</li>
+  <li>Kryssa i <b>Add a README file</b>.</li>
+  <li>Välj <b>.gitignore template: VisualStudio</b>. Då kommer mapparna <code>bin</code>, <code>obj</code> och <code>.vs</code> aldrig med i repot.</li>
+  <li>Klicka <b>Create repository</b>.</li>
+  <li>Bjud in gruppen: <b>Settings → Collaborators → Add people</b>.</li>
+</ol>
+<p>Klona sedan repot och skapa projektet i Visual Studio <b>inuti den klonade mappen</b>:</p>
+<pre><code class="nohighlight">git clone https://github.com/ditt-namn/Kaffekoppen.git
+cd Kaffekoppen
+# skapa solution och projekt i Visual Studio i den här mappen
+git add .
+git commit -m "Skapa projektet"
+git push</code></pre>
+<p class="box">Gör den första commiten <b>innan</b> någon annan börjar koda. Då utgår alla från samma projekt.</p>
+
+<h2>2. Kom igång – alla andra</h2>
+<ol>
+  <li>Acceptera inbjudan. Den kommer på mejlen, eller syns på <b>github.com/notifications</b>.</li>
+  <li>Klona repot:</li>
+</ol>
+<pre><code class="nohighlight">git clone https://github.com/ditt-namn/Kaffekoppen.git</code></pre>
+<ol start="3">
+  <li>Öppna <code>.sln</code>-filen i Visual Studio. Bygg och kör – fungerar det är du redo.</li>
+</ol>
+<p class="hint">I Visual Studio går det också: <i>Clone a repository</i> på startskärmen → klistra in adressen.</p>
+
+<!-- ================= DELA UPP ================= -->
+<h2>3. Dela upp arbetet</h2>
+<ul>
+  <li>Skriv en lista över allt som ska göras. Använd gärna <b>Issues</b> på GitHub – en issue per uppgift.</li>
+  <li>Varje uppgift blir en egen branch: <code>feature/meny</code>, <code>feature/kvitto</code>, <code>feature/rabatt</code>.</li>
+  <li>Försök dela upp så att ni inte ändrar i <b>samma fil</b> samtidigt. Då blir det färre konflikter.</li>
+  <li>Säg till i gruppen när du börjar på något – så gör inte två personer samma sak.</li>
+</ul>
+
+<!-- ================= FLÖDET ================= -->
+<h2>4. Så jobbar du – varje gång</h2>
+<pre><code class="nohighlight">git switch main
+git pull                          # 1. hämta det senaste
+git switch -c feature/meny        # 2. ny branch för uppgiften
+
+# ... koda, testa ...
+git add .
+git commit -m "Lägg till menyn"   # 3. commita ofta
+
+git push -u origin feature/meny   # 4. skicka upp branchen</code></pre>
+<ol start="5">
+  <li>Skapa en <b>Pull Request</b> på GitHub: <i>Compare &amp; pull request</i> → <i>Create pull request</i>.</li>
+  <li>En annan i gruppen läser koden och klickar <b>Merge pull request</b>.</li>
+  <li>Städa och börja om från steg 1:</li>
+</ol>
+<pre><code class="nohighlight">git switch main
+git pull
+git branch -d feature/meny</code></pre>
+
+<!-- ================= MAIN HAR ÄNDRATS ================= -->
+<h2>5. När <code>main</code> har ändrats medan du jobbar</h2>
+<p>Någon annan har fått in sin kod. Hämta in den i din branch innan du gör din Pull Request:</p>
+<pre><code class="nohighlight">git switch main
+git pull                  # hämta det nya
+git switch feature/meny
+git merge main            # ta in det nya i din branch</code></pre>
+<p>Blir det en konflikt löser du den som vanligt – se <a href="merge-conflicts-presentation.html">Presentation: Merge conflicts</a>. Sedan <code>git add</code>, <code>git commit</code> och <code>git push</code>.</p>
+
+<!-- ================= REGLER ================= -->
+<h2>6. Reglerna i gruppen</h2>
+<ol>
+  <li>Ingen committar direkt på <code>main</code>.</li>
+  <li>En <code>feature/…</code>-branch per uppgift.</li>
+  <li>Börja alltid med <code>git pull</code> på <code>main</code>.</li>
+  <li>Små branches – merga ofta, hellre varje dag än en gång i veckan.</li>
+  <li>Koden ska bygga innan du gör en Pull Request.</li>
+  <li>Någon annan än du själv godkänner din Pull Request.</li>
+</ol>
+<p class="box"><b>Tips:</b> skydda <code>main</code> så att ingen råkar pusha direkt. <i>Settings → Branches → Add branch ruleset</i> → kryssa i <i>Require a pull request before merging</i>. (Fungerar gratis på publika repon.)</p>
+
+<!-- ================= PROBLEM ================= -->
+<h2>7. Vanliga problem</h2>
+<div class="scroll"><table>
+  <tr><th>Det händer</th><th>Gör så här</th></tr>
+  <tr><td><code>rejected … fetch first</code> när du pushar</td><td>Någon har pushat före dig. Kör <code>git pull</code> och sedan <code>git push</code> igen.</td></tr>
+  <tr><td><code>bin</code> och <code>obj</code> kommer med i commiten</td><td>Repot saknar <code>.gitignore</code>. Lägg till en för Visual Studio.</td></tr>
+  <tr><td>Du har jobbat på <code>main</code> av misstag – inte commitat än</td><td><code>git switch -c feature/namn</code> – ändringarna följer med till den nya branchen.</td></tr>
+  <tr><td>Merge-konflikt</td><td>Läs konflikten, välj vad som ska stå kvar, ta bort <code>&lt;&lt;&lt;</code> <code>===</code> <code>&gt;&gt;&gt;</code>. Osäker? <code>git merge --abort</code>.</td></tr>
+  <tr><td>"Var står jag nu?"</td><td><code>git status</code> och <code>git branch</code>.</td></tr>
+</table></div>
+
+<!-- ================= KLART ================= -->
+<h2>Klart när</h2>
+<ul>
+  <li>☐ Repot finns på GitHub med <code>.gitignore</code> för Visual Studio.</li>
+  <li>☐ Alla i gruppen är inbjudna och har klonat repot.</li>
+  <li>☐ Projektet bygger på allas datorer.</li>
+  <li>☐ Alla har gjort minst en <code>feature/…</code>-branch och en Pull Request.</li>
+</ul>
+
+</main>
+<script src="cli.js"></script>
+</body>
+</html>
