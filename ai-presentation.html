@@ -92,6 +92,29 @@
   .cards span { display: block; font-size: 2rem; margin-bottom: 8px; }
   .cards b { display: block; font-size: 1.15rem; margin-bottom: 8px; color: #14112a; font-weight: 700; }
 
+  /* Rader med ikon och linje emellan */
+  .rows { list-style: none; padding: 0; margin: 8px 0; }
+  .rows li { display: flex; align-items: center; gap: 24px; padding: 18px 8px; border-bottom: 1px solid var(--line); font-size: clamp(1.1rem, 2.6vw, 1.4rem); }
+  .rows li:last-child { border-bottom: 0; }
+  .rows span { flex: 0 0 auto; font-size: 2.4rem; width: 56px; text-align: center; }
+
+  /* Pyramid: smal topp, bred botten */
+  .pyramid { display: grid; gap: 8px; justify-items: center; margin-top: 16px; }
+  .pyramid > div { border-radius: 12px; padding: 12px 16px; text-align: center; color: #14112a; }
+  .pyramid > div:nth-child(1) { width: 40%; color: #fff; }
+  .pyramid > div:nth-child(2) { width: 60%; }
+  .pyramid > div:nth-child(3) { width: 80%; }
+  .pyramid > div:nth-child(4) { width: 100%; }
+  .pyramid small { display: block; font-size: .8em; opacity: .85; }
+  .orange { background: #ffb347; }
+  @media (max-width: 560px) { .pyramid > div { width: 100% !important; } }
+
+  /* Steg i en rad med pilar emellan */
+  .steps { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 8px; margin-block: 16px; }
+  .steps > div { background: var(--card); border: 2px solid var(--accent); border-radius: 10px; padding: 8px 12px; text-align: center; font-weight: 600; }
+  .steps small { display: block; font-weight: 400; color: var(--muted); font-size: .75rem; }
+  .steps > span { color: var(--muted); font-size: 1.3rem; }
+
   /* Bild i en slide */
   .pic { margin: 8px 0 0; background: #fff; border: 1px solid var(--line); border-radius: 10px; padding: 12px; text-align: center; }
   .pic img { display: block; margin: 0 auto; max-width: 100%; max-height: 62vh; height: auto; }
@@ -337,6 +360,127 @@
       <div><span aria-hidden="true">🚀</span><b>Börja om</b>Starta en ny session innan kontextfönstret blir fullt.</div>
     </div>
   </div>
+</section>
+
+<section class="slide">
+  <div class="split">
+    <div><span>Den första prompten är viktigast</span></div>
+    <div>
+      <ul>
+        <li>Den bestämmer riktningen för <b>hela</b> sessionen</li>
+        <li>Undvik vaga prompter – annars:
+          <ul>
+            <li>fattar AI:n viktiga beslut åt dig utan att säga det</li>
+            <li>missar den viktig information</li>
+          </ul>
+        </li>
+        <li>Lägg tid på en bra första prompt:
+          <ul>
+            <li>ett tydligt <b>mål</b></li>
+            <li>peka ut det som är <b>viktigt</b> – filer, krav, exempel</li>
+            <li>sätt <b>gränser</b> – vad den inte får göra</li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="slide">
+  <h2>Planeringsläge</h2>
+  <ul class="rows">
+    <li><span aria-hidden="true">🗺️</span>Bestäm vad som ska byggas <b>innan</b> ni börjar koda</li>
+    <li><span aria-hidden="true">🔒</span>AI:n får inte ändra några filer</li>
+    <li><span aria-hidden="true">💬</span>Agenten ställer frågor till dig för att förstå målet</li>
+  </ul>
+  <p class="hint">Kallas <i>plan mode</i> eller <i>planning mode</i> i de flesta verktyg.</p>
+</section>
+
+<section class="slide">
+  <h2>Vem äger koden?</h2>
+  <div class="tiles">
+    <div class="tile mint">AI:n kan bygga riktigt svåra funktioner</div>
+    <div class="tile mint">Spelar det någon roll om vi inte längre förstår hur programmet är uppbyggt?</div>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="split">
+    <div class="center"><div class="blob pink" aria-hidden="true">💡</div></div>
+    <div class="middle">
+      <ul>
+        <li>Var med <b>hela vägen</b>
+          <ul>
+            <li>styr planeringen</li>
+            <li>följ med när koden skrivs</li>
+          </ul>
+        </li>
+        <li>Granska och testa koden AI:n skriver – <b>kritiskt</b></li>
+        <li>Koden du lämnar in är <b>din</b> – du ska kunna förklara den</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="slide">
+  <h2>Till dig som är ny som utvecklare</h2>
+  <ul class="rows">
+    <li><span aria-hidden="true">⌨️</span>Att kunna koda själv är fortfarande värdefullt</li>
+    <li><span aria-hidden="true">⚖️</span>Lita på ditt eget omdöme</li>
+    <li><span aria-hidden="true">🤖</span>AI kan låta helt säker – och ändå ha fel</li>
+  </ul>
+</section>
+
+<section class="slide">
+  <h2>🇪🇺 EU AI Act – vad är det?</h2>
+  <ul>
+    <li>EU:s lag om artificiell intelligens – den <b>första</b> stora AI-lagen i världen</li>
+    <li>Gäller alla som <b>bygger, säljer eller använder</b> AI i EU – även företag utanför EU</li>
+    <li>Målet: AI ska vara säker och inte skada människors hälsa eller rättigheter</li>
+    <li>Ju större risk ett AI-system har, desto <b>hårdare</b> krav</li>
+  </ul>
+  <div class="steps">
+    <div>Aug 2024<small>lagen börjar gälla</small></div>
+    <span>→</span>
+    <div>Feb 2025<small>förbuden gäller</small></div>
+    <span>→</span>
+    <div>Aug 2025<small>regler för stora AI-modeller</small></div>
+    <span>→</span>
+    <div>2026–2027<small>regler för högrisk-AI</small></div>
+  </div>
+  <p class="hint">Bryter man mot förbuden kan böterna bli upp till 35 miljoner euro eller 7 % av företagets omsättning.</p>
+</section>
+
+<section class="slide">
+  <h2>Fyra risknivåer</h2>
+  <div class="pyramid">
+    <div class="pink"><b>Förbjuden</b><small>Får inte användas alls</small></div>
+    <div class="orange"><b>Hög risk</b><small>Tillåten – men med hårda krav</small></div>
+    <div class="cyan"><b>Begränsad risk</b><small>Måste tala om att det är AI</small></div>
+    <div class="mint"><b>Minimal risk</b><small>Inga särskilda krav – det mesta hamnar här</small></div>
+  </div>
+</section>
+
+<section class="slide">
+  <h2>Exempel på varje nivå</h2>
+  <div class="scroll"><table>
+    <tr><th>Nivå</th><th>Exempel</th><th>Krav</th></tr>
+    <tr><td><b>Förbjuden</b></td><td>Social poängsättning av medborgare, AI som manipulerar människor, känsloigenkänning på jobbet eller i skolan</td><td>Förbjudet</td></tr>
+    <tr><td><b>Hög risk</b></td><td>AI som sorterar jobbansökningar, sätter betyg, bedömer lån eller används i vården</td><td>Riskanalys, bra data, dokumentation, loggning – och en <b>människa</b> som har koll</td></tr>
+    <tr><td><b>Begränsad risk</b></td><td>Chattbottar, AI-genererade bilder och deepfakes</td><td>Användaren ska få veta att det är AI</td></tr>
+    <tr><td><b>Minimal risk</b></td><td>Spamfilter, AI i spel, rättstavning</td><td>Inga särskilda krav</td></tr>
+  </table></div>
+  <p class="hint">Stora AI-modeller som ChatGPT och Claude har egna regler: de som gör modellerna måste bl.a. dokumentera dem och följa upphovsrätten.</p>
+</section>
+
+<section class="slide">
+  <h2>Vad betyder det för dig?</h2>
+  <ul class="rows">
+    <li><span aria-hidden="true">👩‍💻</span><div>Använda AI för att <b>skriva kod</b> – minimal risk. Inga nya krav på dig.</div></li>
+    <li><span aria-hidden="true">💬</span><div>Bygger du en <b>chattbot</b> – tala om för användaren att det är en AI.</div></li>
+    <li><span aria-hidden="true">⚠️</span><div>Bygger du något som <b>bedömer människor</b> – jobb, betyg, lån – blir det högrisk med hårda krav.</div></li>
+    <li><span aria-hidden="true">🎓</span><div>Arbetsgivare ska se till att de anställda <b>förstår AI</b> de använder – precis det vi gör nu.</div></li>
+  </ul>
 </section>
 
 </div>
