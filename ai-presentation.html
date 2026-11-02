@@ -33,6 +33,7 @@
   .tile b { font-size: 1.05em; }
   .tiles.four { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .tiles.four .tile { min-height: 130px; }
+  .tile .desc { display: block; margin-top: 8px; font-size: .68em; line-height: 1.4; color: var(--ink); }
   @media (max-width: 560px) { .tiles.four { grid-template-columns: 1fr; } }
 
   /* För- och nackdelar */
@@ -280,10 +281,10 @@
 <section class="slide">
   <h2>Vilka verktyg finns?</h2>
   <div class="tiles four">
-    <div class="tile white"><b>Från AI-företagen</b><small>t.ex. Claude, Codex, Antigravity</small></div>
-    <div class="tile white"><b>Editorer byggda för AI</b><small>t.ex. Cursor, Windsurf</small></div>
-    <div class="tile white"><b>Öppen källkod</b><small>t.ex. OpenCode</small></div>
-    <div class="tile white"><b>Tillägg i din editor</b><small>t.ex. GitHub Copilot i VS Code</small></div>
+    <div class="tile white"><b>Från AI-företagen</b><span class="desc">Företagen som gör AI-modellerna har egna kodverktyg. Du ger dem en uppgift, och agenten läser, ändrar och testar koden åt dig.</span><small>t.ex. Claude Code, Codex, Antigravity</small></div>
+    <div class="tile white"><b>Editorer byggda för AI</b><span class="desc">Hela kodeditorn är byggd runt AI. Du kodar som vanligt, och kan chatta med AI:n eller låta den ändra i flera filer samtidigt.</span><small>t.ex. Cursor, Windsurf</small></div>
+    <div class="tile white"><b>Öppen källkod</b><span class="desc">Gratis verktyg där koden är öppen. Du kan själv välja vilken AI-modell det ska använda.</span><small>t.ex. OpenCode</small></div>
+    <div class="tile white"><b>Tillägg i din editor</b><span class="desc">Ett tillägg i editorn du redan använder. Det föreslår kod medan du skriver och svarar på frågor i en chatt.</span><small>t.ex. GitHub Copilot i VS Code och Visual Studio</small></div>
   </div>
 </section>
 
