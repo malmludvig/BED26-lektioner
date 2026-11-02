@@ -155,8 +155,7 @@ git switch main     # menyn är "borta" – den finns bara på meny</code></pre>
   <h2>Merge – slå ihop</h2>
   <p>Stå på den branch som ska <b>ta emot</b> ändringarna, och merga in den andra.</p>
   <pre><code class="nohighlight">git switch main       # 1. gå till mottagaren
-git merge meny        # 2. hämta in meny
-git branch -d meny    # 3. städa bort branchen</code></pre>
+git merge meny        # 2. hämta in meny</code></pre>
   <pre class="mermaid">
 gitGraph
   commit id: "Skapa projekt"
@@ -432,8 +431,7 @@ git push -u origin feature-meny   # 3. skicka upp branchen
 # 4. skapa en Pull Request på GitHub
 # 5. någon granskar → Merge
 git switch main
-git pull                          # 6. hämta den mergade koden
-git branch -d feature-meny        # 7. städa</code></pre>
+git pull                          # 6. hämta den mergade koden</code></pre>
 </section>
 
 <section class="slide">
@@ -491,7 +489,6 @@ git branch -d feature-meny        # 7. städa</code></pre>
     <tr><td><code>git switch namn</code></td><td>Byt branch</td></tr>
     <tr><td><code>git merge namn</code></td><td>Hämta in en branch i den du står på</td></tr>
     <tr><td><code>git merge --abort</code></td><td>Avbryt en merge</td></tr>
-    <tr><td><code>git branch -d namn</code></td><td>Ta bort en branch</td></tr>
     <tr><td><code>git push -u origin namn</code></td><td>Skicka upp branchen till GitHub</td></tr>
     <tr><td><code>git log --oneline --graph --all</code></td><td>Visa alla branches som ett träd</td></tr>
   </table></div>

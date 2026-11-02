@@ -85,18 +85,16 @@ git push -u origin feature/meny   # 4. skicka upp branchen</code></pre>
 <ol>
   <li>Skapa en <b>Pull Request</b> på GitHub: <i>Compare &amp; pull request</i> → <i>Create pull request</i>.</li>
   <li>En annan i gruppen läser koden och klickar <b>Merge pull request</b>.</li>
-  <li>Hämta den mergade koden och städa:</li>
+  <li>Hämta den mergade koden:</li>
 </ol>
 <pre><code class="nohighlight">git switch main
-git pull
-git branch -d feature/meny</code></pre>
+git pull</code></pre>
 
 <h3>Väg B – merga lokalt och pusha</h3>
 <pre><code class="nohighlight">git switch main
 git pull                  # hämta det senaste först
 git merge feature/meny    # ta in din branch i main
-git push                  # skicka upp main till GitHub
-git branch -d feature/meny</code></pre>
+git push                  # skicka upp main till GitHub</code></pre>
 
 <div class="scroll"><table>
   <tr><th></th><th>Väg A – Pull Request</th><th>Väg B – merge + push</th></tr>

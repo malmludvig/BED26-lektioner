@@ -140,11 +140,10 @@ git pull                          # 1. börja från senaste versionen
 git switch -c feature/meny        # 2. ny branch för uppgiften
 # ... koda, add, commit – ofta ...
 git push -u origin feature/meny   # 3. skicka upp branchen
-# 4. skapa en Pull Request på GitHub
-# 5. någon granskar → Merge
-git switch main
-git pull                          # 6. hämta den mergade koden
-git branch -d feature/meny        # 7. städa</code></pre>
+# 4. få in branchen i main:
+#    väg A – Pull Request på GitHub
+#    väg B – merga lokalt och git push</code></pre>
+  <p>Två vägar in i <code>main</code> – mer om dem om en stund.</p>
 </section>
 
 <section class="slide">
@@ -156,13 +155,33 @@ git branch -d feature/meny        # 7. städa</code></pre>
 </section>
 
 <section class="slide">
+  <h2>Två vägar in i <code>main</code></h2>
+  <div class="scroll"><table>
+    <tr><th></th><th>Väg A – Pull Request</th><th>Väg B – merge + push</th></tr>
+    <tr><td>Var sker mergen?</td><td>På GitHub</td><td>På din dator</td></tr>
+    <tr><td>Granskar någon koden?</td><td>Ja, innan den kommer in</td><td>Nej – du ansvarar själv</td></tr>
+    <tr><td>Snabbhet</td><td>Lite långsammare</td><td>Snabbare</td></tr>
+    <tr><td>Passar när</td><td>Ni vill att någon tittar först</td><td>Små ändringar, eller när ni sitter tillsammans</td></tr>
+  </table></div>
+  <p class="box">Båda fungerar. Det viktiga är att gruppen <b>bestämmer sig</b> och gör likadant.</p>
+</section>
+
+<section class="slide">
+  <h2>Väg B: merga lokalt och pusha</h2>
+  <pre><code class="nohighlight">git switch main
+git pull                  # 1. hämta det senaste först
+git merge feature/meny    # 2. ta in din branch i main
+git push                  # 3. skicka upp main till GitHub</code></pre>
+  <p>Glöm inte <code>git pull</code> först – annars kan pushen bli <code>rejected</code> för att någon annan hann före.</p>
+</section>
+
+<section class="slide">
   <h2>Reglerna i gruppen</h2>
   <ol>
-    <li>Ingen committar direkt på <code>main</code>.</li>
+    <li>Ingen committar direkt på <code>main</code> – allt görs på en branch först.</li>
     <li>En <code>feature/…</code>-branch per uppgift.</li>
     <li>Håll branchen liten – merga ofta.</li>
-    <li>Allt kommer in i <code>main</code> via en Pull Request.</li>
-    <li>Ta bort branchen när den är mergad.</li>
+    <li>Bestäm i gruppen: Pull Request, merge + push, eller båda.</li>
   </ol>
 </section>
 
@@ -175,7 +194,7 @@ git branch -d feature/meny        # 7. städa</code></pre>
     <span>→</span>
     <div><code>git push</code><small>till GitHub</small></div>
     <span>→</span>
-    <div>Pull Request<small>granska och merga</small></div>
+    <div>PR eller merge + push<small>in i main</small></div>
   </div>
   <p class="box"><code>main</code> fungerar alltid – allt nytt görs på <code>feature/…</code>.</p>
 </section>

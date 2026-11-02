@@ -177,8 +177,7 @@ gitGraph
 git switch -c studentrabatt    # skapa en ny branch och gå dit
 # ... ändra kod, add, commit ...
 git switch main                # gå tillbaka till main
-git merge studentrabatt        # hämta in ändringarna i main
-git branch -d studentrabatt    # ta bort branchen när den är klar</code></pre>
+git merge studentrabatt        # hämta in ändringarna i main</code></pre>
 
 <h3>Merge-konflikt</h3>
 <p>Om två branches har ändrat <b>samma rad</b> kan Git inte välja åt dig. Då blir det en <b>konflikt</b> och Git markerar raden i filen:</p>
@@ -315,7 +314,7 @@ git status
   <li>Skapa en branch <code>meny</code> och gå till den.</li>
   <li>Lägg till en enkel meny i <code>Program.cs</code> och commita.</li>
   <li>Gå tillbaka till <code>main</code>. Titta i <code>Program.cs</code> – vart tog menyn vägen?</li>
-  <li>Merga in <code>meny</code> i <code>main</code> och ta bort branchen.</li>
+  <li>Merga in <code>meny</code> i <code>main</code>.</li>
 </ol>
 <details>
 <summary>Visa facit</summary>
@@ -324,8 +323,7 @@ git status
 git add .
 git commit -m "Lägg till meny"
 git switch main          # menyn är borta – den finns bara på branchen meny
-git merge meny           # nu finns menyn i main också
-git branch -d meny</code></pre>
+git merge meny           # nu finns menyn i main också</code></pre>
 <p>Filerna i arbetsmappen byts ut när du byter branch. Inget är borta – det ligger på en annan branch.</p>
 </details>
 
