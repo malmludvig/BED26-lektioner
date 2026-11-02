@@ -107,6 +107,12 @@
   .pyramid > div:nth-child(4) { width: 100%; }
   .pyramid small { display: block; font-size: .8em; opacity: .85; }
   .orange { background: #ffb347; }
+
+  /* Mörka kort, sista raden centrerad */
+  .dark-tiles { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+  .dark-tiles .tile { grid-column: span 2; background: #14112a; color: #fff; min-height: 140px; }
+  .dark-tiles .tile:nth-child(4) { grid-column: 2 / span 2; }
+  @media (max-width: 640px) { .dark-tiles { grid-template-columns: 1fr; } .dark-tiles .tile, .dark-tiles .tile:nth-child(4) { grid-column: auto; } }
   @media (max-width: 560px) { .pyramid > div { width: 100% !important; } }
 
   /* Steg i en rad med pilar emellan */
@@ -216,7 +222,9 @@
     <div><span>Par&shy;programmering</span></div>
     <div>
       <ul>
-        <li>Kommer från <i>Extreme Programming</i> (Kent Beck)</li>
+        <li>Kommer från <i>Extreme Programming</i> (Kent Beck)
+          <ul><li>ett agilt arbetssätt från slutet av 1990-talet: små steg, mycket tester och tätt samarbete i teamet</li></ul>
+        </li>
         <li><b>Föraren</b> (driver) har tangentbordet och skriver</li>
         <li><b>Navigatören</b> (navigator) tittar, tänker och ger feedback</li>
         <li>Två som jobbar tillsammans gör bättre kod</li>
@@ -255,6 +263,17 @@
       <h3>Parprogrammering med AI</h3>
       <p>Du som utvecklare bestämmer <b>hur programmet ska byggas</b> och fattar de viktiga besluten.</p>
     </div>
+  </div>
+</section>
+
+<section class="slide">
+  <h2><small class="level-tag">Nivå 4</small> AI:n skriver all kod</h2>
+  <div class="tiles dark-tiles">
+    <div class="tile">"Vibe coding"<small>du beskriver vad du vill ha – och läser aldrig koden</small></div>
+    <div class="tile">Agenten bestämmer allt själv</div>
+    <div class="tile">Imponerande resultat – väldigt snabbt</div>
+    <div class="tile">Högre risk</div>
+    <div class="tile">Passar när det inte gör något om det går fel<small>t.ex. ett internt verktyg eller en prototyp</small></div>
   </div>
 </section>
 
