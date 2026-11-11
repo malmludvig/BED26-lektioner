@@ -3,16 +3,28 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>OOP i ett spel</title>
+<title>Dragon Slayer</title>
 <link rel="stylesheet" href="style.css">
+<style>
+  /* Bilder på fienderna */
+  .sprites { display: flex; flex-wrap: wrap; gap: 24px; justify-content: center; align-items: flex-end; margin: 16px 0; }
+  .sprites figure { margin: 0; text-align: center; }
+  .sprites img { height: 180px; width: auto; max-width: 100%; border-radius: 10px; }
+  .sprites figcaption { color: var(--muted); font-size: .9rem; }
+</style>
 </head>
 <body>
 <nav><a href="vecka43.html">Lektioner vecka 5</a><a href="vecka44.html">Lektioner vecka 6</a><a href="index.html">Lektioner vecka 7</a><a href="ai-presentation.html">Lektioner vecka 8</a><a href="vecka9.html" aria-current="true">Lektioner vecka 9</a></nav>
-<nav class="undermeny"><a href="oop-spel-presentation.html">Presentation: OOP i ett spel</a><a href="vecka9.html" aria-current="page">OOP i ett spel</a></nav>
+<nav class="undermeny"><a href="oop-spel-presentation.html">Presentation: Dragon Slayer</a><a href="vecka9.html" aria-current="page">Dragon Slayer</a></nav>
 <main>
 
-<h1>OOP i ett spel</h1>
+<h1>Dragon Slayer</h1>
 <p class="lead">Vi bygger ett litet fantasyspel med fiender och vapen – och använder det för att repetera OOP, enum, abstrakta klasser, interface och composition.</p>
+
+<div class="sprites">
+  <figure><img src="goblin.gif" alt="En grön goblin med hjälm och spikklubba"><figcaption><code>Goblin</code></figcaption></figure>
+  <figure><img src="dragon.jpg" alt="En blå drake med vingar och vassa klor"><figcaption><code>Dragon</code></figcaption></figure>
+</div>
 
 <h2>Lektionsupplägg – cirka 3 timmar</h2>
 <div class="scroll"><table>
@@ -102,6 +114,7 @@ Console.WriteLine(second.Health);   // 30 – den andra goblinen är orörd</cod
 </div>
 
 <h3>En konkret fiende</h3>
+<div class="sprites"><figure><img src="goblin.gif" alt="En grön goblin med hjälm och spikklubba"><figcaption>Goblin – 30 i hälsa, Easy</figcaption></figure></div>
 <pre><code>public class Goblin : Enemy
 {
     public Goblin() : base("Goblin", 30, Difficulty.Easy)
@@ -114,6 +127,7 @@ Console.WriteLine(second.Health);   // 30 – den andra goblinen är orörd</cod
     }
 }</code></pre>
 <p>Skapa sedan en <code>Dragon</code> på samma sätt. Dess <code>Attack()</code> skriver att draken sprutar eld.</p>
+<div class="sprites"><figure><img src="dragon.jpg" alt="En blå drake med vingar och vassa klor"><figcaption>Dragon – sprutar eld</figcaption></figure></div>
 
 <h3>Polymorfism</h3>
 <pre><code>List&lt;Enemy&gt; enemies = new List&lt;Enemy&gt;

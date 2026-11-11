@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="claude:viewport-fit-sides" content="cover">
-<title>OOP i ett spel – presentation</title>
+<title>Dragon Slayer – presentation</title>
 <link rel="stylesheet" href="style.css">
 <style>
   /* Bildspel: en bild i taget, stor text */
@@ -25,18 +25,29 @@
   :fullscreen { background: var(--bg); overflow: auto; }
   .cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr)); gap: 16px; }
   .cols > div { min-width: 0; }
+
+  /* Bilder på fienderna */
+  .sprites { display: flex; flex-wrap: wrap; gap: 32px; justify-content: center; align-items: flex-end; margin: 16px 0; }
+  .sprites img { height: clamp(140px, 28vh, 260px); width: auto; max-width: 100%; border-radius: 10px; }
+  .side { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 24px; align-items: center; }
+  .side img { height: clamp(120px, 30vh, 280px); width: auto; border-radius: 10px; }
+  @media (max-width: 640px) { .side { grid-template-columns: 1fr; } .side img { justify-self: center; } }
 </style>
 </head>
 <body>
 <nav><a href="vecka43.html">Lektioner vecka 5</a><a href="vecka44.html">Lektioner vecka 6</a><a href="index.html">Lektioner vecka 7</a><a href="ai-presentation.html">Lektioner vecka 8</a><a href="vecka9.html" aria-current="true">Lektioner vecka 9</a></nav>
-<nav class="undermeny"><a href="oop-spel-presentation.html" aria-current="page">Presentation: OOP i ett spel</a><a href="vecka9.html">OOP i ett spel</a></nav>
+<nav class="undermeny"><a href="oop-spel-presentation.html" aria-current="page">Presentation: Dragon Slayer</a><a href="vecka9.html">Dragon Slayer</a></nav>
 <main id="show">
 
 <div class="slides">
 
 <section class="slide">
-  <h1>OOP i ett spel</h1>
+  <h1>Dragon Slayer</h1>
   <p class="lead">Fiender, vapen och en spelare – enum, abstrakta klasser, interface och composition.</p>
+  <div class="sprites">
+    <img src="goblin.gif" alt="En grön goblin med hjälm och spikklubba">
+    <img src="dragon.jpg" alt="En blå drake med vingar och vassa klor">
+  </div>
 </section>
 
 <section class="slide">
@@ -142,6 +153,7 @@ Console.WriteLine(second.Health);   // 30</code></pre>
 
 <section class="slide">
   <h2>En konkret fiende: Goblin</h2>
+  <div class="side">
   <pre><code>public class Goblin : Enemy
 {
     public Goblin() : base("Goblin", 30, Difficulty.Easy)
@@ -153,11 +165,14 @@ Console.WriteLine(second.Health);   // 30</code></pre>
         Console.WriteLine("Goblinen attackerar med sin klubba!");
     }
 }</code></pre>
+  <img src="goblin.gif" alt="En grön goblin med hjälm och spikklubba">
+  </div>
   <p><code>: base(...)</code> skickar namn, hälsa och svårighetsgrad till <code>Enemy</code>.</p>
 </section>
 
 <section class="slide">
   <h2>Och en Dragon</h2>
+  <div class="side">
   <pre><code>public class Dragon : Enemy
 {
     public Dragon() : base("Drake", 100, Difficulty.Hard)
@@ -169,6 +184,8 @@ Console.WriteLine(second.Health);   // 30</code></pre>
         Console.WriteLine("Draken sprutar eld!");
     }
 }</code></pre>
+  <img src="dragon.jpg" alt="En blå drake med vingar och vassa klor">
+  </div>
 </section>
 
 <section class="slide">
@@ -316,7 +333,7 @@ Fiendens hälsa: 12</code></pre>
     <li>Skriv ut fiendens hälsa efter varje attack.</li>
   </ol>
   <p><b>Extra:</b> en konsolmeny där spelaren väljer vapen och attackerar tills fiendens hälsa är noll.</p>
-  <p class="box">Nu: <a href="vecka9.html">OOP i ett spel</a> – där finns all kod och facit.</p>
+  <p class="box">Nu: <a href="vecka9.html">Dragon Slayer</a> – där finns all kod och facit.</p>
 </section>
 
 <section class="slide">
