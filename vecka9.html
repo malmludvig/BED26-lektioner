@@ -3,17 +3,360 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Lektioner vecka 9</title>
+<title>OOP i ett spel</title>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
 <nav><a href="vecka43.html">Lektioner vecka 5</a><a href="vecka44.html">Lektioner vecka 6</a><a href="index.html">Lektioner vecka 7</a><a href="ai-presentation.html">Lektioner vecka 8</a><a href="vecka9.html" aria-current="true">Lektioner vecka 9</a></nav>
-<nav class="undermeny"><a href="vecka9.html" aria-current="page">Översikt</a></nav>
+<nav class="undermeny"><a href="oop-spel-presentation.html">Presentation: OOP i ett spel</a><a href="vecka9.html" aria-current="page">OOP i ett spel</a></nav>
 <main>
 
-<h1>Lektioner vecka 9</h1>
-<p class="lead">Innehållet för veckan kommer snart.</p>
+<h1>OOP i ett spel</h1>
+<p class="lead">Vi bygger ett litet fantasyspel med fiender och vapen – och använder det för att repetera OOP, enum, abstrakta klasser, interface och composition.</p>
+
+<h2>Lektionsupplägg – cirka 3 timmar</h2>
+<div class="scroll"><table>
+  <tr><th>Tid</th><th>Innehåll</th><th>Exempel i spelet</th></tr>
+  <tr><td>0–20 min</td><td>OOP-repetition</td><td>Klasser, objekt, hälsa och metoder</td></tr>
+  <tr><td>20–40 min</td><td>Enum</td><td>Fiendens svårighetsgrad</td></tr>
+  <tr><td>40–70 min</td><td>Abstract class och arv</td><td><code>Enemy</code>, <code>Goblin</code> och <code>Dragon</code></td></tr>
+  <tr><td>70–80 min</td><td>Paus</td><td></td></tr>
+  <tr><td>80–110 min</td><td>Interface kontra abstract class</td><td><code>IWeapon</code>, <code>Sword</code> och <code>Bow</code></td></tr>
+  <tr><td>110–135 min</td><td>Composition over inheritance</td><td>Spelaren har ett vapen som kan bytas</td></tr>
+  <tr><td>135–170 min</td><td>Elevövning</td><td>Skapa fiender och vapen</td></tr>
+  <tr><td>170–180 min</td><td>Genomgång</td><td>Motivera val av arv och composition</td></tr>
+</table></div>
+
+<!-- ================= 1. OOP ================= -->
+<h2>1. OOP – skapa en fiende</h2>
+<p>Vad behöver en fiende i ett spel?</p>
+<ul>
+  <li><b>Tillstånd:</b> namn och hälsa.</li>
+  <li><b>Beteende:</b> attackera och ta skada.</li>
+  <li><b>Inkapsling:</b> hälsan ändras bara genom <code>TakeDamage()</code>, som ser till att den aldrig blir negativ.</li>
+</ul>
+<p class="box"><b>Klass och objekt:</b> <code>Goblin</code> är en <b>klass</b> – en ritning. Två skapade gobliner är två separata <b>objekt</b>, och var och en har sin egen hälsa.</p>
+<pre><code>Goblin first = new Goblin();
+Goblin second = new Goblin();
+
+first.TakeDamage(10);
+
+Console.WriteLine(first.Health);    // 20
+Console.WriteLine(second.Health);   // 30 – den andra goblinen är orörd</code></pre>
+
+<!-- ================= 2. ENUM ================= -->
+<h2>2. Enum – svårighetsgrad</h2>
+<p>En <code>enum</code> är en egen typ med ett fast antal namngivna värden.</p>
+<pre><code>public enum Difficulty
+{
+    Easy,
+    Medium,
+    Hard
+}</code></pre>
+<pre><code>Difficulty difficulty = Difficulty.Hard;</code></pre>
+<p class="box"><b>Fundera:</b> varför är det tydligare än att använda strängar som <code>"hard"</code>, <code>"Hard"</code> eller <code>"svår"</code>?</p>
+<details>
+<summary>Visa svar</summary>
+<ul>
+  <li>Bara <code>Easy</code>, <code>Medium</code> och <code>Hard</code> finns – det går inte att skriva fel värde.</li>
+  <li>Stavfel som <code>Difficulty.Hrad</code> blir rött i Visual Studio direkt. Ett stavfel i en sträng märks först när programmet körs – om ens då.</li>
+  <li>Visual Studio föreslår värdena när du skriver <code>Difficulty.</code></li>
+  <li>Ingen behöver gissa om det ska vara stor bokstav, engelska eller svenska.</li>
+</ul>
+</details>
+
+<!-- ================= 3. ABSTRACT ================= -->
+<h2>3. Abstract class – olika fiender med en gemensam grund</h2>
+<p>Alla fiender har namn, hälsa och svårighetsgrad och kan ta skada på samma sätt. Men de <b>attackerar</b> olika. Därför gör vi en abstrakt basklass:</p>
+<pre><code>public abstract class Enemy
+{
+    public string Name { get; }
+    public int Health { get; private set; }
+    public Difficulty Difficulty { get; }
+
+    protected Enemy(string name, int health, Difficulty difficulty)
+    {
+        Name = name;
+        Health = health;
+        Difficulty = difficulty;
+    }
+
+    public void TakeDamage(int damage)
+    {
+        if (damage &gt; 0)
+        {
+            Health = Math.Max(0, Health - damage);
+        }
+    }
+
+    public abstract void Attack();
+}</code></pre>
+<div class="box">
+<p><b>Lägg märke till</b></p>
+<ul>
+  <li><code>abstract class</code> – man kan inte skriva <code>new Enemy(...)</code>. Det finns bara konkreta fiender.</li>
+  <li><code>private set</code> – bara klassen själv kan ändra <code>Health</code>. Utifrån går det bara via <code>TakeDamage()</code>.</li>
+  <li><code>Math.Max(0, …)</code> – hälsan blir aldrig mindre än 0.</li>
+  <li><code>public abstract void Attack();</code> – ingen kropp. Varje fiende <b>måste</b> skriva sin egen.</li>
+</ul>
+</div>
+
+<h3>En konkret fiende</h3>
+<pre><code>public class Goblin : Enemy
+{
+    public Goblin() : base("Goblin", 30, Difficulty.Easy)
+    {
+    }
+
+    public override void Attack()
+    {
+        Console.WriteLine("Goblinen attackerar med sin klubba!");
+    }
+}</code></pre>
+<p>Skapa sedan en <code>Dragon</code> på samma sätt. Dess <code>Attack()</code> skriver att draken sprutar eld.</p>
+
+<h3>Polymorfism</h3>
+<pre><code>List&lt;Enemy&gt; enemies = new List&lt;Enemy&gt;
+{
+    new Goblin(),
+    new Dragon()
+};
+
+foreach (Enemy enemy in enemies)
+{
+    enemy.Attack();
+}</code></pre>
+<pre><code class="nohighlight">Goblinen attackerar med sin klubba!
+Draken sprutar eld!</code></pre>
+<p class="box">Samma metodanrop – <code>enemy.Attack()</code> – ger olika beteenden beroende på vilken typ objektet faktiskt är.</p>
+
+<!-- ================= 4. INTERFACE ================= -->
+<h2>4. Interface – ett gemensamt kontrakt för vapen</h2>
+<pre><code>public interface IWeapon
+{
+    int Use();
+}</code></pre>
+<p>Två implementationer:</p>
+<pre><code>public class Sword : IWeapon
+{
+    public int Use()
+    {
+        Console.WriteLine("Du hugger med svärdet!");
+        return 10;
+    }
+}
+
+public class Bow : IWeapon
+{
+    public int Use()
+    {
+        Console.WriteLine("Du skjuter en pil!");
+        return 8;
+    }
+}</code></pre>
+<p>Returvärdet är hur mycket skada vapnet gör.</p>
+
+<h3>Abstract class eller interface?</h3>
+<div class="scroll"><table>
+  <tr><th>Koncept</th><th>Varför används det här?</th></tr>
+  <tr><td><code>Enemy</code> som abstrakt klass</td><td>Fiender delar tillstånd, konstruktor och kod för att ta skada.</td></tr>
+  <tr><td><code>IWeapon</code> som interface</td><td>Spelaren behöver bara ett kontrakt för hur ett vapen används.</td></tr>
+</table></div>
+<div class="scroll"><table>
+  <tr><th></th><th>Abstract class</th><th>Interface</th></tr>
+  <tr><td>Kan ha fält och färdig kod</td><td>Ja</td><td>Nej – bara vad som ska finnas</td></tr>
+  <tr><td>Kan ha konstruktor</td><td>Ja</td><td>Nej</td></tr>
+  <tr><td>Hur många kan en klass ha?</td><td>En basklass</td><td>Flera interface</td></tr>
+  <tr><td>Beskriver</td><td>"är en" – en Goblin <i>är en</i> Enemy</td><td>"kan" – ett Sword <i>kan</i> användas som vapen</td></tr>
+</table></div>
+
+<!-- ================= 5. COMPOSITION ================= -->
+<h2>5. Composition over inheritance – spelaren har ett vapen</h2>
+<p><b>Diskutera först:</b> vi skulle kunna skapa klasserna <code>SwordPlayer</code> och <code>BowPlayer</code> som ärver från <code>Player</code>.</p>
+<p class="box"><b>Fundera:</b> vad händer om spelaren ska kunna byta vapen under spelets gång?</p>
+<details>
+<summary>Visa svar</summary>
+<p>Ett objekt kan inte byta klass. En <code>SwordPlayer</code> förblir en <code>SwordPlayer</code> – vi skulle behöva skapa en helt ny spelare och kopiera över allt. Och för varje nytt vapen behövs en ny spelarklass: <code>WandPlayer</code>, <code>AxePlayer</code>, …</p>
+</details>
+<p>Låt i stället spelaren <b>ha</b> ett vapen:</p>
+<pre><code>public class Player
+{
+    public IWeapon Weapon { get; set; }
+
+    public Player(IWeapon weapon)
+    {
+        Weapon = weapon;
+    }
+
+    public void Attack(Enemy enemy)
+    {
+        int damage = Weapon.Use();
+        enemy.TakeDamage(damage);
+    }
+}</code></pre>
+<p>Användning:</p>
+<pre><code>Player player = new Player(new Sword());
+Enemy enemy = new Goblin();
+
+player.Attack(enemy);
+
+player.Weapon = new Bow();
+
+player.Attack(enemy);
+
+Console.WriteLine($"Fiendens hälsa: {enemy.Health}");</code></pre>
+<pre><code class="nohighlight">Du hugger med svärdet!
+Du skjuter en pil!
+Fiendens hälsa: 12</code></pre>
+<div class="box">
+<p><b>Skillnaden</b></p>
+<ul>
+  <li>En <code>Goblin</code> <b>är en</b> <code>Enemy</code> → arv.</li>
+  <li>En <code>Player</code> <b>har ett</b> <code>IWeapon</code> → composition.</li>
+  <li>Vapnet kan bytas utan att klassen <code>Player</code> behöver ändras.</li>
+</ul>
+</div>
+
+<!-- ================= 6. ÖVNING ================= -->
+<h2>6. Elevövning – bygg ut spelet</h2>
+<ol>
+  <li>Skapa <code>Dragon</code> som ärver <code>Enemy</code>.</li>
+  <li>Lägg flera fiender i en <code>List&lt;Enemy&gt;</code> och anropa deras attacker.</li>
+  <li>Skapa <code>MagicWand</code> som implementerar <code>IWeapon</code>.</li>
+  <li>Låt spelaren attackera med olika vapen.</li>
+  <li>Skriv ut fiendens hälsa efter varje attack.</li>
+</ol>
+<details>
+<summary>Visa facit</summary>
+<pre><code>public class Dragon : Enemy
+{
+    public Dragon() : base("Drake", 100, Difficulty.Hard)
+    {
+    }
+
+    public override void Attack()
+    {
+        Console.WriteLine("Draken sprutar eld!");
+    }
+}
+
+public class MagicWand : IWeapon
+{
+    public int Use()
+    {
+        Console.WriteLine("Du kastar en eldboll med trollstaven!");
+        return 15;
+    }
+}
+
+// I Program.cs
+List&lt;Enemy&gt; enemies = new List&lt;Enemy&gt;
+{
+    new Goblin(),
+    new Goblin(),
+    new Dragon()
+};
+
+foreach (Enemy e in enemies)
+{
+    e.Attack();
+}
+
+Player player = new Player(new Sword());
+Enemy dragon = new Dragon();
+
+player.Attack(dragon);
+Console.WriteLine($"{dragon.Name}: {dragon.Health}");
+
+player.Weapon = new Bow();
+player.Attack(dragon);
+Console.WriteLine($"{dragon.Name}: {dragon.Health}");
+
+player.Weapon = new MagicWand();
+player.Attack(dragon);
+Console.WriteLine($"{dragon.Name}: {dragon.Health}");</code></pre>
+<p>Utskrift:</p>
+<pre><code class="nohighlight">Goblinen attackerar med sin klubba!
+Goblinen attackerar med sin klubba!
+Draken sprutar eld!
+Du hugger med svärdet!
+Drake: 90
+Du skjuter en pil!
+Drake: 82
+Du kastar en eldboll med trollstaven!
+Drake: 67</code></pre>
+<p>Varken <code>Player</code> eller <code>Enemy</code> behövde ändras för att lägga till en drake och en trollstav.</p>
+</details>
+
+<h3>Extra utmaning</h3>
+<p>Låt spelaren välja vapen i en konsolmeny och fortsätta attackera tills fiendens hälsa är noll.</p>
+<details>
+<summary>Visa facit</summary>
+<pre><code>Player player = new Player(new Sword());
+Enemy enemy = new Dragon();
+
+while (enemy.Health &gt; 0)
+{
+    Console.WriteLine();
+    Console.WriteLine($"{enemy.Name} har {enemy.Health} i hälsa.");
+    Console.WriteLine("1. Svärd");
+    Console.WriteLine("2. Pilbåge");
+    Console.WriteLine("3. Trollstav");
+    Console.Write("Välj vapen: ");
+    string choice = Console.ReadLine();
+
+    if (choice == "1")
+    {
+        player.Weapon = new Sword();
+    }
+    else if (choice == "2")
+    {
+        player.Weapon = new Bow();
+    }
+    else if (choice == "3")
+    {
+        player.Weapon = new MagicWand();
+    }
+    else
+    {
+        Console.WriteLine("Ogiltigt val.");
+        continue;
+    }
+
+    player.Attack(enemy);
+
+    if (enemy.Health &gt; 0)
+    {
+        enemy.Attack();
+    }
+}
+
+Console.WriteLine($"{enemy.Name} är besegrad!");</code></pre>
+</details>
+
+<h3>Klart när</h3>
+<ul>
+  <li>☐ <code>Goblin</code> och <code>Dragon</code> ärver från <code>Enemy</code> och attackerar på olika sätt.</li>
+  <li>☐ En loop över en <code>List&lt;Enemy&gt;</code> anropar alla fienders attacker.</li>
+  <li>☐ <code>Sword</code>, <code>Bow</code> och <code>MagicWand</code> implementerar <code>IWeapon</code>.</li>
+  <li>☐ Spelaren kan byta vapen, och fiendens hälsa skrivs ut efter varje attack.</li>
+  <li>☐ Hälsan blir aldrig negativ.</li>
+</ul>
+
+<!-- ================= GENOMGÅNG ================= -->
+<h2>Genomgång</h2>
+<p class="box" style="font-size:1.15em"><i>"Varför ärver goblinen från <code>Enemy</code>, medan spelaren har ett separat vapenobjekt?"</i></p>
+<details>
+<summary>Visa svar</summary>
+<ul>
+  <li>En goblin <b>är</b> alltid en fiende – det ändras aldrig. Den delar hälsa och <code>TakeDamage()</code> med alla andra fiender. Då passar arv.</li>
+  <li>En spelare <b>har</b> ett vapen, och vapnet kan bytas under spelets gång. Då passar composition: spelaren pratar bara med <code>IWeapon</code> och bryr sig inte om vilket vapen det är.</li>
+  <li>Tumregel: <b>"är en"</b> → arv. <b>"har en"</b> eller <b>"kan bytas"</b> → composition.</li>
+</ul>
+</details>
 
 </main>
+<script src="vs.js"></script>
+<script src="cli.js"></script>
 </body>
 </html>

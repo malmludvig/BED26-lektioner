@@ -1,0 +1,372 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="claude:viewport-fit-sides" content="cover">
+<title>OOP i ett spel – presentation</title>
+<link rel="stylesheet" href="style.css">
+<style>
+  /* Bildspel: en bild i taget, stor text */
+  .slides { min-height: 60vh; display: flex; flex-direction: column; justify-content: center; }
+  .slide { display: none; font-size: 1.25rem; }
+  .slide.active { display: block; }
+  .slide h1 { font-size: clamp(2.2rem, 7vw, 3.6rem); margin: 0 0 8px; }
+  .slide h2 { margin-top: 0; font-size: clamp(1.6rem, 4.5vw, 2.2rem); }
+  .slide pre { font-size: clamp(14px, 2.4vw, 19px); }
+  .big { font-size: clamp(1.4rem, 4vw, 2rem); text-align: center; }
+  .controls { display: flex; align-items: center; justify-content: space-between; gap: 12px; border-top: 1px solid var(--line); padding-top: 12px; margin-top: 24px; }
+  .controls button { font: inherit; font-weight: 600; background: var(--card); color: var(--ink); border: 1px solid var(--line); border-radius: 8px; padding: 8px 16px; cursor: pointer; }
+  .controls button:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
+  .controls button:disabled { opacity: .4; cursor: default; }
+  .counter { color: var(--muted); font-variant-numeric: tabular-nums; }
+  .hint { color: var(--muted); font-size: .9rem; text-align: center; }
+  :fullscreen main { max-width: 1100px; }
+  :fullscreen { background: var(--bg); overflow: auto; }
+  .cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr)); gap: 16px; }
+  .cols > div { min-width: 0; }
+</style>
+</head>
+<body>
+<nav><a href="vecka43.html">Lektioner vecka 5</a><a href="vecka44.html">Lektioner vecka 6</a><a href="index.html">Lektioner vecka 7</a><a href="ai-presentation.html">Lektioner vecka 8</a><a href="vecka9.html" aria-current="true">Lektioner vecka 9</a></nav>
+<nav class="undermeny"><a href="oop-spel-presentation.html" aria-current="page">Presentation: OOP i ett spel</a><a href="vecka9.html">OOP i ett spel</a></nav>
+<main id="show">
+
+<div class="slides">
+
+<section class="slide">
+  <h1>OOP i ett spel</h1>
+  <p class="lead">Fiender, vapen och en spelare – enum, abstrakta klasser, interface och composition.</p>
+</section>
+
+<section class="slide">
+  <h2>Idag</h2>
+  <ol>
+    <li>OOP-repetition – en fiende</li>
+    <li>Enum – svårighetsgrad</li>
+    <li>Abstract class och arv – <code>Enemy</code>, <code>Goblin</code>, <code>Dragon</code></li>
+    <li>Interface – <code>IWeapon</code>, <code>Sword</code>, <code>Bow</code></li>
+    <li>Composition over inheritance – spelaren byter vapen</li>
+    <li>Övning – bygg ut spelet</li>
+  </ol>
+</section>
+
+<section class="slide">
+  <h2>Vad behöver en fiende?</h2>
+  <ul>
+    <li><b>Tillstånd:</b> namn och hälsa.</li>
+    <li><b>Beteende:</b> attackera och ta skada.</li>
+    <li><b>Inkapsling:</b> hälsan ändras bara genom <code>TakeDamage()</code> – och blir aldrig negativ.</li>
+  </ul>
+</section>
+
+<section class="slide">
+  <h2>Klass och objekt</h2>
+  <p><code>Goblin</code> är en <b>klass</b> – en ritning. Varje <code>new Goblin()</code> är ett eget <b>objekt</b>.</p>
+  <pre><code>Goblin first = new Goblin();
+Goblin second = new Goblin();
+
+first.TakeDamage(10);
+
+Console.WriteLine(first.Health);    // 20
+Console.WriteLine(second.Health);   // 30</code></pre>
+  <p class="box">Två gobliner – två objekt – var sin hälsa.</p>
+</section>
+
+<section class="slide">
+  <h2>Enum – svårighetsgrad</h2>
+  <div class="cols">
+    <div>
+      <pre><code>public enum Difficulty
+{
+    Easy,
+    Medium,
+    Hard
+}</code></pre>
+    </div>
+    <div>
+      <pre><code>Difficulty difficulty = Difficulty.Hard;</code></pre>
+      <p>En egen typ med ett <b>fast antal</b> värden.</p>
+    </div>
+  </div>
+</section>
+
+<section class="slide">
+  <h2>Varför inte en sträng?</h2>
+  <pre><code>string difficulty = "hard";    // eller "Hard"? "svår"? "hrad"?</code></pre>
+  <ul>
+    <li>Med en enum går det inte att skriva ett värde som inte finns.</li>
+    <li>Stavfel blir rött i Visual Studio direkt.</li>
+    <li>Visual Studio föreslår värdena när du skriver <code>Difficulty.</code></li>
+  </ul>
+  <p class="box">Strängar: felet märks när programmet körs. Enum: felet märks när du skriver.</p>
+</section>
+
+<section class="slide">
+  <h2>Abstract class: Enemy</h2>
+  <pre><code>public abstract class Enemy
+{
+    public string Name { get; }
+    public int Health { get; private set; }
+    public Difficulty Difficulty { get; }
+
+    protected Enemy(string name, int health, Difficulty difficulty)
+    {
+        Name = name;
+        Health = health;
+        Difficulty = difficulty;
+    }
+
+    public void TakeDamage(int damage)
+    {
+        if (damage &gt; 0)
+        {
+            Health = Math.Max(0, Health - damage);
+        }
+    }
+
+    public abstract void Attack();
+}</code></pre>
+</section>
+
+<section class="slide">
+  <h2>Vad betyder det?</h2>
+  <ul>
+    <li><code>abstract class</code> – man kan inte skriva <code>new Enemy(...)</code>.</li>
+    <li><code>private set</code> – hälsan kan bara ändras inifrån klassen.</li>
+    <li><code>Math.Max(0, …)</code> – hälsan blir aldrig mindre än 0.</li>
+    <li><code>abstract void Attack();</code> – ingen kropp. Varje fiende <b>måste</b> skriva sin egen.</li>
+  </ul>
+  <p class="box">Allt som är <b>gemensamt</b> ligger i <code>Enemy</code>. Det som <b>skiljer</b> sig lämnas åt subklasserna.</p>
+</section>
+
+<section class="slide">
+  <h2>En konkret fiende: Goblin</h2>
+  <pre><code>public class Goblin : Enemy
+{
+    public Goblin() : base("Goblin", 30, Difficulty.Easy)
+    {
+    }
+
+    public override void Attack()
+    {
+        Console.WriteLine("Goblinen attackerar med sin klubba!");
+    }
+}</code></pre>
+  <p><code>: base(...)</code> skickar namn, hälsa och svårighetsgrad till <code>Enemy</code>.</p>
+</section>
+
+<section class="slide">
+  <h2>Och en Dragon</h2>
+  <pre><code>public class Dragon : Enemy
+{
+    public Dragon() : base("Drake", 100, Difficulty.Hard)
+    {
+    }
+
+    public override void Attack()
+    {
+        Console.WriteLine("Draken sprutar eld!");
+    }
+}</code></pre>
+</section>
+
+<section class="slide">
+  <h2>Polymorfism</h2>
+  <pre><code>List&lt;Enemy&gt; enemies = new List&lt;Enemy&gt;
+{
+    new Goblin(),
+    new Dragon()
+};
+
+foreach (Enemy enemy in enemies)
+{
+    enemy.Attack();
+}</code></pre>
+  <pre><code class="nohighlight">Goblinen attackerar med sin klubba!
+Draken sprutar eld!</code></pre>
+  <p class="box">Samma anrop – olika beteende beroende på objektets typ.</p>
+</section>
+
+<section class="slide">
+  <h2 class="big">Paus</h2>
+  <p class="big">☕ 10 minuter</p>
+</section>
+
+<section class="slide">
+  <h2>Interface: IWeapon</h2>
+  <pre><code>public interface IWeapon
+{
+    int Use();
+}</code></pre>
+  <p>Ett <b>kontrakt</b>: alla vapen kan användas, och svarar med hur mycket skada de gör.</p>
+</section>
+
+<section class="slide">
+  <h2>Sword och Bow</h2>
+  <div class="cols">
+    <div>
+      <pre><code>public class Sword : IWeapon
+{
+    public int Use()
+    {
+        Console.WriteLine("Du hugger med svärdet!");
+        return 10;
+    }
+}</code></pre>
+    </div>
+    <div>
+      <pre><code>public class Bow : IWeapon
+{
+    public int Use()
+    {
+        Console.WriteLine("Du skjuter en pil!");
+        return 8;
+    }
+}</code></pre>
+    </div>
+  </div>
+</section>
+
+<section class="slide">
+  <h2>Abstract class eller interface?</h2>
+  <div class="scroll"><table>
+    <tr><th>Koncept</th><th>Varför?</th></tr>
+    <tr><td><code>Enemy</code> som abstrakt klass</td><td>Fiender delar tillstånd, konstruktor och kod för att ta skada</td></tr>
+    <tr><td><code>IWeapon</code> som interface</td><td>Spelaren behöver bara ett kontrakt för hur ett vapen används</td></tr>
+  </table></div>
+  <div class="scroll"><table>
+    <tr><th></th><th>Abstract class</th><th>Interface</th></tr>
+    <tr><td>Färdig kod och fält</td><td>Ja</td><td>Nej</td></tr>
+    <tr><td>Hur många per klass</td><td>En</td><td>Flera</td></tr>
+    <tr><td>Beskriver</td><td>"är en"</td><td>"kan"</td></tr>
+  </table></div>
+</section>
+
+<section class="slide">
+  <h2>Spelaren – ett första försök</h2>
+  <pre><code class="nohighlight">Player
+├── SwordPlayer
+└── BowPlayer</code></pre>
+  <p class="box big">Vad händer om spelaren ska <b>byta vapen</b> mitt i spelet?</p>
+</section>
+
+<section class="slide">
+  <h2>Problemet med arv här</h2>
+  <ul>
+    <li>Ett objekt kan inte byta klass – en <code>SwordPlayer</code> förblir en <code>SwordPlayer</code>.</li>
+    <li>Varje nytt vapen kräver en ny spelarklass: <code>WandPlayer</code>, <code>AxePlayer</code>, …</li>
+  </ul>
+  <p class="box">Lösning: spelaren <b>har</b> ett vapen i stället för att <b>vara</b> ett.</p>
+</section>
+
+<section class="slide">
+  <h2>Composition: Player har ett IWeapon</h2>
+  <pre><code>public class Player
+{
+    public IWeapon Weapon { get; set; }
+
+    public Player(IWeapon weapon)
+    {
+        Weapon = weapon;
+    }
+
+    public void Attack(Enemy enemy)
+    {
+        int damage = Weapon.Use();
+        enemy.TakeDamage(damage);
+    }
+}</code></pre>
+</section>
+
+<section class="slide">
+  <h2>Byt vapen</h2>
+  <pre><code>Player player = new Player(new Sword());
+Enemy enemy = new Goblin();
+
+player.Attack(enemy);
+
+player.Weapon = new Bow();
+
+player.Attack(enemy);
+
+Console.WriteLine($"Fiendens hälsa: {enemy.Health}");</code></pre>
+  <pre><code class="nohighlight">Du hugger med svärdet!
+Du skjuter en pil!
+Fiendens hälsa: 12</code></pre>
+</section>
+
+<section class="slide">
+  <h2>Är en – har en</h2>
+  <div class="scroll"><table>
+    <tr><th>Relation</th><th>Exempel</th><th>Lösning</th></tr>
+    <tr><td><b>är en</b></td><td>En <code>Goblin</code> är en <code>Enemy</code></td><td>Arv</td></tr>
+    <tr><td><b>har en</b></td><td>En <code>Player</code> har ett <code>IWeapon</code></td><td>Composition</td></tr>
+  </table></div>
+  <p class="box">Vapnet kan bytas utan att klassen <code>Player</code> behöver ändras.</p>
+</section>
+
+<section class="slide">
+  <h2>Övning – bygg ut spelet</h2>
+  <ol>
+    <li>Skapa <code>Dragon</code> som ärver <code>Enemy</code>.</li>
+    <li>Lägg flera fiender i en <code>List&lt;Enemy&gt;</code> och anropa deras attacker.</li>
+    <li>Skapa <code>MagicWand</code> som implementerar <code>IWeapon</code>.</li>
+    <li>Låt spelaren attackera med olika vapen.</li>
+    <li>Skriv ut fiendens hälsa efter varje attack.</li>
+  </ol>
+  <p><b>Extra:</b> en konsolmeny där spelaren väljer vapen och attackerar tills fiendens hälsa är noll.</p>
+  <p class="box">Nu: <a href="vecka9.html">OOP i ett spel</a> – där finns all kod och facit.</p>
+</section>
+
+<section class="slide">
+  <h2>Genomgång</h2>
+  <p class="box big"><i>"Varför ärver goblinen från <code>Enemy</code>, medan spelaren har ett separat vapenobjekt?"</i></p>
+</section>
+
+</div>
+
+<div class="controls">
+  <button id="prev" type="button">← Föregående</button>
+  <span class="counter" id="counter"></span>
+  <button id="next" type="button">Nästa →</button>
+</div>
+<p class="hint">Piltangenterna byter bild · <button id="fs" type="button" style="font:inherit;background:none;border:0;color:var(--accent);cursor:pointer;padding:0">Helskärm (F)</button></p>
+
+</main>
+<script src="vs.js"></script>
+<script src="cli.js"></script>
+<script>
+  const slides = [...document.querySelectorAll(".slide")];
+  const prev = document.getElementById("prev"), next = document.getElementById("next");
+  let current = 0;
+
+  function show(i) {
+    current = Math.max(0, Math.min(slides.length - 1, i));
+    slides.forEach((s, n) => s.classList.toggle("active", n === current));
+    document.getElementById("counter").textContent = `${current + 1} / ${slides.length}`;
+    prev.disabled = current === 0;
+    next.disabled = current === slides.length - 1;
+    history.replaceState(null, "", "#" + (current + 1));
+  }
+
+  function fullscreen() {
+    try {
+      if (document.fullscreenElement) document.exitFullscreen();
+      else document.getElementById("show").requestFullscreen();
+    } catch (e) { }
+  }
+
+  prev.onclick = () => show(current - 1);
+  next.onclick = () => show(current + 1);
+  document.getElementById("fs").onclick = fullscreen;
+  document.addEventListener("keydown", e => {
+    if (e.key === "ArrowRight" || e.key === " " || e.key === "PageDown") { e.preventDefault(); show(current + 1); }
+    if (e.key === "ArrowLeft" || e.key === "PageUp") { e.preventDefault(); show(current - 1); }
+    if (e.key === "f" || e.key === "F") fullscreen();
+  });
+
+  show((parseInt(location.hash.slice(1)) || 1) - 1);
+</script>
+</body>
+</html>
