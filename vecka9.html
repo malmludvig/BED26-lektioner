@@ -28,17 +28,16 @@
 
 <p class="box"><b>Hela projektet på GitHub:</b> <a href="https://github.com/malmludvig/DragonSlayer" target="_blank" rel="noopener">github.com/malmludvig/DragonSlayer</a> – koden från lektionen, utbyggd till ett RPG i konsolen (se <a href="#rpg">avsnitt 7</a>). Klona repot och öppna <code>DragonSlayer.slnx</code> i Visual Studio.</p>
 
-<h2>Lektionsupplägg – cirka 3 timmar</h2>
+<h2>Lektionsupplägg</h2>
 <div class="scroll"><table>
-  <tr><th>Tid</th><th>Innehåll</th><th>Exempel i spelet</th></tr>
-  <tr><td>0–20 min</td><td>OOP-repetition</td><td>Klasser, objekt, hälsa och metoder</td></tr>
-  <tr><td>20–40 min</td><td>Enum</td><td>Fiendens svårighetsgrad</td></tr>
-  <tr><td>40–70 min</td><td>Abstract class och arv</td><td><code>Enemy</code>, <code>Goblin</code> och <code>Dragon</code></td></tr>
-  <tr><td>70–80 min</td><td>Paus</td><td></td></tr>
-  <tr><td>80–110 min</td><td>Interface kontra abstract class</td><td><code>IWeapon</code>, <code>Sword</code> och <code>Bow</code></td></tr>
-  <tr><td>110–135 min</td><td>Composition over inheritance</td><td>Spelaren har ett vapen som kan bytas</td></tr>
-  <tr><td>135–170 min</td><td>Elevövning</td><td>Skapa fiender och vapen</td></tr>
-  <tr><td>170–180 min</td><td>Genomgång</td><td>Motivera val av arv och composition</td></tr>
+  <tr><th>Innehåll</th><th>Exempel i spelet</th></tr>
+  <tr><td>OOP-repetition</td><td>Klasser, objekt, hälsa och metoder</td></tr>
+  <tr><td>Enum</td><td>Fiendens svårighetsgrad</td></tr>
+  <tr><td>Abstract class och arv</td><td><code>Enemy</code>, <code>Goblin</code> och <code>Dragon</code></td></tr>
+  <tr><td>Interface kontra abstract class</td><td><code>IWeapon</code>, <code>Sword</code> och <code>Bow</code></td></tr>
+  <tr><td>Composition over inheritance</td><td>Spelaren har ett vapen som kan bytas</td></tr>
+  <tr><td>Elevövning</td><td>Skapa fiender och vapen</td></tr>
+  <tr><td>Genomgång</td><td>Motivera val av arv och composition</td></tr>
 </table></div>
 
 <!-- ================= 1. OOP ================= -->
@@ -192,6 +191,87 @@ public class Bow : IWeapon
   <img src="composition-vs-inheritance.png" alt="UML-diagram: Composition vs. Inheritance. House ärver från Building med en ofylld triangel – 'is a' (inheritance). House har en Bathroom med en fylld romb – 'has a' (composition).">
   <figcaption>Ett hus <b>är en</b> byggnad (arv, ofylld triangel). Ett hus <b>har ett</b> badrum (composition, fylld romb).</figcaption>
 </figure>
+
+<h3>Principen: Composition over inheritance</h3>
+<p><b>Composition over inheritance</b> betyder: <i>bygg hellre ihop en klass av mindre delar än att ärva från en annan klass.</i></p>
+<ul>
+  <li><b>Arv</b> – "är en". Klassen <i>blir</i> en sorts basklass och får allt den har.</li>
+  <li><b>Composition</b> – "har en". Klassen <i>har</i> ett annat objekt som gör en del av jobbet.</li>
+</ul>
+<p>Samma exempel som i bilden, i C#:</p>
+<pre><code>// Arv: ett hus ÄR EN byggnad
+class Building
+{
+}
+
+class House : Building
+{
+}
+
+// Composition: ett hus HAR ETT badrum
+class Bathroom
+{
+}
+
+class House2
+{
+    private Bathroom bathroom = new Bathroom();
+}</code></pre>
+
+<h3>Jätteenkelt exempel: en bil med en motor</h3>
+<p>Med arv behövs en ny bilklass för varje sorts motor:</p>
+<pre><code>class Car { }
+class PetrolCar : Car { }
+class ElectricCar : Car { }
+class HybridCar : Car { }   // ... och så vidare</code></pre>
+<p>Med composition <b>har</b> bilen en motor – och motorn kan bytas:</p>
+<pre><code>interface IEngine
+{
+    void Start();
+}
+
+class PetrolEngine : IEngine
+{
+    public void Start() { Console.WriteLine("Brum brum!"); }
+}
+
+class ElectricEngine : IEngine
+{
+    public void Start() { Console.WriteLine("Bzzzz..."); }
+}
+
+class Car
+{
+    public IEngine Engine { get; set; }
+
+    public Car(IEngine engine)
+    {
+        Engine = engine;
+    }
+
+    public void Drive()
+    {
+        Engine.Start();
+    }
+}</code></pre>
+<pre><code>Car car = new Car(new PetrolEngine());
+car.Drive();                        // Brum brum!
+
+car.Engine = new ElectricEngine();  // byt motor
+car.Drive();                        // Bzzzz...</code></pre>
+
+<h3>Fördelar</h3>
+<div class="scroll"><table>
+  <tr><th>Fördel</th><th>Vad det betyder</th></tr>
+  <tr><td>Flexibelt</td><td>Delarna kan bytas medan programmet körs – bilen byter motor, spelaren byter vapen.</td></tr>
+  <tr><td>Färre klasser</td><td>Ingen ny <code>PetrolCar</code>, <code>ElectricCar</code>, <code>HybridCar</code> … – bara nya motorer.</td></tr>
+  <tr><td>Lätt att bygga ut</td><td>En ny motor är en ny klass. <code>Car</code> behöver inte ändras.</td></tr>
+  <tr><td>Återanvändning</td><td>Samma <code>ElectricEngine</code> kan sitta i en bil, en båt eller en gräsklippare.</td></tr>
+  <tr><td>Inga långa arvskedjor</td><td>Ändrar man i en basklass påverkas alla som ärver. Små delar påverkar bara sig själva.</td></tr>
+</table></div>
+<p class="box"><b>Arv är inte fel.</b> Använd arv när det verkligen är "är en" och aldrig ändras – en <code>Goblin</code> <i>är</i> alltid en <code>Enemy</code>. Använd composition när något är en <b>del</b> som kan bytas – en spelare <i>har</i> ett vapen.</p>
+
+<h3>Tillbaka till spelet</h3>
 <p><b>Diskutera först:</b> vi skulle kunna skapa klasserna <code>SwordPlayer</code> och <code>BowPlayer</code> som ärver från <code>Player</code>.</p>
 <p class="box"><b>Fundera:</b> vad händer om spelaren ska kunna byta vapen under spelets gång?</p>
 <details>

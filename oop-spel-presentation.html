@@ -206,11 +206,6 @@ Draken sprutar eld!</code></pre>
 </section>
 
 <section class="slide">
-  <h2 class="big">Paus</h2>
-  <p class="big">☕ 10 minuter</p>
-</section>
-
-<section class="slide">
   <h2>Interface: IWeapon</h2>
   <pre><code>public interface IWeapon
 {
@@ -269,6 +264,90 @@ Draken sprutar eld!</code></pre>
     <li>Ett hus <b>är en</b> byggnad → arv (ofylld triangel).</li>
     <li>Ett hus <b>har ett</b> badrum → composition (fylld romb).</li>
   </ul>
+</section>
+
+<section class="slide">
+  <h2>Composition over inheritance</h2>
+  <p class="box big">Bygg hellre ihop en klass av <b>mindre delar</b> än att ärva från en annan klass.</p>
+  <ul>
+    <li><b>Arv</b> – "är en". Klassen <i>blir</i> en sorts basklass.</li>
+    <li><b>Composition</b> – "har en". Klassen <i>har</i> ett objekt som gör en del av jobbet.</li>
+  </ul>
+</section>
+
+<section class="slide">
+  <h2>Huset i kod</h2>
+  <div class="cols">
+    <div>
+      <p><b>Arv</b> – ett hus <i>är en</i> byggnad</p>
+      <pre><code>class Building
+{
+}
+
+class House : Building
+{
+}</code></pre>
+    </div>
+    <div>
+      <p><b>Composition</b> – ett hus <i>har ett</i> badrum</p>
+      <pre><code>class Bathroom
+{
+}
+
+class House
+{
+    private Bathroom bathroom = new Bathroom();
+}</code></pre>
+    </div>
+  </div>
+</section>
+
+<section class="slide">
+  <h2>Exempel: en bil med en motor</h2>
+  <p>Med arv: en ny bilklass för varje motor.</p>
+  <pre><code>class PetrolCar : Car { }
+class ElectricCar : Car { }
+class HybridCar : Car { }   // ... och så vidare</code></pre>
+  <p>Med composition: bilen <b>har</b> en motor.</p>
+  <pre><code>class Car
+{
+    public IEngine Engine { get; set; }
+
+    public void Drive() { Engine.Start(); }
+}</code></pre>
+</section>
+
+<section class="slide">
+  <h2>Byt motor</h2>
+  <pre><code>interface IEngine { void Start(); }
+
+class PetrolEngine : IEngine
+{
+    public void Start() { Console.WriteLine("Brum brum!"); }
+}
+
+class ElectricEngine : IEngine
+{
+    public void Start() { Console.WriteLine("Bzzzz..."); }
+}</code></pre>
+  <pre><code>Car car = new Car();
+car.Engine = new PetrolEngine();
+car.Drive();                        // Brum brum!
+
+car.Engine = new ElectricEngine();  // byt motor
+car.Drive();                        // Bzzzz...</code></pre>
+</section>
+
+<section class="slide">
+  <h2>Fördelar</h2>
+  <ul>
+    <li><b>Flexibelt</b> – delar kan bytas medan programmet körs.</li>
+    <li><b>Färre klasser</b> – inga <code>PetrolCar</code>, <code>ElectricCar</code> … bara nya motorer.</li>
+    <li><b>Lätt att bygga ut</b> – en ny motor ändrar inte <code>Car</code>.</li>
+    <li><b>Återanvändning</b> – samma motor i en bil, en båt eller en gräsklippare.</li>
+    <li><b>Inga långa arvskedjor</b> – en ändring påverkar bara sin egen del.</li>
+  </ul>
+  <p class="box"><b>Arv är inte fel.</b> "Är en" som aldrig ändras → arv. En del som kan bytas → composition.</p>
 </section>
 
 <section class="slide">
@@ -363,6 +442,7 @@ Fiendens hälsa: 12</code></pre>
 <section class="slide">
   <h2>Genomgång</h2>
   <p class="box big"><i>"Varför ärver goblinen från <code>Enemy</code>, medan spelaren har ett separat vapenobjekt?"</i></p>
+  <p class="big">Hela spelet: <a href="https://github.com/malmludvig/DragonSlayer" target="_blank" rel="noopener">github.com/malmludvig/DragonSlayer</a></p>
 </section>
 
 </div>
