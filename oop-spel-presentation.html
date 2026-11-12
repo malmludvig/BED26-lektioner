@@ -59,6 +59,8 @@
     <li>Interface – <code>IWeapon</code>, <code>Sword</code>, <code>Bow</code></li>
     <li>Composition over inheritance – spelaren byter vapen</li>
     <li>Övning – bygg ut spelet</li>
+    <li>Hela spelet och JSON – ladda fiender från en fil</li>
+    <li>När ska vi använda vad?</li>
   </ol>
 </section>
 
@@ -101,13 +103,13 @@ Console.WriteLine(second.Health);   // 30</code></pre>
     </div>
   </div>
   <p>En klass kan ha en enum som <b>property</b>:</p>
-  <pre><code>class Enemy
+  <pre><code>class Boss
 {
     public string Name { get; set; }
     public Difficulty Difficulty { get; set; }
 }
 
-Enemy boss = new Enemy();
+Boss boss = new Boss();
 boss.Difficulty = Difficulty.Hard;</code></pre>
 </section>
 

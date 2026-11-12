@@ -66,13 +66,13 @@ Console.WriteLine(second.Health);   // 30 – den andra goblinen är orörd</cod
 }</code></pre>
 <pre><code>Difficulty difficulty = Difficulty.Hard;</code></pre>
 <p>En klass kan ha en enum som <b>property</b> – precis som en <code>string</code> eller en <code>int</code>:</p>
-<pre><code>class Enemy
+<pre><code>class Boss
 {
     public string Name { get; set; }
     public Difficulty Difficulty { get; set; }
 }
 
-Enemy boss = new Enemy();
+Boss boss = new Boss();
 boss.Name = "Drakkungen";
 boss.Difficulty = Difficulty.Hard;
 
