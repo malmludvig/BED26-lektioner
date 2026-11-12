@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Hämta data från ett API</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<nav><a href="vecka43.html">Lektioner vecka 5</a><a href="vecka44.html">Lektioner vecka 6</a><a href="index.html">Lektioner vecka 7</a><a href="ai-presentation.html">Lektioner vecka 8</a><a href="vecka9.html" aria-current="true">Lektioner vecka 9</a></nav>
+<nav class="undermeny"><a href="oop-spel-presentation.html">Presentation: Dragon Slayer</a><a href="vecka9.html">Dragon Slayer</a><a href="api.html" aria-current="page">API</a></nav>
+<main>
+
+<h1>Hämta data från ett API</h1>
+<p class="lead">Hittills har all data i våra program funnits i koden eller i en fil. Nu hämtar vi data från internet – ett slumpat Chuck Norris-skämt – med några få rader C#.</p>
+
+<!-- ================= 1. VAD ÄR ETT API ================= -->
+<h2>1. Vad är ett API?</h2>
+<p>Ett <b>API</b> (Application Programming Interface) är ett sätt för ett program att prata med ett annat program. Ett <b>webb-API</b> är en adress på internet som ger tillbaka <b>data</b> i stället för en webbsida.</p>
+<div class="box">
+<p><b>Tänk dig en restaurang</b></p>
+<ul>
+  <li><b>Du</b> är vårt program. Du vill ha mat, men du går inte själv in i köket.</li>
+  <li><b>Servitören</b> är API:et. Du beställer, och servitören kommer tillbaka med maten.</li>
+  <li><b>Köket</b> är servern. Hur maten lagas behöver du inte veta.</li>
+</ul>
+</div>
+<p>Vårt program skickar en <b>förfrågan</b> (request) till en adress och får tillbaka ett <b>svar</b> (response).</p>
+<pre><code class="nohighlight">Vårt program  ──  förfrågan: "ge mig ett skämt"  ──▶  api.chucknorris.io
+Vårt program  ◀──  svar: JSON med ett skämt  ──────  api.chucknorris.io</code></pre>
+
+<!-- ================= 2. PROVA I WEBBLÄSAREN ================= -->
+<h2>2. Prova i webbläsaren först</h2>
+<p>Öppna den här adressen i webbläsaren:</p>
+<p class="box"><a href="https://api.chucknorris.io/jokes/random" target="_blank" rel="noopener">https://api.chucknorris.io/jokes/random</a></p>
+<p>Du får ingen snygg sida – bara text. Det är <b>JSON</b>, samma format som vi använde för <a href="vecka9.html#json">fienderna i Dragon Slayer</a>. Uppdatera sidan så kommer ett nytt skämt.</p>
+<p>Så här ser svaret ut, uppställt så att det blir lättare att läsa:</p>
+<pre><code class="nohighlight">{
+  "categories": [],
+  "created_at": "2020-01-05 13:42:22.089095",
+  "icon_url": "https://api.chucknorris.io/img/avatar/chuck-norris.png",
+  "id": "Tck4XfHyQt-90ruRqbn_fw",
+  "updated_at": "2020-01-05 13:42:22.089095",
+  "url": "https://api.chucknorris.io/jokes/Tck4XfHyQt-90ruRqbn_fw",
+  "value": "Fool me once, shame on you. Fool Chuck Norris once and he will roundhouse you in the face."
+}</code></pre>
+<ul>
+  <li>JSON består av <b>namn</b> och <b>värden</b>: <code>"value": "Fool me once…"</code></li>
+  <li>Själva skämtet ligger under namnet <code>"value"</code>. Det är det vi vill plocka ut.</li>
+</ul>
+
+<!-- ================= 3. KODEN ================= -->
+<h2>3. Hämta skämtet med C#</h2>
+<p>Skapa ett nytt konsolprojekt och ersätt allt i <code>Program.cs</code> med:</p>
+<pre><code>using System.Text.Json;
+
+HttpClient client = new HttpClient();
+
+string url = "https://api.chucknorris.io/jokes/random";
+string json = await client.GetStringAsync(url);
+
+JsonDocument document = JsonDocument.Parse(json);
+string joke = document.RootElement.GetProperty("value").GetString()!;
+
+Console.WriteLine($"{joke}");</code></pre>
+<p>Kör programmet. Varje gång får du ett nytt skämt:</p>
+<pre><code class="nohighlight">Fool me once, shame on you. Fool Chuck Norris once and he will roundhouse you in the face.</code></pre>
+
+<h3>Rad för rad</h3>
+<div class="scroll"><table>
+  <tr><th>Kod</th><th>Vad den gör</th></tr>
+  <tr><td><code>using System.Text.Json;</code></td><td>Ger oss verktygen för att läsa JSON.</td></tr>
+  <tr><td><code>HttpClient client = new HttpClient();</code></td><td>Skapar en "webbläsare" i koden som kan prata med internet.</td></tr>
+  <tr><td><code>string url = "...";</code></td><td>Adressen till API:et – samma som du öppnade i webbläsaren.</td></tr>
+  <tr><td><code>await client.GetStringAsync(url)</code></td><td>Skickar förfrågan och får tillbaka svaret som en lång sträng med JSON.</td></tr>
+  <tr><td><code>JsonDocument.Parse(json)</code></td><td>Gör om texten till något vi kan leta i.</td></tr>
+  <tr><td><code>.RootElement</code></td><td>Det yttersta objektet – allt mellan <code>{</code> och <code>}</code>.</td></tr>
+  <tr><td><code>.GetProperty("value")</code></td><td>Letar upp namnet <code>"value"</code>.</td></tr>
+  <tr><td><code>.GetString()!</code></td><td>Hämtar värdet som en <code>string</code>.</td></tr>
+  <tr><td><code>Console.WriteLine($"{joke}");</code></td><td>Skriver ut skämtet.</td></tr>
+</table></div>
+
+<h3>Två nya saker</h3>
+<div class="box">
+<p><b><code>await</code> – vänta på svaret</b></p>
+<p>Det tar en liten stund att få svar från internet. <code>await</code> betyder: <i>vänta här tills svaret har kommit, fortsätt sedan</i>. Metoder som tar tid heter ofta något med <code>Async</code> i slutet – som <code>GetStringAsync</code>.</p>
+</div>
+<div class="box">
+<p><b><code>!</code> efter <code>GetString()</code></b></p>
+<p><code>GetString()</code> kan i teorin ge <code>null</code> (ingenting). Utropstecknet säger till kompilatorn: <i>lita på mig, här finns det text</i>. Då slipper vi en gul varning i Visual Studio.</p>
+</div>
+
+<h3>Om något går fel</h3>
+<ul>
+  <li><b>Ingen internetuppkoppling</b> – programmet kraschar med ett <code>HttpRequestException</code>.</li>
+  <li><b>Fel namn</b> – skriver du <code>GetProperty("joke")</code> kraschar det med <code>KeyNotFoundException</code>, eftersom det inte finns något <code>"joke"</code> i svaret. Kontrollera alltid namnen i webbläsaren först.</li>
+</ul>
+
+<!-- ================= 4. ÖVNING ================= -->
+<h2>4. Övning</h2>
+<ol>
+  <li>Skriv ut <b>tre</b> skämt efter varandra med en <code>for</code>-loop.</li>
+  <li>Skriv också ut skämtets <code>"id"</code> på raden ovanför skämtet.</li>
+  <li>API:et kan ge skämt från en viss kategori. Ändra adressen till <code>https://api.chucknorris.io/jokes/random?category=dev</code> och få bara programmeringsskämt.</li>
+</ol>
+<details>
+<summary>Visa facit</summary>
+<pre><code>using System.Text.Json;
+
+HttpClient client = new HttpClient();
+
+string url = "https://api.chucknorris.io/jokes/random?category=dev";
+
+for (int i = 0; i &lt; 3; i++)
+{
+    string json = await client.GetStringAsync(url);
+
+    JsonDocument document = JsonDocument.Parse(json);
+    string id = document.RootElement.GetProperty("id").GetString()!;
+    string joke = document.RootElement.GetProperty("value").GetString()!;
+
+    Console.WriteLine($"Skämt {id}:");
+    Console.WriteLine(joke);
+    Console.WriteLine();
+}</code></pre>
+<p>Vi skapar bara <b>en</b> <code>HttpClient</code> och återanvänder den för alla förfrågningar.</p>
+</details>
+
+<h3>Extra utmaning</h3>
+<p>Adressen <a href="https://api.chucknorris.io/jokes/categories" target="_blank" rel="noopener">https://api.chucknorris.io/jokes/categories</a> ger en lista med alla kategorier. Låt användaren skriva in en kategori i konsolen och hämta ett skämt från just den.</p>
+<details>
+<summary>Visa facit</summary>
+<pre><code>using System.Text.Json;
+
+HttpClient client = new HttpClient();
+
+Console.Write("Välj kategori (till exempel dev, food eller sport): ");
+string category = Console.ReadLine();
+
+string url = $"https://api.chucknorris.io/jokes/random?category={category}";
+string json = await client.GetStringAsync(url);
+
+JsonDocument document = JsonDocument.Parse(json);
+string joke = document.RootElement.GetProperty("value").GetString()!;
+
+Console.WriteLine(joke);</code></pre>
+<p>Skriver man en kategori som inte finns svarar API:et med ett fel, och programmet kraschar. Det kan man lösa med <code>try</code>/<code>catch</code> – men det är en annan lektion.</p>
+</details>
+
+<!-- ================= ORDLISTA ================= -->
+<h2>Ordlista</h2>
+<div class="scroll"><table>
+  <tr><th>Ord</th><th>Betyder</th></tr>
+  <tr><td><b>API</b></td><td>Ett sätt för program att prata med varandra.</td></tr>
+  <tr><td><b>Request</b> (förfrågan)</td><td>Det vårt program skickar: "ge mig ett skämt".</td></tr>
+  <tr><td><b>Response</b> (svar)</td><td>Det servern skickar tillbaka.</td></tr>
+  <tr><td><b>URL</b></td><td>Adressen vi skickar förfrågan till.</td></tr>
+  <tr><td><b>JSON</b></td><td>Textformatet som datan skickas i.</td></tr>
+  <tr><td><b><code>HttpClient</code></b></td><td>Klassen i C# som skickar förfrågningar till internet.</td></tr>
+  <tr><td><b><code>await</code></b></td><td>Vänta på något som tar tid innan programmet går vidare.</td></tr>
+</table></div>
+
+</main>
+<script src="vs.js"></script>
+<script src="cli.js"></script>
+</body>
+</html>
