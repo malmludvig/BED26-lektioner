@@ -26,7 +26,7 @@
   <figure><img src="dragon.jpg" alt="En blå drake med vingar och vassa klor"><figcaption><code>Dragon</code></figcaption></figure>
 </div>
 
-<p class="box"><b>Hela projektet på GitHub:</b> <a href="https://github.com/malmludvig/DragonSlayer" target="_blank" rel="noopener">github.com/malmludvig/DragonSlayer</a> – en färdig konsolapp med all kod från lektionen. Klona repot och öppna <code>DragonSlayer.slnx</code> i Visual Studio.</p>
+<p class="box"><b>Hela projektet på GitHub:</b> <a href="https://github.com/malmludvig/DragonSlayer" target="_blank" rel="noopener">github.com/malmludvig/DragonSlayer</a> – koden från lektionen, utbyggd till ett RPG i konsolen (se <a href="#rpg">avsnitt 7</a>). Klona repot och öppna <code>DragonSlayer.slnx</code> i Visual Studio.</p>
 
 <h2>Lektionsupplägg – cirka 3 timmar</h2>
 <div class="scroll"><table>
@@ -357,6 +357,71 @@ Console.WriteLine($"{enemy.Name} är besegrad!");</code></pre>
   <li>☐ <code>Sword</code>, <code>Bow</code> och <code>MagicWand</code> implementerar <code>IWeapon</code>.</li>
   <li>☐ Spelaren kan byta vapen, och fiendens hälsa skrivs ut efter varje attack.</li>
   <li>☐ Hälsan blir aldrig negativ.</li>
+</ul>
+
+<!-- ================= 7. RPG ================= -->
+<h2 id="rpg">7. Spela hela spelet – Dragon Slayer RPG</h2>
+<p>I <a href="https://github.com/malmludvig/DragonSlayer" target="_blank" rel="noopener">GitHub-repot</a> har koden från lektionen byggts ut till ett litet RPG i konsolen. Starta programmet och välj <b>1. Spela Dragon Slayer</b> – eller <b>2</b> för att köra exemplen från lektionen.</p>
+<p class="box"><i>Drakkungen härjar i landet. Bli stark nog att besegra honom!</i></p>
+<div class="scroll"><table>
+  <tr><th>Val</th><th>Vad händer</th></tr>
+  <tr><td>Gå på äventyr</td><td>Slåss mot en goblin, ett troll eller en drake. Vinn guld och få 10 mer i maxhälsa.</td></tr>
+  <tr><td>Vila vid lägerelden</td><td>Full hälsa – men ibland smyger en goblin fram ur mörkret.</td></tr>
+  <tr><td>Besök handlaren</td><td>Köp läkedrycker (15 guld), en trollstav (40 guld) eller en stridsyxa (100 guld).</td></tr>
+  <tr><td>Utmana Drakkungen</td><td>Slutbossen. Besegra honom och vinn spelet.</td></tr>
+</table></div>
+<p>I striden kan du <b>attackera</b>, <b>dricka en läkedryck</b> (+40 hälsa) eller försöka <b>fly</b> (50 % chans).</p>
+<div class="scroll"><table>
+  <tr><th>Fiende</th><th>Hälsa</th><th>Skada</th><th>Svårighet</th><th>Guld</th></tr>
+  <tr><td><code>Goblin</code></td><td>30</td><td>5</td><td>Easy</td><td>10</td></tr>
+  <tr><td><code>Troll</code></td><td>60</td><td>9</td><td>Medium</td><td>25</td></tr>
+  <tr><td><code>Dragon</code></td><td>100</td><td>10</td><td>Hard</td><td>50</td></tr>
+  <tr><td><code>DragonKing</code></td><td>180</td><td>16</td><td>Hard</td><td>50</td></tr>
+</table></div>
+
+<h3>Det här är nytt i koden</h3>
+<p>Fienderna måste kunna skada spelaren. Därför får <code>Enemy</code> en <b>abstrakt egenskap</b> – varje fiende måste säga hur hårt den slår:</p>
+<pre><code>// I Enemy
+public abstract int Damage { get; }
+
+// I Goblin
+public override int Damage =&gt; 5;</code></pre>
+<p>Svårighetsgraden bestämmer hur mycket guld fienden ger. Här gör enumen verklig nytta:</p>
+<pre><code>public int GoldReward()
+{
+    switch (Difficulty)
+    {
+        case Difficulty.Easy:
+            return 10;
+        case Difficulty.Medium:
+            return 25;
+        default:
+            return 50;
+    }
+}</code></pre>
+<p>Spelaren får hälsa, guld och läkedrycker. Precis som hos fienden ändras hälsan bara genom metoder:</p>
+<pre><code>public int Health { get; private set; }
+public int MaxHealth { get; private set; }
+public int Gold { get; set; }
+public int Potions { get; set; }
+
+public void TakeDamage(int damage) { ... }   // aldrig under 0
+public void Heal(int amount) { ... }         // aldrig över MaxHealth
+public void LevelUp() { ... }                // +10 maxhälsa efter varje seger</code></pre>
+<div class="scroll"><table>
+  <tr><th>Fil</th><th>Innehåll</th></tr>
+  <tr><td><code>Troll.cs</code>, <code>DragonKing.cs</code></td><td>Två nya fiender – ärver <code>Enemy</code></td></tr>
+  <tr><td><code>Axe.cs</code></td><td>Nytt vapen – implementerar <code>IWeapon</code></td></tr>
+  <tr><td><code>Game.cs</code></td><td>Spelet: menyn, striderna, vilan och handlaren</td></tr>
+  <tr><td><code>Examples.cs</code></td><td>Exemplen från lektionen, steg för steg</td></tr>
+</table></div>
+<p class="box">Lägg märke till att <code>Game</code> aldrig frågar <i>vilken</i> fiende det är när den slåss – den anropar bara <code>enemy.Attack()</code> och <code>enemy.Damage</code>. Och spelaren byter vapen hos handlaren utan att <code>Player</code> ändras. Samma idéer som i lektionen – arv, polymorfism och composition.</p>
+
+<h3>Bygg vidare</h3>
+<ul>
+  <li>Lägg till en ny fiende, till exempel en <code>Skeleton</code>. Vad behöver du ändra i <code>Game.cs</code>?</li>
+  <li>Lägg till ett nytt vapen hos handlaren.</li>
+  <li>Låt Drakkungen göra dubbel skada var tredje runda.</li>
 </ul>
 
 <!-- ================= GENOMGÅNG ================= -->
