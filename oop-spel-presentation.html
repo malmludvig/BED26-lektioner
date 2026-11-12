@@ -457,14 +457,15 @@ Fiendens hälsa: 12</code></pre>
 
 <section class="slide">
   <h2>Övning – bygg ut spelet</h2>
+  <p>Bygg något som inte finns i koden ännu:</p>
   <ol>
-    <li>Skapa <code>Dragon</code> som ärver <code>Enemy</code>.</li>
-    <li>Lägg flera fiender i en <code>List&lt;Enemy&gt;</code> och anropa deras attacker.</li>
-    <li>Skapa <code>MagicWand</code> som implementerar <code>IWeapon</code>.</li>
-    <li>Låt spelaren attackera med olika vapen.</li>
-    <li>Skriv ut fiendens hälsa efter varje attack.</li>
+    <li>Skapa <code>Skeleton</code> som ärver <code>Enemy</code> – <i>Skelett</i>, 40 i hälsa, <code>Medium</code>.</li>
+    <li>Skapa <code>Hammer</code> som implementerar <code>IWeapon</code> – 20 i skada.</li>
+    <li>Lägg en goblin, ett skelett och en drake i en <code>List&lt;Enemy&gt;</code> och låt alla attackera.</li>
+    <li>Ge spelaren hammaren och slå varje fiende en gång. Skriv ut hälsan efter varje slag.</li>
+    <li>Byt till svärdet och slå skelettet en gång till.</li>
   </ol>
-  <p><b>Extra:</b> en konsolmeny där spelaren väljer vapen och attackerar tills fiendens hälsa är noll.</p>
+  <p><b>Extra:</b> slåss mot fienderna i listan tills alla är besegrade · lägg in skelettet i det riktiga spelet.</p>
   <p class="box">Nu: <a href="vecka9.html">Dragon Slayer</a> – där finns all kod och facit.</p>
   <p class="hint">Hela projektet: <a href="https://github.com/malmludvig/DragonSlayer" target="_blank" rel="noopener">github.com/malmludvig/DragonSlayer</a></p>
 </section>

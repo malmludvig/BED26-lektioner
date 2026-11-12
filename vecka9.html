@@ -161,8 +161,19 @@ Console.WriteLine(Difficulty.Hard);            // Hard</code></pre>
         Console.WriteLine("Goblinen attackerar med sin klubba!");
     }
 }</code></pre>
-<p>Skapa sedan en <code>Dragon</code> på samma sätt. Dess <code>Attack()</code> skriver att draken sprutar eld.</p>
-<div class="sprites"><figure><img src="dragon.jpg" alt="En blå drake med vingar och vassa klor"><figcaption>Dragon – sprutar eld</figcaption></figure></div>
+<p>En <code>Dragon</code> skapas på samma sätt – bara namn, hälsa, svårighetsgrad och attack skiljer:</p>
+<div class="sprites"><figure><img src="dragon.jpg" alt="En blå drake med vingar och vassa klor"><figcaption>Dragon – 100 i hälsa, Hard</figcaption></figure></div>
+<pre><code>public class Dragon : Enemy
+{
+    public Dragon() : base("Drake", 100, Difficulty.Hard)
+    {
+    }
+
+    public override void Attack()
+    {
+        Console.WriteLine("Draken sprutar eld!");
+    }
+}</code></pre>
 
 <h3>Polymorfism</h3>
 <pre><code>List&lt;Enemy&gt; enemies = new List&lt;Enemy&gt;
@@ -361,33 +372,34 @@ Fiendens hälsa: 12</code></pre>
 
 <!-- ================= 6. ÖVNING ================= -->
 <h2>6. Elevövning – bygg ut spelet</h2>
+<p><code>Goblin</code>, <code>Dragon</code>, <code>Sword</code> och <code>Bow</code> har du redan sett. Nu bygger du något som inte finns i koden ännu.</p>
 <ol>
-  <li>Skapa <code>Dragon</code> som ärver <code>Enemy</code>.</li>
-  <li>Lägg flera fiender i en <code>List&lt;Enemy&gt;</code> och anropa deras attacker.</li>
-  <li>Skapa <code>MagicWand</code> som implementerar <code>IWeapon</code>.</li>
-  <li>Låt spelaren attackera med olika vapen.</li>
-  <li>Skriv ut fiendens hälsa efter varje attack.</li>
+  <li>Skapa en ny fiende, <code>Skeleton</code>, som ärver <code>Enemy</code>. Den heter <i>Skelett</i>, har 40 i hälsa och svårighetsgraden <code>Medium</code>. När den attackerar skriver den ut <i>Skelettet skjuter en benpil!</i></li>
+  <li>Skapa ett nytt vapen, <code>Hammer</code>, som implementerar <code>IWeapon</code>. Det gör 20 i skada och skriver ut <i>Du slår med stridshammaren!</i></li>
+  <li>Lägg en <code>Goblin</code>, en <code>Skeleton</code> och en <code>Dragon</code> i en <code>List&lt;Enemy&gt;</code> och låt alla attackera.</li>
+  <li>Ge spelaren hammaren och låt hen slå varje fiende en gång. Skriv ut fiendens hälsa efter varje slag.</li>
+  <li>Byt till svärdet och slå skelettet en gång till.</li>
 </ol>
 <details>
 <summary>Visa facit</summary>
-<pre><code>public class Dragon : Enemy
+<pre><code>public class Skeleton : Enemy
 {
-    public Dragon() : base("Drake", 100, Difficulty.Hard)
+    public Skeleton() : base("Skelett", 40, Difficulty.Medium)
     {
     }
 
     public override void Attack()
     {
-        Console.WriteLine("Draken sprutar eld!");
+        Console.WriteLine("Skelettet skjuter en benpil!");
     }
 }
 
-public class MagicWand : IWeapon
+public class Hammer : IWeapon
 {
     public int Use()
     {
-        Console.WriteLine("Du kastar en eldboll med trollstaven!");
-        return 15;
+        Console.WriteLine("Du slår med stridshammaren!");
+        return 20;
     }
 }
 
@@ -395,7 +407,7 @@ public class MagicWand : IWeapon
 List&lt;Enemy&gt; enemies = new List&lt;Enemy&gt;
 {
     new Goblin(),
-    new Goblin(),
+    new Skeleton(),
     new Dragon()
 };
 
@@ -404,83 +416,91 @@ foreach (Enemy e in enemies)
     e.Attack();
 }
 
-Player player = new Player(new Sword());
-Enemy dragon = new Dragon();
+Player player = new Player(new Hammer());
 
-player.Attack(dragon);
-Console.WriteLine($"{dragon.Name}: {dragon.Health}");
-
-player.Weapon = new Bow();
-player.Attack(dragon);
-Console.WriteLine($"{dragon.Name}: {dragon.Health}");
-
-player.Weapon = new MagicWand();
-player.Attack(dragon);
-Console.WriteLine($"{dragon.Name}: {dragon.Health}");</code></pre>
-<p>Utskrift:</p>
-<pre><code class="nohighlight">Goblinen attackerar med sin klubba!
-Goblinen attackerar med sin klubba!
-Draken sprutar eld!
-Du hugger med svärdet!
-Drake: 90
-Du skjuter en pil!
-Drake: 82
-Du kastar en eldboll med trollstaven!
-Drake: 67</code></pre>
-<p>Varken <code>Player</code> eller <code>Enemy</code> behövde ändras för att lägga till en drake och en trollstav.</p>
-</details>
-
-<h3>Extra utmaning</h3>
-<p>Låt spelaren välja vapen i en konsolmeny och fortsätta attackera tills fiendens hälsa är noll.</p>
-<details>
-<summary>Visa facit</summary>
-<pre><code>Player player = new Player(new Sword());
-Enemy enemy = new Dragon();
-
-while (enemy.Health &gt; 0)
+foreach (Enemy e in enemies)
 {
-    Console.WriteLine();
-    Console.WriteLine($"{enemy.Name} har {enemy.Health} i hälsa.");
-    Console.WriteLine("1. Svärd");
-    Console.WriteLine("2. Pilbåge");
-    Console.WriteLine("3. Trollstav");
-    Console.Write("Välj vapen: ");
-    string choice = Console.ReadLine();
-
-    if (choice == "1")
-    {
-        player.Weapon = new Sword();
-    }
-    else if (choice == "2")
-    {
-        player.Weapon = new Bow();
-    }
-    else if (choice == "3")
-    {
-        player.Weapon = new MagicWand();
-    }
-    else
-    {
-        Console.WriteLine("Ogiltigt val.");
-        continue;
-    }
-
-    player.Attack(enemy);
-
-    if (enemy.Health &gt; 0)
-    {
-        enemy.Attack();
-    }
+    player.Attack(e);
+    Console.WriteLine($"{e.Name}: {e.Health}");
 }
 
-Console.WriteLine($"{enemy.Name} är besegrad!");</code></pre>
+player.Weapon = new Sword();
+player.Attack(enemies[1]);
+Console.WriteLine($"{enemies[1].Name}: {enemies[1].Health}");</code></pre>
+<p>Utskrift:</p>
+<pre><code class="nohighlight">Goblinen attackerar med sin klubba!
+Skelettet skjuter en benpil!
+Draken sprutar eld!
+Du slår med stridshammaren!
+Goblin: 10
+Du slår med stridshammaren!
+Skelett: 20
+Du slår med stridshammaren!
+Drake: 80
+Du hugger med svärdet!
+Skelett: 10</code></pre>
+<p>Varken <code>Player</code> eller <code>Enemy</code> behövde ändras för att lägga till ett skelett och en hammare.</p>
+</details>
+
+<h3>Extra utmaning 1 – slåss tills alla är besegrade</h3>
+<p>Låt spelaren möta fienderna i listan en i taget. Spelaren slår tills fienden har 0 i hälsa, och fienden slår tillbaka så länge den lever. När alla är besegrade skriver programmet ut det.</p>
+<details>
+<summary>Visa facit</summary>
+<pre><code>Player player = new Player(new Hammer());
+
+foreach (Enemy enemy in enemies)
+{
+    Console.WriteLine();
+    Console.WriteLine($"{enemy.Name} dyker upp!");
+
+    while (enemy.Health &gt; 0)
+    {
+        player.Attack(enemy);
+        Console.WriteLine($"{enemy.Name}: {enemy.Health}");
+
+        if (enemy.Health &gt; 0)
+        {
+            enemy.Attack();
+        }
+    }
+
+    Console.WriteLine($"{enemy.Name} är besegrad!");
+}
+
+Console.WriteLine();
+Console.WriteLine("Alla fiender är besegrade!");</code></pre>
+</details>
+
+<h3>Extra utmaning 2 – lägg in skelettet i det riktiga spelet</h3>
+<p>Klona <a href="https://github.com/malmludvig/DragonSlayer" target="_blank" rel="noopener">GitHub-repot</a> och lägg till <code>Skeleton</code> så att det dyker upp när du går på äventyr.</p>
+<details>
+<summary>Visa facit</summary>
+<p>I repot har <code>Enemy</code> också en abstrakt egenskap <code>Damage</code>, så skelettet måste tala om hur hårt det slår:</p>
+<pre><code>public class Skeleton : Enemy
+{
+    public Skeleton() : base("Skelett", 40, Difficulty.Medium)
+    {
+    }
+
+    public override int Damage =&gt; 7;
+
+    public override void Attack()
+    {
+        Console.WriteLine("Skelettet skjuter en benpil!");
+    }
+}</code></pre>
+<p>Lägg till namnet i <code>enemies.json</code> …</p>
+<pre><code class="nohighlight">["Goblin", "Goblin", "Goblin", "Troll", "Troll", "Skeleton", "Skeleton", "Dragon"]</code></pre>
+<p>… och ett nytt <code>case</code> i <code>EnemyLoader.Create</code>:</p>
+<pre><code>case "Skeleton":
+    return new Skeleton();</code></pre>
 </details>
 
 <h3>Klart när</h3>
 <ul>
-  <li>☐ <code>Goblin</code> och <code>Dragon</code> ärver från <code>Enemy</code> och attackerar på olika sätt.</li>
+  <li>☐ <code>Skeleton</code> ärver från <code>Enemy</code> och attackerar på sitt eget sätt.</li>
+  <li>☐ <code>Hammer</code> implementerar <code>IWeapon</code>.</li>
   <li>☐ En loop över en <code>List&lt;Enemy&gt;</code> anropar alla fienders attacker.</li>
-  <li>☐ <code>Sword</code>, <code>Bow</code> och <code>MagicWand</code> implementerar <code>IWeapon</code>.</li>
   <li>☐ Spelaren kan byta vapen, och fiendens hälsa skrivs ut efter varje attack.</li>
   <li>☐ Hälsan blir aldrig negativ.</li>
 </ul>
