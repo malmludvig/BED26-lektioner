@@ -440,6 +440,17 @@ Fiendens hälsa: 12</code></pre>
 </section>
 
 <section class="slide">
+  <h2>När ska vi använda vad?</h2>
+  <div class="scroll"><table>
+    <tr><th></th><th>Använd när …</th><th>I spelet</th></tr>
+    <tr><td><b>Abstract class</b></td><td>klasserna <b>är</b> samma sorts sak och delar data och kod</td><td><code>Goblin</code> och <code>Dragon</code> <i>är</i> fiender – <code>Enemy</code></td></tr>
+    <tr><td><b>Interface</b></td><td>olika klasser ska <b>kunna</b> samma sak, men gör det på eget sätt</td><td>Alla vapen <i>kan</i> användas – <code>IWeapon</code></td></tr>
+    <tr><td><b>Composition</b></td><td>något är en <b>del</b> som kan bytas</td><td>Spelaren <i>har</i> ett vapen – <code>Player.Weapon</code></td></tr>
+  </table></div>
+  <p class="box">Fråga dig: <b>"är en"</b> → abstract class · <b>"kan"</b> → interface · <b>"har en"</b> → composition</p>
+</section>
+
+<section class="slide">
   <h2>Genomgång</h2>
   <p class="box big"><i>"Varför ärver goblinen från <code>Enemy</code>, medan spelaren har ett separat vapenobjekt?"</i></p>
   <p class="big">Hela spelet: <a href="https://github.com/malmludvig/DragonSlayer" target="_blank" rel="noopener">github.com/malmludvig/DragonSlayer</a></p>

@@ -508,6 +508,24 @@ public void LevelUp() { ... }                // +10 maxhälsa efter varje seger<
   <li>Låt Drakkungen göra dubbel skada var tredje runda.</li>
 </ul>
 
+<!-- ================= NÄR ANVÄNDA VAD ================= -->
+<h2>När ska vi använda vad?</h2>
+<div class="scroll"><table>
+  <tr><th></th><th>Använd när …</th><th>Kännetecken</th><th>I spelet</th></tr>
+  <tr><td><b>Abstract class</b></td><td>klasserna <b>är</b> samma sorts sak och delar data och kod</td><td>Fält, konstruktor och färdiga metoder. En klass kan bara ärva <b>en</b> basklass.</td><td><code>Goblin</code> och <code>Dragon</code> <i>är</i> fiender – de ärver <code>Enemy</code> och delar <code>Health</code> och <code>TakeDamage()</code>.</td></tr>
+  <tr><td><b>Interface</b></td><td>olika klasser ska <b>kunna</b> samma sak, men gör det på eget sätt</td><td>Bara ett kontrakt – ingen gemensam kod. En klass kan ha <b>flera</b> interface.</td><td><code>Sword</code>, <code>Bow</code> och <code>MagicWand</code> <i>kan</i> användas – de implementerar <code>IWeapon</code>.</td></tr>
+  <tr><td><b>Composition</b></td><td>något är en <b>del</b> som ska kunna bytas</td><td>Klassen har ett annat objekt som en egenskap, ofta av en interface-typ.</td><td>Spelaren <i>har</i> ett vapen – <code>Player.Weapon</code> – som kan bytas under spelet.</td></tr>
+</table></div>
+<div class="box">
+<p><b>Fråga dig</b></p>
+<ul>
+  <li><b>"Är en"</b> och delar kod? → abstract class</li>
+  <li><b>"Kan"</b> – samma förmåga hos olika klasser? → interface</li>
+  <li><b>"Har en"</b> – en del som kan bytas? → composition</li>
+</ul>
+<p>Ofta används alla tre tillsammans – precis som i Dragon Slayer.</p>
+</div>
+
 <!-- ================= GENOMGÅNG ================= -->
 <h2>Genomgång</h2>
 <p class="box" style="font-size:1.15em"><i>"Varför ärver goblinen från <code>Enemy</code>, medan spelaren har ett separat vapenobjekt?"</i></p>
