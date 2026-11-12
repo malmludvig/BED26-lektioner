@@ -188,6 +188,10 @@ public class Bow : IWeapon
 
 <!-- ================= 5. COMPOSITION ================= -->
 <h2>5. Composition over inheritance – spelaren har ett vapen</h2>
+<figure class="shot" style="max-width:560px">
+  <img src="composition-vs-inheritance.png" alt="UML-diagram: Composition vs. Inheritance. House ärver från Building med en ofylld triangel – 'is a' (inheritance). House har en Bathroom med en fylld romb – 'has a' (composition).">
+  <figcaption>Ett hus <b>är en</b> byggnad (arv, ofylld triangel). Ett hus <b>har ett</b> badrum (composition, fylld romb).</figcaption>
+</figure>
 <p><b>Diskutera först:</b> vi skulle kunna skapa klasserna <code>SwordPlayer</code> och <code>BowPlayer</code> som ärver från <code>Player</code>.</p>
 <p class="box"><b>Fundera:</b> vad händer om spelaren ska kunna byta vapen under spelets gång?</p>
 <details>

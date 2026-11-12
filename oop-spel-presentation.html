@@ -261,6 +261,17 @@ Draken sprutar eld!</code></pre>
 </section>
 
 <section class="slide">
+  <h2>Arv eller composition?</h2>
+  <figure class="shot" style="max-width:620px;margin-inline:auto">
+    <img src="composition-vs-inheritance.png" alt="UML-diagram: Composition vs. Inheritance. House ärver från Building med en ofylld triangel – 'is a' (inheritance). House har en Bathroom med en fylld romb – 'has a' (composition).">
+  </figure>
+  <ul>
+    <li>Ett hus <b>är en</b> byggnad → arv (ofylld triangel).</li>
+    <li>Ett hus <b>har ett</b> badrum → composition (fylld romb).</li>
+  </ul>
+</section>
+
+<section class="slide">
   <h2>Spelaren – ett första försök</h2>
   <pre><code class="nohighlight">Player
 ├── SwordPlayer
