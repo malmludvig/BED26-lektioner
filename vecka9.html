@@ -65,6 +65,19 @@ Console.WriteLine(second.Health);   // 30 – den andra goblinen är orörd</cod
     Hard
 }</code></pre>
 <pre><code>Difficulty difficulty = Difficulty.Hard;</code></pre>
+<p>En klass kan ha en enum som <b>property</b> – precis som en <code>string</code> eller en <code>int</code>:</p>
+<pre><code>class Enemy
+{
+    public string Name { get; set; }
+    public Difficulty Difficulty { get; set; }
+}
+
+Enemy boss = new Enemy();
+boss.Name = "Drakkungen";
+boss.Difficulty = Difficulty.Hard;
+
+Console.WriteLine($"{boss.Name} är {boss.Difficulty}");   // Drakkungen är Hard</code></pre>
+<p class="hint">Det är helt okej att propertyn heter samma sak som typen: <code>public Difficulty Difficulty</code>. Det är vanligt i C#.</p>
 <p class="box"><b>Fundera:</b> varför är det tydligare än att använda strängar som <code>"hard"</code>, <code>"Hard"</code> eller <code>"svår"</code>?</p>
 <details>
 <summary>Visa svar</summary>

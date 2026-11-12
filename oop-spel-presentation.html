@@ -100,6 +100,15 @@ Console.WriteLine(second.Health);   // 30</code></pre>
       <p>En egen typ med ett <b>fast antal</b> värden.</p>
     </div>
   </div>
+  <p>En klass kan ha en enum som <b>property</b>:</p>
+  <pre><code>class Enemy
+{
+    public string Name { get; set; }
+    public Difficulty Difficulty { get; set; }
+}
+
+Enemy boss = new Enemy();
+boss.Difficulty = Difficulty.Hard;</code></pre>
 </section>
 
 <section class="slide">
