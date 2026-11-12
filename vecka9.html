@@ -508,6 +508,75 @@ public void LevelUp() { ... }                // +10 maxhälsa efter varje seger<
   <li>Låt Drakkungen göra dubbel skada var tredje runda.</li>
 </ul>
 
+<!-- ================= 8. JSON ================= -->
+<h2 id="json">8. Ladda fiender från en JSON-fil</h2>
+<p>I stället för att skriva in i koden vilka fiender som finns kan vi läsa in dem från en fil. Då kan man ändra spelet <b>utan att ändra koden</b>.</p>
+
+<h3>Filen <code>enemies.json</code></h3>
+<pre><code class="nohighlight">[
+  "Goblin",
+  "Goblin",
+  "Goblin",
+  "Troll",
+  "Troll",
+  "Dragon"
+]</code></pre>
+<p>En lista med namn. Ett namn som står flera gånger dyker upp oftare – här är goblinen vanligast och draken ovanligast.</p>
+<p class="hint">I Visual Studio: högerklicka på <code>enemies.json</code> → <i>Properties</i> → <b>Copy to Output Directory: Copy if newer</b>. Annars hittar programmet inte filen.</p>
+
+<h3>Läs in filen</h3>
+<pre><code>using System.Text.Json;
+
+public static class EnemyLoader
+{
+    public static List&lt;string&gt; LoadNames(string path)
+    {
+        string json = File.ReadAllText(path);
+        return JsonSerializer.Deserialize&lt;List&lt;string&gt;&gt;(json);
+    }
+
+    // Gör om ett namn från JSON-filen till ett riktigt fiendeobjekt
+    public static Enemy Create(string name)
+    {
+        switch (name)
+        {
+            case "Goblin":
+                return new Goblin();
+            case "Troll":
+                return new Troll();
+            case "Dragon":
+                return new Dragon();
+            default:
+                throw new ArgumentException($"Okänd fiende: {name}");
+        }
+    }
+}</code></pre>
+<ul>
+  <li><code>File.ReadAllText</code> läser hela filen som en sträng.</li>
+  <li><code>JsonSerializer.Deserialize&lt;List&lt;string&gt;&gt;</code> gör om JSON-texten till en <code>List&lt;string&gt;</code>.</li>
+  <li><code>Create</code> gör om namnet till ett objekt. Klasserna <code>Goblin</code>, <code>Troll</code> och <code>Dragon</code> är precis som förut.</li>
+</ul>
+
+<h3>Använd det</h3>
+<pre><code>List&lt;string&gt; names = EnemyLoader.LoadNames("enemies.json");
+
+foreach (string name in names)
+{
+    Enemy enemy = EnemyLoader.Create(name);
+    enemy.Attack();
+}</code></pre>
+<pre><code class="nohighlight">Goblinen attackerar med sin klubba!
+Goblinen attackerar med sin klubba!
+Goblinen attackerar med sin klubba!
+Trollet slår med en trädstam!
+Trollet slår med en trädstam!
+Draken sprutar eld!</code></pre>
+<p>I spelet väljs ett slumpat namn ur listan varje gång du går på äventyr:</p>
+<pre><code>string name = enemyNames[Random.Shared.Next(enemyNames.Count)];
+return EnemyLoader.Create(name);</code></pre>
+<p class="box">Varför läser vi bara in <b>namnen</b>, och skapar ett nytt objekt varje gång? Varje strid behöver en fiende med <b>full hälsa</b>. Hade vi återanvänt samma objekt hade draken redan varit död andra gången du mötte den.</p>
+<p><b>Prova:</b> ändra i <code>enemies.json</code> så att det kommer fler drakar – utan att röra koden.</p>
+
 <!-- ================= NÄR ANVÄNDA VAD ================= -->
 <h2>När ska vi använda vad?</h2>
 <div class="scroll"><table>

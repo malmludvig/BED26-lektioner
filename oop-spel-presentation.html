@@ -440,6 +440,34 @@ Fiendens hälsa: 12</code></pre>
 </section>
 
 <section class="slide">
+  <h2>Ladda fiender från JSON</h2>
+  <div class="cols">
+    <div>
+      <p><code>enemies.json</code></p>
+      <pre><code class="nohighlight">[
+  "Goblin",
+  "Goblin",
+  "Troll",
+  "Dragon"
+]</code></pre>
+    </div>
+    <div>
+      <p>Läs in och skapa fienderna</p>
+      <pre><code>string json = File.ReadAllText("enemies.json");
+List&lt;string&gt; names =
+    JsonSerializer.Deserialize&lt;List&lt;string&gt;&gt;(json);
+
+foreach (string name in names)
+{
+    Enemy enemy = EnemyLoader.Create(name);
+    enemy.Attack();
+}</code></pre>
+    </div>
+  </div>
+  <p class="box">Ändra i filen – inte i koden – för att ändra vilka fiender som dyker upp. <a href="vecka9.html#json">Läs mer</a></p>
+</section>
+
+<section class="slide">
   <h2>När ska vi använda vad?</h2>
   <div class="scroll"><table>
     <tr><th></th><th>Använd när …</th><th>I spelet</th></tr>
