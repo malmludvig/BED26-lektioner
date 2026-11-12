@@ -114,6 +114,27 @@ Console.WriteLine(second.Health);   // 30</code></pre>
 </section>
 
 <section class="slide">
+  <h2>Använd enumen: switch</h2>
+  <p>Svårighetsgraden bestämmer hur mycket guld fienden ger:</p>
+  <pre><code>int GoldFor(Difficulty difficulty)
+{
+    switch (difficulty)
+    {
+        case Difficulty.Easy:
+            return 10;
+        case Difficulty.Medium:
+            return 25;
+        default:
+            return 50;
+    }
+}
+
+Console.WriteLine(GoldFor(Difficulty.Hard));   // 50
+Console.WriteLine(Difficulty.Hard);            // Hard</code></pre>
+  <p class="box">Visual Studio kan fylla i alla <code>case</code> åt dig – skriv <code>switch</code>, tryck <b>Tab</b> två gånger och skriv in variabeln.</p>
+</section>
+
+<section class="slide">
   <h2>Abstract class: Enemy</h2>
   <pre><code>public abstract class Enemy
 {

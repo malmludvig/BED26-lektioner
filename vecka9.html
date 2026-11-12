@@ -78,6 +78,29 @@ Console.WriteLine(second.Health);   // 30 – den andra goblinen är orörd</cod
 </ul>
 </details>
 
+<h3>Använd enumen i en switch</h3>
+<p>En enum passar perfekt i en <code>switch</code>. Här bestämmer svårighetsgraden hur mycket guld fienden ger:</p>
+<pre><code>int GoldFor(Difficulty difficulty)
+{
+    switch (difficulty)
+    {
+        case Difficulty.Easy:
+            return 10;
+        case Difficulty.Medium:
+            return 25;
+        default:
+            return 50;
+    }
+}
+
+Console.WriteLine(GoldFor(Difficulty.Hard));   // 50
+Console.WriteLine(Difficulty.Hard);            // Hard</code></pre>
+<ul>
+  <li>Skriver du ut en enum får du namnet: <code>Hard</code>.</li>
+  <li>Visual Studio kan fylla i alla <code>case</code> åt dig – skriv <code>switch</code>, tryck <b>Tab</b> två gånger och skriv in variabeln.</li>
+  <li>I <a href="#rpg">RPG-versionen</a> ligger samma kod som metoden <code>GoldReward()</code> i <code>Enemy</code>.</li>
+</ul>
+
 <!-- ================= 3. ABSTRACT ================= -->
 <h2>3. Abstract class – olika fiender med en gemensam grund</h2>
 <p>Alla fiender har namn, hälsa och svårighetsgrad och kan ta skada på samma sätt. Men de <b>attackerar</b> olika. Därför gör vi en abstrakt basklass:</p>
