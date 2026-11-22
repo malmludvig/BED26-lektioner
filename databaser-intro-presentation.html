@@ -15,7 +15,8 @@
   .slide .tva-kol { grid-template-columns: 1fr 1.15fr; }
   @media (max-width: 760px) { .slide .tva-kol { grid-template-columns: 1fr; } }
   .slide.bild img { display: block; max-width: 100%; max-height: 78vh; width: auto; height: auto; margin: 0 auto; border-radius: 8px; border: 1px solid var(--line); }
-  :fullscreen .slide.bild img { max-height: 85vh; width: auto; margin: 0 auto; }
+  :fullscreen .slide.bild img { max-height: 65vh; }   /* i helskärm: ungefär lika stor som texten */
+  #show:fullscreen { padding-inline: max(16px, calc((100% - 1100px) / 2)); }   /* samma kolumnbredd för text och bilder */
   .slides.ready .slide.active { display: block; }
   .slide .scroll { margin-block: 12px; }
   .slide h1 { font-size: clamp(2.2rem, 7vw, 3.6rem); margin: 0 0 8px; }
@@ -144,6 +145,7 @@ customers.Add(new Customer { Name = "Ada" });
   <li><b>Relation</b> – hur entiteterna hänger ihop, med <b>kardinalitet</b> (1 eller många)</li>
 </ul>
 <pre class="mermaid">
+%%{init: {"er": {"layoutDirection": "LR"}}}%%
 erDiagram
     CUSTOMER ||--o{ ORDER : "lägger"
     CUSTOMER {

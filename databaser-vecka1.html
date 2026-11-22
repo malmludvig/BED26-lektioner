@@ -108,6 +108,7 @@ customers.Add(new Customer { Name = "Ada" });
   <li><b>Relation</b> – hur entiteterna hänger ihop, med <b>kardinalitet</b> (1 eller många)</li>
 </ul>
 <pre class="mermaid">
+%%{init: {"er": {"layoutDirection": "LR"}}}%%
 erDiagram
     CUSTOMER ||--o{ ORDER : "lägger"
     CUSTOMER {
