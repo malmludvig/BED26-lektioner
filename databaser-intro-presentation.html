@@ -12,6 +12,8 @@
   .slide { display: block; margin-bottom: 48px; font-size: 1.25rem; }
   .slides.ready .slide { display: none; margin: 0; }
   .slide .tva-kol table { font-size: 1rem; }
+  .slides.ready .slide.bild.par.active { display: flex; gap: 24px; justify-content: center; align-items: center; }
+  .slide.bild.par img { margin: 0; max-width: 48%; max-height: 70vh; }
   .slide .mermaid svg { width: 100%; max-width: 100% !important; height: auto; max-height: 52vh; }   /* större ER-diagram */
   .slide .tva-kol.modell { grid-template-columns: 1fr 2fr; }
   .slide .tva-kol.modell pre { font-size: clamp(12px, 1.2vw, 15px); margin: 0; }
@@ -117,6 +119,10 @@ customers.Add(new Customer { Name = "Ada" });
 
 <section class="slide bild">
   <img src="db-sql.webp" alt="SQL: SELECT Titel FROM Bok; ger titeln Mio, min Mio">
+</section>
+
+<section class="slide bild par">
+  <img src="db-meme-sql-uttal.webp" alt="Meme: Structured Query Language, S-Q-L, Se-quel, Skewl/Squeal/Squiggle"><img src="db-meme-caps-lock.webp" alt="Meme: SQL programmers be like – värmer upp och trycker på Caps Lock">
 </section>
 
 <section class="slide bild">

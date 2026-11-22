@@ -67,3 +67,8 @@ nav.veckor { padding-bottom: 6px; }
 .tva-kol.modell pre { margin: 0; font-size: 14px; }
 .tva-kol.modell .mermaid svg { width: 100%; max-width: 100% !important; height: auto; }
 @media (max-width: 760px) { .tva-kol.modell { grid-template-columns: 1fr; } }
+
+/* Två bilder bredvid varandra */
+.bildpar { display: flex; gap: 16px; align-items: center; justify-content: center; }
+.bildpar .shot { flex: 1; margin: 16px 0; }
+.bildpar .shot img { max-height: 420px; width: auto; max-width: 100%; margin: 0 auto; }
