@@ -56,3 +56,8 @@ nav.kurser, nav.veckor { padding-block: 4px; font-size: .95rem; }
 nav.kurser a { font-size: 1rem; }
 nav.veckor { padding-bottom: 6px; }
 .undermeny { padding-block: 4px; font-size: .95rem; }
+
+/* Två kolumner, t.ex. tabell och bild bredvid varandra */
+.tva-kol { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; align-items: center; }
+.tva-kol .shot { margin: 0; }
+@media (max-width: 760px) { .tva-kol { grid-template-columns: 1fr; } }

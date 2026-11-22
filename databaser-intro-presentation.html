@@ -11,7 +11,10 @@
   .slides { min-height: 60vh; display: flex; flex-direction: column; justify-content: center; }
   .slide { display: block; margin-bottom: 48px; font-size: 1.25rem; }
   .slides.ready .slide { display: none; margin: 0; }
-  .slide.bild img { display: block; width: 100%; height: auto; border-radius: 8px; border: 1px solid var(--line); }
+  .slide .tva-kol table { font-size: 1rem; }
+  .slide .tva-kol { grid-template-columns: 1fr 1.15fr; }
+  @media (max-width: 760px) { .slide .tva-kol { grid-template-columns: 1fr; } }
+  .slide.bild img { display: block; max-width: 100%; max-height: 78vh; width: auto; height: auto; margin: 0 auto; border-radius: 8px; border: 1px solid var(--line); }
   :fullscreen .slide.bild img { max-height: 85vh; width: auto; margin: 0 auto; }
   .slides.ready .slide.active { display: block; }
   .slide .scroll { margin-block: 12px; }
@@ -117,6 +120,7 @@ customers.Add(new Customer { Name = "Ada" });
 
 <section class="slide">
   <h2>Centrala begrepp</h2>
+<div class="tva-kol">
 <div class="scroll"><table>
   <tr><th>Begrepp</th><th>Betyder</th></tr>
   <tr><td><b>Databas</b></td><td>En samling data som sparas permanent och hör ihop</td></tr>
@@ -127,6 +131,8 @@ customers.Add(new Customer { Name = "Ada" });
   <tr><td><b>Relation</b></td><td>Hur saker i olika tabeller hänger ihop, t.ex. en kund och hennes ordrar</td></tr>
   <tr><td><b>SQL</b></td><td>Språket man använder för att prata med databasen</td></tr>
 </table></div>
+<figure class="shot"><img src="db-tabell-kund.webp" alt="En tabell för entiteten Kund: kolumner (fält), rader (poster) och attribut. En SQL-tabell är som en List&lt;Kund&gt; i C#."></figure>
+</div>
 </section>
 
 <section class="slide">
@@ -226,6 +232,10 @@ class Course
     public List&lt;Student&gt; Students { get; set; } = new();
 }</code></pre>
 <p>I C# räcker det med en lista på varje sida.</p>
+</section>
+
+<section class="slide bild">
+  <img src="db-er-diagram-stilar.webp" alt="Olika stilar för ER-diagram: Crow's Foot, Chen, Bachman, IDEF1X och Barker – 1 till många, många till många och 1 till 1">
 </section>
 
 <section class="slide">

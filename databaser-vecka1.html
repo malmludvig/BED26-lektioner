@@ -86,6 +86,7 @@ customers.Add(new Customer { Name = "Ada" });
 <figure class="shot"><img src="db-fran-databas-till-sql.webp" alt="Från databas till SQL: databas, relationsdatabas och SQL" loading="lazy"></figure>
 
 <h2 id="del5">5. Centrala begrepp</h2>
+<div class="tva-kol">
 <div class="scroll"><table>
   <tr><th>Begrepp</th><th>Betyder</th></tr>
   <tr><td><b>Databas</b></td><td>En samling data som sparas permanent och hör ihop</td></tr>
@@ -96,6 +97,8 @@ customers.Add(new Customer { Name = "Ada" });
   <tr><td><b>Relation</b></td><td>Hur saker i olika tabeller hänger ihop, t.ex. en kund och hennes ordrar</td></tr>
   <tr><td><b>SQL</b></td><td>Språket man använder för att prata med databasen</td></tr>
 </table></div>
+<figure class="shot"><img src="db-tabell-kund.webp" alt="En tabell för entiteten Kund: kolumner (fält), rader (poster) och attribut. En SQL-tabell är som en List&lt;Kund&gt; i C#."></figure>
+</div>
 
 <h2 id="del6">6. ER-diagram</h2>
 <p>Ett <b>ER-diagram</b> (Entity–Relationship) är en ritning av databasen innan man bygger den.</p>
@@ -185,6 +188,7 @@ class Course
     public List&lt;Student&gt; Students { get; set; } = new();
 }</code></pre>
 <p>I C# räcker det med en lista på varje sida.</p>
+<figure class="shot"><img src="db-er-diagram-stilar.webp" alt="Olika stilar för ER-diagram: Crow's Foot, Chen, Bachman, IDEF1X och Barker – 1 till många, många till många och 1 till 1" loading="lazy"></figure>
 
 <h2 id="del11">11. Gruppövning: ER-modellering</h2>
 <p><b>Del 1 – i grupp:</b> Ett bibliotek vill hålla koll på böcker, författare, låntagare och lån.</p>
