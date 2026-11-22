@@ -72,3 +72,7 @@ nav.veckor { padding-bottom: 6px; }
 .bildpar { display: flex; gap: 16px; align-items: center; justify-content: center; }
 .bildpar .shot { flex: 1; margin: 16px 0; }
 .bildpar .shot img { max-height: 420px; width: auto; max-width: 100%; margin: 0 auto; }
+
+/* Två diagram bredvid varandra */
+.diagrampar { align-items: start; }
+.diagrampar .mermaid svg { width: 100%; max-width: 100% !important; height: auto; max-height: 340px; }

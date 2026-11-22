@@ -27,11 +27,14 @@
   <li><a href="#del5">Centrala begrepp</a></li>
   <li><a href="#del6">ER-diagram</a></li>
   <li><a href="#del7">Tre sorters relationer</a></li>
-  <li><a href="#del8">ER-diagram ↔ klasser i C#</a></li>
-  <li><a href="#del9">Samma modell i C#</a></li>
-  <li><a href="#del10">Många till många – i ER och i C#</a></li>
-  <li><a href="#del11">Gruppövning: ER-modellering</a></li>
-  <li><a href="#del12">Sammanfattning</a></li>
+  <li><a href="#del8">Nycklar</a></li>
+  <li><a href="#del9">UML-klassdiagram eller ER-diagram?</a></li>
+  <li><a href="#del10">ER-diagram ↔ klasser i C#</a></li>
+  <li><a href="#del11">Samma modell i C#</a></li>
+  <li><a href="#del12">Många till många – i ER och i C#</a></li>
+  <li><a href="#del13">Gruppövning: ER-modellering</a></li>
+  <li><a href="#del14">Förslag på gruppövningar</a></li>
+  <li><a href="#del15">Sammanfattning</a></li>
 </ol>
 <p><a href="databaser-intro-presentation.html">Presentationen</a> har samma innehåll som den här sidan.</p>
 </div>
@@ -133,7 +136,81 @@ erDiagram
 </table></div>
 <p class="box">Fråga dig åt båda hållen: <i>"Hur många ordrar kan en kund ha?"</i> och <i>"Hur många kunder kan en order ha?"</i> Svaren ger kardinaliteten.</p>
 
-<h2 id="del8">8. ER-diagram ↔ klasser i C#</h2>
+<h2 id="del8">8. Nycklar</h2>
+<p>Hur vet databasen <i>vilken</i> kund en order tillhör? Med <b>nycklar</b>.</p>
+<div class="tva-kol">
+<div>
+<div class="scroll"><table>
+  <tr><th colspan="2">Customers</th></tr>
+  <tr><th>Id (PK)</th><th>Name</th></tr>
+  <tr><td>1</td><td>Ada</td></tr>
+  <tr><td>2</td><td>Bo</td></tr>
+</table></div>
+<div class="scroll"><table>
+  <tr><th colspan="3">Orders</th></tr>
+  <tr><th>Id (PK)</th><th>OrderDate</th><th>CustomerId (FK)</th></tr>
+  <tr><td>10</td><td>2026-11-02</td><td>1</td></tr>
+  <tr><td>11</td><td>2026-11-05</td><td>1</td></tr>
+  <tr><td>12</td><td>2026-11-06</td><td>2</td></tr>
+</table></div>
+</div>
+<div class="scroll"><table>
+  <tr><th>Databas</th><th>C# / OOP</th></tr>
+  <tr><td><b>Primärnyckel</b> (PK) – identifierar en rad unikt</td><td>Objektets identitet. Två objekt kan ha samma namn men är ändå olika objekt.</td></tr>
+  <tr><td><b>Främmande nyckel</b> (FK) – pekar på en PK i en annan tabell</td><td>En <b>referens</b>: <code>order.Customer</code></td></tr>
+  <tr><td>Flera rader med samma FK</td><td>En <code>List&lt;Order&gt;</code> i kunden</td></tr>
+</table></div>
+</div>
+<p class="box">I C# pekar ett objekt direkt på ett annat. En tabell kan inte lagra en referens – därför sparar vi kundens <b>Id</b> i ordern. Ada har ordrar 10 och 11, Bo har order 12.</p>
+
+<h2 id="del9">9. UML-klassdiagram eller ER-diagram?</h2>
+<div class="tva-kol diagrampar">
+<div>
+<p><b>UML-klassdiagram</b> – hur programmet är byggt</p>
+<pre class="mermaid">
+classDiagram
+    class Customer {
+        +int Id
+        +string Name
+        +List~Order~ Orders
+        +PlaceOrder() Order
+    }
+    class Order {
+        +int Id
+        +DateTime OrderDate
+        +Customer Customer
+    }
+    Customer "1" --> "0..*" Order : lägger
+</pre>
+</div>
+<div>
+<p><b>ER-diagram</b> – hur datan lagras</p>
+<pre class="mermaid">
+erDiagram
+    CUSTOMER ||--o{ ORDER : "lägger"
+    CUSTOMER {
+        int Id PK
+        string Name
+    }
+    ORDER {
+        int Id PK
+        date OrderDate
+        int CustomerId FK
+    }
+</pre>
+</div>
+</div>
+<div class="scroll"><table>
+  <tr><th></th><th>UML-klassdiagram (OOP)</th><th>ER-diagram (databas)</th></tr>
+  <tr><td><b>Beskriver</b></td><td>Klasser i programmet</td><td>Tabeller i databasen</td></tr>
+  <tr><td><b>Innehåll</b></td><td>Egenskaper <i>och metoder</i></td><td>Bara attribut – data, inget beteende</td></tr>
+  <tr><td><b>Koppling</b></td><td>Referens och <code>List&lt;T&gt;</code></td><td>Främmande nyckel</td></tr>
+  <tr><td><b>Antal</b></td><td><code>1</code>, <code>0..*</code></td><td>Kråkfot: <code>||</code>, <code>o{</code></td></tr>
+  <tr><td><b>Många till många</b></td><td>En lista på varje sida</td><td>Kopplingstabell</td></tr>
+  <tr><td><b>Arv</b></td><td>Finns: <code>class Dog : Animal</code></td><td>Finns inte direkt – måste lösas med tabeller</td></tr>
+</table></div>
+
+<h2 id="del10">10. ER-diagram ↔ klasser i C#</h2>
 <p>Du har redan ritat UML-klassdiagram. Ett ER-diagram är nästan samma sak:</p>
 <div class="scroll"><table>
   <tr><th>ER-diagram</th><th>Databas</th><th>C#</th></tr>
@@ -144,7 +221,7 @@ erDiagram
   <tr><td>"Många"-sidan</td><td>Flera rader</td><td><code>List&lt;T&gt;</code></td></tr>
 </table></div>
 
-<h2 id="del9">9. Samma modell i C#</h2>
+<h2 id="del11">11. Samma modell i C#</h2>
 <div class="tva-kol modell">
 <pre class="mermaid">
 erDiagram
@@ -176,9 +253,9 @@ class Order
     public Customer Customer { get; set; }
 }</code></pre>
 </div>
-<p class="box">Entiteten blir en <b>klass</b>, attributen blir <b>egenskaper</b> och relationen blir en <b>referens</b>. Hur databasen själv kopplar ihop tabellerna – med nycklar – går vi igenom på onsdag.</p>
+<p class="box">Entiteten blir en <b>klass</b>, attributen blir <b>egenskaper</b> och relationen blir en <b>referens</b>. I databasen blir referensen en <b>främmande nyckel</b> – på onsdag skapar vi tabellerna på riktigt.</p>
 
-<h2 id="del10">10. Många till många – i ER och i C#</h2>
+<h2 id="del12">12. Många till många – i ER och i C#</h2>
 <div class="tva-kol modell">
 <pre class="mermaid">
 erDiagram
@@ -209,7 +286,7 @@ class Course
 <p>I C# räcker det med en lista på varje sida.</p>
 <figure class="shot"><img src="db-er-diagram-stilar.webp" alt="Olika stilar för ER-diagram: Crow's Foot, Chen, Bachman, IDEF1X och Barker – 1 till många, många till många och 1 till 1" loading="lazy"></figure>
 
-<h2 id="del11">11. Gruppövning: ER-modellering</h2>
+<h2 id="del13">13. Gruppövning: ER-modellering</h2>
 <p><b>Del 1 – i grupp:</b> Ett bibliotek vill hålla koll på böcker, författare, låntagare och lån.</p>
 <ol>
   <li>Vilka <b>entiteter</b> finns?</li>
@@ -219,10 +296,40 @@ class Course
 </ol>
 <p><b>Del 2 – ditt projektcase:</b> Gör samma sak för ditt eget projekt. Rita på papper, i draw.io eller med Mermaid. Spara diagrammet – det redovisas muntligt vecka 4.</p>
 
-<h2 id="del12">12. Sammanfattning</h2>
+<h2 id="del14">14. Förslag på gruppövningar</h2>
+<p>Välj en verksamhet – från listan eller en som ni själva känner till – och modellera den.</p>
+<div class="scroll"><table>
+  <tr><th>Verksamhet</th><th>Tänk på</th></tr>
+  <tr><td>Gym</td><td>Medlemmar, pass, instruktörer, bokningar – kan ett pass ha många medlemmar?</td></tr>
+  <tr><td>Restaurang</td><td>Bord, bokningar, rätter, beställningar – en beställning innehåller många rätter</td></tr>
+  <tr><td>Vårdcentral</td><td>Patienter, läkare, besök, rum – vem träffar vem, och när?</td></tr>
+  <tr><td>Streamingtjänst</td><td>Användare, filmer, serier, avsnitt, betyg – vem har sett vad?</td></tr>
+  <tr><td>Bilverkstad</td><td>Kunder, bilar, reparationer, reservdelar – en kund kan ha flera bilar</td></tr>
+  <tr><td>Fotbollsförening</td><td>Lag, spelare, tränare, matcher – kan en spelare vara med i flera lag?</td></tr>
+  <tr><td>Webbshop</td><td>Kunder, produkter, ordrar, kategorier – en order har många produkter och tvärtom</td></tr>
+</table></div>
+<p><b>Så här gör ni:</b></p>
+<ol>
+  <li><b>Beskriv</b> verksamheten med några meningar. Substantiven är kandidater till entiteter.</li>
+  <li>Kom på <b>tabellerna</b> och deras attribut. Ge varje tabell en primärnyckel.</li>
+  <li><b>Relationerna är det viktigaste:</b> hitta minst en 1–N och en N–M. Fråga åt båda hållen: "hur många … kan en … ha?"</li>
+  <li>Rita <b>ER-diagrammet</b> med kråkfot. Var behövs främmande nycklar? Var behövs en kopplingstabell?</li>
+  <li>Rita samma sak som ett <b>UML-klassdiagram</b> och skriv <b>klasserna i C#</b>.</li>
+</ol>
+<p><b>Diskutera i gruppen:</b></p>
+<ul>
+  <li>Vilka relationer blir en referens i C#, och vilka blir en <code>List&lt;T&gt;</code>?</li>
+  <li>Vilka <b>metoder</b> skulle klasserna ha – och varför syns de inte i ER-diagrammet?</li>
+  <li>Finns det <b>arv</b> i er modell (t.ex. <code>Employee</code> och <code>Customer</code> som båda är <code>Person</code>)? Hur skulle ni lagra det i tabeller?</li>
+  <li>Var skiljer sig ert UML-diagram från ert ER-diagram?</li>
+</ul>
+
+<h2 id="del15">15. Sammanfattning</h2>
 <ul>
   <li>En <b>relationsdatabas</b> sparar data permanent i <b>tabeller</b> med rader och kolumner.</li>
   <li>Relationer är <b>1–1</b>, <b>1–N</b> eller <b>N–M</b>.</li>
+  <li><b>Primärnyckeln</b> identifierar en rad. <b>Främmande nyckeln</b> är databasens version av en referens i C#.</li>
+  <li><b>UML</b> beskriver programmet (med metoder), <b>ER</b> beskriver datan (bara attribut).</li>
   <li>Ett <b>ER-diagram</b> är ritningen: entitet = klass, attribut = egenskap, relation = referens.</li>
   <li>På onsdag: från modell till riktiga tabeller i SQL Server.</li>
 </ul>
