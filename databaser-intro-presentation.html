@@ -38,7 +38,7 @@
 
 <section class="slide">
   <h1>Databaser intro</h1>
-  <p class="lead">Kursstart: vad en relationsdatabas är, hur man ritar en ER-modell – och hur allt hänger ihop med klasserna du redan kan i C#.</p>
+  <p class="lead">Kursstart: vad en relationsdatabas är, de centrala begreppen – och hur man ritar en ER-modell som hänger ihop med klasserna du redan kan i C#.</p>
 </section>
 
 <section class="slide">
@@ -53,27 +53,38 @@ customers.Add(new Customer { Name = "Ada" });
 <section class="slide">
   <h2>Genomgång av kursplanering</h2>
 <div class="scroll"><table>
-  <tr><th>Vi går igenom</th><th>Varför</th></tr>
-  <tr><td><b>Kursplan</b></td><td>Vad kursen innehåller och vilka mål du ska nå</td></tr>
-  <tr><td><b>Kursplanering</b></td><td>Vad vi gör vecka för vecka</td></tr>
-  <tr><td><b>Betygskriterier</b></td><td>Vad som krävs för G och VG</td></tr>
+  <tr><th>Vecka</th><th>Innehåll</th></tr>
+  <tr><td><b>1</b> (v.48)</td><td>Relationsdatabaser, centrala begrepp och ER-diagram. Från modell till tabeller i SQL Server.</td></tr>
+  <tr><td><b>2</b> (v.49)</td><td>Normalisering (1NF–3NF), constraints, CRUD och JOIN.</td></tr>
+  <tr><td><b>3</b> (v.50)</td><td>Authentication och authorization, databasroller, minsta behörighet, SQL-injektion.</td></tr>
+  <tr><td><b>4</b> (v.51)</td><td>EF Core: koppla en databas till en konsolapp och göra CRUD. Individuell inlämningsuppgift och muntlig delredovisning av ER-diagram.</td></tr>
+  <tr><td><b>5</b> (v.53)</td><td>Projektarbete.</td></tr>
 </table></div>
-<p class="box">Läs kursplanen och betygskriterierna själv efter genomgången – då vet du redan från start vad som bedöms.</p>
+<p>Den här veckan:</p>
+<div class="scroll"><table>
+  <tr><th>Dag</th><th>Innehåll</th></tr>
+  <tr><td>Måndag</td><td>Introduktion, relationsdatabaser, centrala begrepp, ER-diagram</td></tr>
+  <tr><td>Onsdag</td><td>Från modell till tabeller i SQL Server</td></tr>
+  <tr><td>Torsdag</td><td>Extralektion (digitalt): databasrader och C#-objekt</td></tr>
+  <tr><td>Fredag</td><td>Repetition, reflektion och kodgranskning</td></tr>
+</table></div>
+<p class="box">Vi går också igenom <b>kursplanen</b> och <b>betygskriterierna</b>. Läs dem själv efter genomgången – då vet du redan från start vad som bedöms.</p>
 </section>
 
 <section class="slide">
   <h2>Veckans mål</h2>
 <p>Efter den här veckan ska du kunna:</p>
 <ol>
-  <li><b>Förklara</b> centrala databasbegrepp – tabell, rad, kolumn, primärnyckel och främmande nyckel.</li>
+  <li><b>Förklara</b> centrala databasbegrepp.</li>
   <li><b>Rita</b> en ER-modell för ditt projektcase.</li>
   <li><b>Skapa</b> en lokal databas med tabeller och nycklar.</li>
 </ol>
+<p>Idag jobbar vi med mål 1 och 2. Mål 3 kommer på onsdag.</p>
 </section>
 
 <section class="slide">
   <h2>Vad är en relationsdatabas?</h2>
-<p>En <b>relationsdatabas</b> sparar data i <b>tabeller</b> – ungefär som kalkylblad. Tabellerna kopplas ihop med hjälp av <b>nycklar</b>.</p>
+<p>En <b>relationsdatabas</b> sparar data i <b>tabeller</b> – ungefär som kalkylblad. Tabellerna kan kopplas ihop med varandra.</p>
 <div class="scroll"><table>
   <tr><th>Id</th><th>Name</th><th>Email</th></tr>
   <tr><td>1</td><td>Ada Lovelace</td><td>ada@example.com</td></tr>
@@ -86,43 +97,13 @@ customers.Add(new Customer { Name = "Ada" });
   <h2>Centrala begrepp</h2>
 <div class="scroll"><table>
   <tr><th>Begrepp</th><th>Betyder</th></tr>
-  <tr><td><b>Tabell</b></td><td>Samling av data om en sorts sak, t.ex. <code>Customers</code></td></tr>
+  <tr><td><b>Databas</b></td><td>En samling data som sparas permanent och hör ihop</td></tr>
+  <tr><td><b>DBMS</b></td><td>Programmet som lagrar och hämtar datan, t.ex. SQL Server</td></tr>
+  <tr><td><b>Tabell</b></td><td>Data om en sorts sak, t.ex. <code>Customers</code></td></tr>
   <tr><td><b>Rad</b> (post)</td><td>En sak i tabellen, t.ex. kunden Ada</td></tr>
   <tr><td><b>Kolumn</b> (fält)</td><td>En egenskap som alla rader har, t.ex. <code>Email</code></td></tr>
-  <tr><td><b>Datatyp</b></td><td>Vad en kolumn får innehålla: <code>INT</code>, <code>NVARCHAR</code>, <code>DATE</code> …</td></tr>
-  <tr><td><b>Primärnyckel</b> (PK)</td><td>Kolumn som unikt identifierar varje rad, oftast <code>Id</code></td></tr>
-  <tr><td><b>Främmande nyckel</b> (FK)</td><td>Kolumn som pekar på primärnyckeln i en annan tabell</td></tr>
-  <tr><td><b>Relation</b></td><td>Kopplingen mellan två tabeller</td></tr>
-  <tr><td><b>NULL</b></td><td>"Inget värde" – värdet saknas</td></tr>
-</table></div>
-</section>
-
-<section class="slide">
-  <h2>Primärnyckel och främmande nyckel</h2>
-<p><code>Orders.CustomerId</code> är en <b>främmande nyckel</b> som pekar på <code>Customers.Id</code>.</p>
-<div class="scroll"><table>
-  <tr><th colspan="2">Customers</th></tr>
-  <tr><th>Id (PK)</th><th>Name</th></tr>
-  <tr><td>1</td><td>Ada Lovelace</td></tr>
-  <tr><td>2</td><td>Linus Torvalds</td></tr>
-</table></div>
-<div class="scroll"><table>
-  <tr><th colspan="3">Orders</th></tr>
-  <tr><th>Id (PK)</th><th>OrderDate</th><th>CustomerId (FK)</th></tr>
-  <tr><td>10</td><td>2026-11-02</td><td>1</td></tr>
-  <tr><td>11</td><td>2026-11-05</td><td>1</td></tr>
-  <tr><td>12</td><td>2026-11-06</td><td>2</td></tr>
-</table></div>
-<p class="box">Ada har två ordrar och Linus har en. Kundens namn står bara på <b>ett</b> ställe – ändrar vi det, ändras det överallt.</p>
-</section>
-
-<section class="slide">
-  <h2>Tre sorters relationer</h2>
-<div class="scroll"><table>
-  <tr><th>Relation</th><th>Exempel</th><th>Så löser man det</th></tr>
-  <tr><td><b>Ett till ett</b> (1–1)</td><td>En person har ett pass</td><td>FK i en av tabellerna</td></tr>
-  <tr><td><b>Ett till många</b> (1–N)</td><td>En kund har många ordrar</td><td>FK på "många"-sidan: <code>Orders.CustomerId</code></td></tr>
-  <tr><td><b>Många till många</b> (N–M)</td><td>En student läser många kurser, en kurs har många studenter</td><td>En <b>kopplingstabell</b>: <code>Enrollments(StudentId, CourseId)</code></td></tr>
+  <tr><td><b>Relation</b></td><td>Hur saker i olika tabeller hänger ihop, t.ex. en kund och hennes ordrar</td></tr>
+  <tr><td><b>SQL</b></td><td>Språket man använder för att prata med databasen</td></tr>
 </table></div>
 </section>
 
@@ -138,17 +119,27 @@ customers.Add(new Customer { Name = "Ada" });
 erDiagram
     CUSTOMER ||--o{ ORDER : "lägger"
     CUSTOMER {
-        int Id PK
+        int Id
         string Name
         string Email
     }
     ORDER {
-        int Id PK
+        int Id
         date OrderDate
-        int CustomerId FK
     }
 </pre>
 <p><code>||--o{</code> läses: en kund kan ha noll eller många ordrar, varje order tillhör exakt en kund.</p>
+</section>
+
+<section class="slide">
+  <h2>Tre sorters relationer</h2>
+<div class="scroll"><table>
+  <tr><th>Relation</th><th>Exempel</th></tr>
+  <tr><td><b>Ett till ett</b> (1–1)</td><td>En person har ett pass</td></tr>
+  <tr><td><b>Ett till många</b> (1–N)</td><td>En kund har många ordrar</td></tr>
+  <tr><td><b>Många till många</b> (N–M)</td><td>En student läser många kurser, en kurs har många studenter</td></tr>
+</table></div>
+<p class="box">Fråga dig åt båda hållen: <i>"Hur många ordrar kan en kund ha?"</i> och <i>"Hur många kunder kan en order ha?"</i> Svaren ger kardinaliteten.</p>
 </section>
 
 <section class="slide">
@@ -158,9 +149,9 @@ erDiagram
   <tr><th>ER-diagram</th><th>Databas</th><th>C#</th></tr>
   <tr><td>Entitet</td><td>Tabell</td><td>Klass</td></tr>
   <tr><td>Attribut</td><td>Kolumn</td><td>Egenskap (property)</td></tr>
-  <tr><td>Primärnyckel</td><td><code>Id INT PRIMARY KEY</code></td><td><code>public int Id { get; set; }</code></td></tr>
-  <tr><td>Relation</td><td>Främmande nyckel</td><td>Referens till ett annat objekt</td></tr>
-  <tr><td>"Många"-sidan</td><td>Flera rader med samma FK</td><td><code>List&lt;T&gt;</code></td></tr>
+  <tr><td>En rad</td><td>Rad</td><td>Ett objekt</td></tr>
+  <tr><td>Relation</td><td>Koppling mellan tabeller</td><td>Referens till ett annat objekt</td></tr>
+  <tr><td>"Många"-sidan</td><td>Flera rader</td><td><code>List&lt;T&gt;</code></td></tr>
 </table></div>
 </section>
 
@@ -168,7 +159,7 @@ erDiagram
   <h2>Samma modell i C#</h2>
 <pre><code>class Customer
 {
-    public int Id { get; set; }                       // primärnyckel
+    public int Id { get; set; }
     public string Name { get; set; }
     public string Email { get; set; }
 
@@ -177,31 +168,25 @@ erDiagram
 
 class Order
 {
-    public int Id { get; set; }                       // primärnyckel
+    public int Id { get; set; }
     public DateTime OrderDate { get; set; }
 
-    public int CustomerId { get; set; }               // främmande nyckel
-    public Customer Customer { get; set; }            // referens till kunden
+    public Customer Customer { get; set; }            // varje order – en kund
 }</code></pre>
-<p class="box">I C# pekar objekt på varandra med <b>referenser</b>. I databasen gör man samma sak med ett <b>Id</b> – den främmande nyckeln.</p>
+<p class="box">Entiteten blir en <b>klass</b>, attributen blir <b>egenskaper</b> och relationen blir en <b>referens</b>. Hur databasen själv kopplar ihop tabellerna – med nycklar – går vi igenom på onsdag.</p>
 </section>
 
 <section class="slide">
-  <h2>Många till många – i databasen och i C#</h2>
+  <h2>Många till många – i ER och i C#</h2>
 <pre class="mermaid">
 erDiagram
-    STUDENT ||--o{ ENROLLMENT : "har"
-    COURSE ||--o{ ENROLLMENT : "har"
+    STUDENT }o--o{ COURSE : "läser"
     STUDENT {
-        int Id PK
+        int Id
         string Name
     }
-    ENROLLMENT {
-        int StudentId FK
-        int CourseId FK
-    }
     COURSE {
-        int Id PK
+        int Id
         string Title
     }
 </pre>
@@ -218,51 +203,33 @@ class Course
     public string Title { get; set; }
     public List&lt;Student&gt; Students { get; set; } = new();
 }</code></pre>
-<p>I C# räcker det med en lista på varje sida. I databasen behövs kopplingstabellen <code>Enrollments</code>.</p>
+<p>I C# räcker det med en lista på varje sida.</p>
 </section>
 
 <section class="slide">
-  <h2>Skapa tabeller med SQL</h2>
-<p>Så här blir ER-diagrammet med kunder och ordrar till riktiga tabeller (SQL Server):</p>
-<pre><code class="nohighlight">CREATE TABLE Customers (
-    Id     INT IDENTITY(1,1) PRIMARY KEY,   -- räknas upp automatiskt
-    Name   NVARCHAR(100) NOT NULL,
-    Email  NVARCHAR(200) NOT NULL
-);
-
-CREATE TABLE Orders (
-    Id          INT IDENTITY(1,1) PRIMARY KEY,
-    OrderDate   DATE NOT NULL,
-    CustomerId  INT NOT NULL,
-    FOREIGN KEY (CustomerId) REFERENCES Customers(Id)
-);</code></pre>
-<p class="box">Den främmande nyckeln gör att databasen <b>vägrar</b> spara en order med ett <code>CustomerId</code> som inte finns.</p>
-</section>
-
-<section class="slide">
-  <h2>Övning: ditt projektcase</h2>
+  <h2>Gruppövning: ER-modellering</h2>
+<p><b>Del 1 – i grupp:</b> Ett bibliotek vill hålla koll på böcker, författare, låntagare och lån.</p>
 <ol>
-  <li>Skriv ner vilka <b>saker</b> ditt projekt behöver spara data om – det blir dina entiteter.</li>
-  <li>Ge varje entitet en <b>primärnyckel</b> och de attribut den behöver.</li>
-  <li>Bestäm <b>relationerna</b>: 1–1, 1–N eller N–M? Behövs någon kopplingstabell?</li>
-  <li>Rita <b>ER-diagrammet</b> – på papper, i draw.io eller med Mermaid.</li>
-  <li>Skriv motsvarande <b>klasser i C#</b>, med egenskaper och referenser.</li>
-  <li>Skapa en <b>lokal databas</b> och tabellerna med primär- och främmande nycklar.</li>
+  <li>Vilka <b>entiteter</b> finns?</li>
+  <li>Vilka <b>attribut</b> behöver varje entitet?</li>
+  <li>Vilka <b>relationer</b> finns, och vilken kardinalitet har de? (Kan en bok ha flera författare?)</li>
+  <li>Rita <b>ER-diagrammet</b> och skriv motsvarande <b>klasser i C#</b>.</li>
 </ol>
+<p><b>Del 2 – ditt projektcase:</b> Gör samma sak för ditt eget projekt. Rita på papper, i draw.io eller med Mermaid. Spara diagrammet – det redovisas muntligt vecka 4.</p>
 </section>
 
 <section class="slide">
   <h2>Sammanfattning</h2>
 <ul>
   <li>En <b>relationsdatabas</b> sparar data permanent i <b>tabeller</b> med rader och kolumner.</li>
-  <li><b>Primärnyckeln</b> identifierar en rad. <b>Främmande nyckeln</b> pekar på en rad i en annan tabell.</li>
-  <li>Relationer är <b>1–1</b>, <b>1–N</b> eller <b>N–M</b> – N–M kräver en kopplingstabell.</li>
+  <li>Relationer är <b>1–1</b>, <b>1–N</b> eller <b>N–M</b>.</li>
   <li>Ett <b>ER-diagram</b> är ritningen: entitet = klass, attribut = egenskap, relation = referens.</li>
+  <li>På onsdag: från modell till riktiga tabeller i SQL Server.</li>
 </ul>
 </section>
 
 <section class="slide">
-  <p class="big">Nu: <a href="databaser-vecka1.html">lektionssidan</a> – läs igen och börja på ditt ER-diagram.</p>
+  <p class="big">Nu: <a href="databaser-vecka1.html">lektionssidan</a> – läs igen och fortsätt med ditt ER-diagram.</p>
 </section>
 
 </div>
@@ -280,6 +247,16 @@ CREATE TABLE Orders (
   import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.esm.min.mjs";
   mermaid.initialize({ startOnLoad: false, theme: "neutral" });
   try { await mermaid.run(); } catch (e) { }   // rita diagrammen medan alla bilder syns
+
+  // Mermaid ger markörerna samma id i alla diagram – gör dem unika per diagram
+  document.querySelectorAll(".mermaid svg").forEach((svg, n) => {
+    svg.querySelectorAll("marker[id]").forEach(m => {
+      const old = m.id, nu = old + "_" + n;
+      m.id = nu;
+      svg.querySelectorAll(`[marker-start="url(#${old})"]`).forEach(e => e.setAttribute("marker-start", `url(#${nu})`));
+      svg.querySelectorAll(`[marker-end="url(#${old})"]`).forEach(e => e.setAttribute("marker-end", `url(#${nu})`));
+    });
+  });
   document.querySelector(".slides").classList.add("ready");
 
   const slides = [...document.querySelectorAll(".slide")];
