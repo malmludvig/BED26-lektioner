@@ -43,11 +43,9 @@ pre samp { font: inherit; color: inherit; }
 .shot img { display: block; width: 100%; height: auto; border: 1px solid var(--line); border-radius: 8px; }
 .shot figcaption { color: var(--muted); font-size: .9rem; margin-top: 6px; }
 
-/* Huvudmeny: en rad per kurs – kursnamn till vänster, veckor till höger */
-nav.kurser { display: grid; grid-template-columns: auto 1fr; align-items: baseline; gap: 8px 24px; }
-nav.kurser .kursnamn { color: var(--code-ink); opacity: .6; font-size: .8rem; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; }
-nav.kurser .veckor { display: flex; flex-wrap: wrap; gap: 8px 20px; }
-@media (max-width: 640px) {
-  nav.kurser { grid-template-columns: 1fr; gap: 2px; }
-  nav.kurser .veckor { margin-bottom: 8px; }
-}
+/* Meny i tre nivåer: kurs, vecka, lektion */
+nav.kurser { gap: 8px 12px; border-bottom: 1px solid rgba(255,255,255,.12); }
+nav.kurser a { font-size: 1.05rem; }
+nav.kurser span { color: var(--code-ink); opacity: .4; }
+nav.veckor a { font-weight: 500; opacity: .85; }
+nav.veckor a[aria-current] { opacity: 1; font-weight: 600; }
