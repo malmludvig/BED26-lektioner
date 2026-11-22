@@ -185,7 +185,7 @@ classDiagram
     }
     Customer "1" --> "0..*" Order : lägger
 </pre>
-<pre class="mermaid">
+<pre class="mermaid utan-en">
 erDiagram
     CUSTOMER ||--o{ ORDER : "lägger"
     CUSTOMER {
@@ -204,7 +204,7 @@ erDiagram
   <tr><td><b>Beskriver</b></td><td>Klasser i programmet</td><td>Tabeller i databasen</td></tr>
   <tr><td><b>Innehåll</b></td><td>Egenskaper <i>och metoder</i></td><td>Bara attribut – data, inget beteende</td></tr>
   <tr><td><b>Koppling</b></td><td>Referens och <code>List&lt;T&gt;</code></td><td>Främmande nyckel</td></tr>
-  <tr><td><b>Antal</b></td><td><code>1</code>, <code>0..*</code></td><td>Streck = en, kråkfot = många</td></tr>
+  <tr><td><b>Antal</b></td><td><code>1</code>, <code>0..*</code></td><td>Rak linje = en, kråkfot = många</td></tr>
   <tr><td><b>Många till många</b></td><td>En lista på varje sida</td><td>Kopplingstabell</td></tr>
   <tr><td><b>Arv</b></td><td>Finns: <code>class Dog : Animal</code></td><td>Finns inte direkt – måste lösas med tabeller</td></tr>
 </table></div>
