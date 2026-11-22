@@ -49,3 +49,10 @@ nav.kurser a { font-size: 1.05rem; }
 nav.kurser span { color: var(--code-ink); opacity: .4; }
 nav.veckor a { font-weight: 500; opacity: .85; }
 nav.veckor a[aria-current] { opacity: 1; font-weight: 600; }
+
+/* Kompakt sidhuvud och meny */
+.sidhuvud { background: var(--code); color: var(--code-ink); font-weight: 700; font-size: 1.1rem; padding-block: 8px 2px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+nav.kurser, nav.veckor { padding-block: 4px; font-size: .95rem; }
+nav.kurser a { font-size: 1rem; }
+nav.veckor { padding-bottom: 6px; }
+.undermeny { padding-block: 4px; font-size: .95rem; }
