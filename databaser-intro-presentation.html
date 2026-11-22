@@ -17,6 +17,7 @@
   .slide .tva-kol.excel p { font-size: 1.05rem; margin: 0; }
   .slide table { font-size: 1rem; }
   .slide .diagrampar .mermaid svg { max-height: 30vh; }
+  .slide .tva-kol.diagrampar { grid-template-columns: 1fr 1fr; }
   .slide .diagrampar p { margin: 0 0 6px; }
   .slide ol, .slide ul { margin-block: 6px; }
   .slide.bild.par .bildrad { display: flex; gap: 24px; justify-content: center; align-items: center; }
@@ -232,8 +233,8 @@ erDiagram
 <section class="slide">
   <h2>UML-klassdiagram eller ER-diagram?</h2>
 <div class="tva-kol diagrampar">
-<div>
 <p><b>UML-klassdiagram</b> – hur programmet är byggt</p>
+<p><b>ER-diagram</b> – hur datan lagras</p>
 <pre class="mermaid">
 classDiagram
     class Customer {
@@ -249,9 +250,6 @@ classDiagram
     }
     Customer "1" --> "0..*" Order : lägger
 </pre>
-</div>
-<div>
-<p><b>ER-diagram</b> – hur datan lagras</p>
 <pre class="mermaid">
 erDiagram
     CUSTOMER ||--o{ ORDER : "lägger"
@@ -265,7 +263,6 @@ erDiagram
         int CustomerId FK
     }
 </pre>
-</div>
 </div>
 <div class="scroll"><table>
   <tr><th></th><th>UML-klassdiagram (OOP)</th><th>ER-diagram (databas)</th></tr>

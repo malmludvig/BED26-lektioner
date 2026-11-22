@@ -172,8 +172,8 @@ erDiagram
 
 <h2 id="del9">9. UML-klassdiagram eller ER-diagram?</h2>
 <div class="tva-kol diagrampar">
-<div>
 <p><b>UML-klassdiagram</b> – hur programmet är byggt</p>
+<p><b>ER-diagram</b> – hur datan lagras</p>
 <pre class="mermaid">
 classDiagram
     class Customer {
@@ -189,9 +189,6 @@ classDiagram
     }
     Customer "1" --> "0..*" Order : lägger
 </pre>
-</div>
-<div>
-<p><b>ER-diagram</b> – hur datan lagras</p>
 <pre class="mermaid">
 erDiagram
     CUSTOMER ||--o{ ORDER : "lägger"
@@ -205,7 +202,6 @@ erDiagram
         int CustomerId FK
     }
 </pre>
-</div>
 </div>
 <div class="scroll"><table>
   <tr><th></th><th>UML-klassdiagram (OOP)</th><th>ER-diagram (databas)</th></tr>

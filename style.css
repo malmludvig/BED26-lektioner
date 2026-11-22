@@ -78,3 +78,7 @@ nav.veckor { padding-bottom: 6px; }
 .diagrampar .mermaid svg { width: 100%; max-width: 100% !important; height: auto; max-height: 340px; }
 .bildpar + .tva-kol { align-items: start; }
 .bildrubrik { font-size: 1.2rem; margin: 20px 0 0; }
+/* rubriker på en rad, diagram på nästa – så att båda diagrammen börjar på samma höjd */
+.diagrampar { align-items: stretch; row-gap: 6px; }
+.diagrampar > p { align-self: end; margin: 0; }
+.diagrampar > .mermaid { display: flex; align-items: center; justify-content: center; margin: 0; }
