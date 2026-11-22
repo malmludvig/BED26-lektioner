@@ -18,8 +18,11 @@
   .slide .diagrampar .mermaid svg { max-height: 30vh; }
   .slide .diagrampar p { margin: 0 0 6px; }
   .slide ol, .slide ul { margin-block: 6px; }
-  .slides.ready .slide.bild.par.active { display: flex; gap: 24px; justify-content: center; align-items: center; }
-  .slide.bild.par img { margin: 0; max-width: 48%; max-height: 70vh; }
+  .slide.bild.par .bildrad { display: flex; gap: 24px; justify-content: center; align-items: center; }
+  .slide.bild.par img { margin: 0; max-width: 48%; max-height: 48vh; }
+  .slide.bild.par .tva-kol { margin-top: 16px; align-items: start; gap: 24px; }
+  .slide.bild.par .tva-kol p { margin: 0; font-size: 1.05rem; }
+  :fullscreen .slide.bild.par img { max-height: 48vh; }
   .slide .mermaid svg { width: 100%; max-width: 100% !important; height: auto; max-height: 52vh; }   /* större ER-diagram */
   .slide .tva-kol.modell { grid-template-columns: 1fr 2fr; }
   .slide .tva-kol.modell pre { font-size: clamp(12px, 1.2vw, 15px); margin: 0; }
@@ -132,7 +135,11 @@ customers.Add(new Customer { Name = "Ada" });
 </section>
 
 <section class="slide bild par">
-  <img src="db-meme-sql-uttal.webp" alt="Meme: Structured Query Language, S-Q-L, Se-quel, Skewl/Squeal/Squiggle"><img src="db-meme-caps-lock.webp" alt="Meme: SQL programmers be like – värmer upp och trycker på Caps Lock">
+  <div class="bildrad"><img src="db-meme-sql-uttal.webp" alt="Meme: Structured Query Language, S-Q-L, Se-quel, Skewl/Squeal/Squiggle"><img src="db-meme-caps-lock.webp" alt="Meme: SQL programmers be like – värmer upp och trycker på Caps Lock"></div>
+<div class="tva-kol">
+<p><b>Hur uttalar man SQL?</b> Både <b>"es-kju-ell"</b> och <b>"sequel"</b> är rätt. Språket togs fram av IBM på 1970-talet och hette först <i>SEQUEL</i> – därför säger många fortfarande "sequel", t.ex. "Sequel Server".</p>
+<p><b>Varför Caps Lock?</b> SQL bryr sig inte om stora eller små bokstäver i nyckelorden – <code>select titel from bok</code> fungerar lika bra som <code>SELECT Titel FROM Bok</code>. Men konventionen är att skriva nyckelorden med <b>VERSALER</b>, så att de syns tydligt mot tabell- och kolumnnamnen.</p>
+</div>
 </section>
 
 <section class="slide bild">
