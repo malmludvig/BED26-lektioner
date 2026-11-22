@@ -77,3 +77,4 @@ nav.veckor { padding-bottom: 6px; }
 .diagrampar { align-items: start; }
 .diagrampar .mermaid svg { width: 100%; max-width: 100% !important; height: auto; max-height: 340px; }
 .bildpar + .tva-kol { align-items: start; }
+.bildrubrik { font-size: 1.2rem; margin: 20px 0 0; }
