@@ -187,7 +187,7 @@ erDiagram
         date OrderDate
     }
 </pre>
-<p><code>||--o{</code> läses: en kund kan ha noll eller många ordrar, varje order tillhör exakt en kund.</p>
+<p><b>Ett streck</b> vid entiteten betyder <b>en</b>, en <b>kråkfot</b> betyder <b>många</b>. Läs: en kund lägger många ordrar – varje order läggs av en kund.</p>
 </section>
 
 <section class="slide">
@@ -269,7 +269,7 @@ erDiagram
   <tr><td><b>Beskriver</b></td><td>Klasser i programmet</td><td>Tabeller i databasen</td></tr>
   <tr><td><b>Innehåll</b></td><td>Egenskaper <i>och metoder</i></td><td>Bara attribut – data, inget beteende</td></tr>
   <tr><td><b>Koppling</b></td><td>Referens och <code>List&lt;T&gt;</code></td><td>Främmande nyckel</td></tr>
-  <tr><td><b>Antal</b></td><td><code>1</code>, <code>0..*</code></td><td>Kråkfot: <code>||</code>, <code>o{</code></td></tr>
+  <tr><td><b>Antal</b></td><td><code>1</code>, <code>0..*</code></td><td>Streck = en, kråkfot = många</td></tr>
   <tr><td><b>Många till många</b></td><td>En lista på varje sida</td><td>Kopplingstabell</td></tr>
   <tr><td><b>Arv</b></td><td>Finns: <code>class Dog : Animal</code></td><td>Finns inte direkt – måste lösas med tabeller</td></tr>
 </table></div>
@@ -434,12 +434,26 @@ class Course
   try { await mermaid.run(); } catch (e) { }   // rita diagrammen medan alla bilder syns
 
   // Mermaid ger markörerna samma id i alla diagram – gör dem unika per diagram
+  // och byt till förenklad kråkfot: ett streck = en, kråkfot = många (min anges inte)
+  const ENKEL = {
+    EN_START:     { w: 18, refX: 0,  d: "M9,0 L9,18" },
+    EN_END:       { w: 18, refX: 18, d: "M9,0 L9,18" },
+    MANGA_START:  { w: 20, refX: 0,  d: "M0,1 L16,9 M0,17 L16,9 M0,9 L16,9" },
+    MANGA_END:    { w: 20, refX: 20, d: "M20,1 L4,9 M20,17 L4,9 M20,9 L4,9" },
+  };
   document.querySelectorAll(".mermaid svg").forEach((svg, n) => {
     svg.querySelectorAll("marker[id]").forEach(m => {
       const old = m.id, nu = old + "_" + n;
       m.id = nu;
       svg.querySelectorAll(`[marker-start="url(#${old})"]`).forEach(e => e.setAttribute("marker-start", `url(#${nu})`));
       svg.querySelectorAll(`[marker-end="url(#${old})"]`).forEach(e => e.setAttribute("marker-end", `url(#${nu})`));
+      const typ = /^(ONLY_ONE|ZERO_OR_ONE)_(START|END)/.exec(old) ? "EN_" + RegExp.$2
+                : /^(ONE_OR_MORE|ZERO_OR_MORE)_(START|END)/.exec(old) ? "MANGA_" + RegExp.$2 : null;
+      if (!typ) return;
+      const k = ENKEL[typ];
+      m.setAttribute("markerWidth", k.w); m.setAttribute("markerHeight", 18);
+      m.setAttribute("refX", k.refX); m.setAttribute("refY", 9);
+      m.innerHTML = `<path d="${k.d}" fill="none" stroke="gray"></path>`;
     });
   });
   document.querySelector(".slides").classList.add("ready");
