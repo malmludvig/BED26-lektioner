@@ -11,6 +11,8 @@
   .slides { min-height: 60vh; display: flex; flex-direction: column; justify-content: center; }
   .slide { display: block; margin-bottom: 48px; font-size: 1.25rem; }
   .slides.ready .slide { display: none; margin: 0; }
+  .slide.bild img { display: block; width: 100%; height: auto; border-radius: 8px; border: 1px solid var(--line); }
+  :fullscreen .slide.bild img { max-height: 85vh; width: auto; margin: 0 auto; }
   .slides.ready .slide.active { display: block; }
   .slide .scroll { margin-block: 12px; }
   .slide h1 { font-size: clamp(2.2rem, 7vw, 3.6rem); margin: 0 0 8px; }
@@ -48,6 +50,10 @@
 customers.Add(new Customer { Name = "Ada" });
 // Programmet avslutas … och Ada är borta</code></pre>
 <p class="box">En <b>databas</b> sparar data permanent, så att den finns kvar nästa gång programmet startar – och så att många användare och program kan dela på samma data.</p>
+</section>
+
+<section class="slide bild">
+  <img src="db-databaser.webp" alt="Databaser: en databas lagrar och organiserar information">
 </section>
 
 <section class="slide">
@@ -91,6 +97,18 @@ customers.Add(new Customer { Name = "Ada" });
   <tr><td>2</td><td>Linus Torvalds</td><td>linus@example.com</td></tr>
 </table></div>
 <p>Programmet som sköter databasen kallas <b>DBMS</b> (databashanterare), t.ex. SQL Server, PostgreSQL, MySQL och SQLite. Man pratar med det på språket <b>SQL</b>.</p>
+</section>
+
+<section class="slide bild">
+  <img src="db-relationsdatabaser.webp" alt="Relationsdatabaser: tabellerna Bok och Lån kopplas ihop med BokID">
+</section>
+
+<section class="slide bild">
+  <img src="db-sql.webp" alt="SQL: SELECT Titel FROM Bok; ger titeln Mio, min Mio">
+</section>
+
+<section class="slide bild">
+  <img src="db-fran-databas-till-sql.webp" alt="Från databas till SQL: databas, relationsdatabas och SQL">
 </section>
 
 <section class="slide">
