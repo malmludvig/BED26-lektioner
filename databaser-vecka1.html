@@ -144,13 +144,27 @@ erDiagram
 </table></div>
 
 <h2 id="del9">9. Samma modell i C#</h2>
+<div class="tva-kol modell">
+<pre class="mermaid">
+erDiagram
+    CUSTOMER ||--o{ ORDER : "lägger"
+    CUSTOMER {
+        int Id
+        string Name
+        string Email
+    }
+    ORDER {
+        int Id
+        date OrderDate
+    }
+</pre>
 <pre><code>class Customer
 {
     public int Id { get; set; }
     public string Name { get; set; }
     public string Email { get; set; }
 
-    public List&lt;Order&gt; Orders { get; set; } = new();  // en kund – många ordrar
+    public List&lt;Order&gt; Orders { get; set; } = new();
 }
 
 class Order
@@ -158,11 +172,13 @@ class Order
     public int Id { get; set; }
     public DateTime OrderDate { get; set; }
 
-    public Customer Customer { get; set; }            // varje order – en kund
+    public Customer Customer { get; set; }
 }</code></pre>
+</div>
 <p class="box">Entiteten blir en <b>klass</b>, attributen blir <b>egenskaper</b> och relationen blir en <b>referens</b>. Hur databasen själv kopplar ihop tabellerna – med nycklar – går vi igenom på onsdag.</p>
 
 <h2 id="del10">10. Många till många – i ER och i C#</h2>
+<div class="tva-kol modell">
 <pre class="mermaid">
 erDiagram
     STUDENT }o--o{ COURSE : "läser"
@@ -188,6 +204,7 @@ class Course
     public string Title { get; set; }
     public List&lt;Student&gt; Students { get; set; } = new();
 }</code></pre>
+</div>
 <p>I C# räcker det med en lista på varje sida.</p>
 <figure class="shot"><img src="db-er-diagram-stilar.webp" alt="Olika stilar för ER-diagram: Crow's Foot, Chen, Bachman, IDEF1X och Barker – 1 till många, många till många och 1 till 1" loading="lazy"></figure>
 
