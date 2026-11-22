@@ -113,7 +113,7 @@ customers.Add(new Customer { Name = "Ada" });
   <li><b>Attribut</b> – egenskaper hos entiteten (blir kolumner)</li>
   <li><b>Relation</b> – hur entiteterna hänger ihop, med <b>kardinalitet</b> (1 eller många)</li>
 </ul>
-<pre class="mermaid">
+<pre class="mermaid utan-en">
 %%{init: {"er": {"layoutDirection": "LR"}}}%%
 erDiagram
     CUSTOMER ||--o{ ORDER : "lägger"
@@ -127,7 +127,7 @@ erDiagram
         date OrderDate
     }
 </pre>
-<p><b>Ett streck</b> vid entiteten betyder <b>en</b>, en <b>kråkfot</b> betyder <b>många</b>. Läs: en kund lägger många ordrar – varje order läggs av en kund.</p>
+<p>En <b>rak linje</b> betyder <b>en</b>, en <b>kråkfot</b> betyder <b>många</b>. Läs: en kund lägger många ordrar – varje order läggs av en kund.</p>
 
 <h2 id="del7">7. Tre sorters relationer</h2>
 <div class="scroll"><table>
@@ -354,6 +354,7 @@ class Course
       const typ = /^(ONLY_ONE|ZERO_OR_ONE)_(START|END)/.exec(old) ? "EN_" + RegExp.$2
                 : /^(ONE_OR_MORE|ZERO_OR_MORE)_(START|END)/.exec(old) ? "MANGA_" + RegExp.$2 : null;
       if (!typ) return;
+      if (typ.startsWith("EN_") && svg.closest(".utan-en")) { m.innerHTML = ""; return; }   // bara kråkfoten: -----<
       const k = ENKEL[typ];
       m.setAttribute("markerWidth", k.w); m.setAttribute("markerHeight", 18);
       m.setAttribute("refX", k.refX); m.setAttribute("refY", 9);
