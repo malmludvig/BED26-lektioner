@@ -104,3 +104,8 @@ th .fk { color: #5eead4; }
 .slide .tre-typer > div { padding: 32px 18px; }
 /* Helt svart text i datatyp-korten för bättre läsbarhet */
 .tre-typer, .tre-typer *, .tre-typer .cs, .tre-typer code { color: #000; }
+/* Exempel: ER-diagram och tabeller */
+.exempel-er { margin: 8px 0 12px; }
+.exempel-er svg { width: 100%; max-width: 100% !important; height: auto; max-height: 260px; }
+.tabellpar.tre { grid-template-columns: 1fr 1fr 1fr; }
+@media (max-width: 760px) { .tabellpar.tre { grid-template-columns: 1fr; } }

@@ -16,6 +16,8 @@
   .slide .tva-kol.excel { grid-template-columns: 1.2fr 1fr; margin-block: 12px; }
   .slide .tva-kol.excel p { font-size: 1.05rem; margin: 0; }
   .slide table { font-size: 1rem; }
+  .slide .mermaid.exempel-er svg { max-height: 28vh; }
+  .slide .tabellpar.tre { grid-template-columns: 1fr 1fr 1fr; }
   .slide table.datatyper td, .slide table.datatyper th { padding-block: 5px; }
   .slide .diagrampar .mermaid svg { max-height: 30vh; }
   .slide .tva-kol.diagrampar { grid-template-columns: 1fr 1fr; }
@@ -467,6 +469,155 @@ class Course
   <li>Ett <b>ER-diagram</b> är ritningen: entitet = klass, attribut = egenskap, relation = referens.</li>
   <li>På onsdag: från modell till riktiga tabeller i SQL Server.</li>
 </ul>
+</section>
+
+<section class="slide">
+  <h2>Exempel: Skola</h2>
+<p>En klass har många elever – varje elev går i en klass.</p>
+<pre class="mermaid utan-en exempel-er">
+%%{init: {"er": {"layoutDirection": "LR"}}}%%
+erDiagram
+    KLASS ||--o{ ELEV : "har"
+    KLASS {
+        int KlassId PK
+        string Namn
+    }
+    ELEV {
+        int ElevId PK
+        string Namn
+        int KlassId FK
+    }
+</pre>
+<div class="tva-kol tabellpar">
+<div class="scroll"><table>
+  <tr><th colspan="2">Klass</th></tr>
+  <tr><th>KlassId (<span class="pk">PK</span>)</th><th>Namn</th></tr>
+  <tr><td>1</td><td>BED26</td></tr>
+  <tr><td>2</td><td>JAVA26</td></tr>
+</table></div>
+<div class="scroll"><table>
+  <tr><th colspan="3">Elev</th></tr>
+  <tr><th>ElevId (<span class="pk">PK</span>)</th><th>Namn</th><th>KlassId (<span class="fk">FK</span>)</th></tr>
+  <tr><td>10</td><td>Anna</td><td>1</td></tr>
+  <tr><td>11</td><td>Omar</td><td>1</td></tr>
+  <tr><td>12</td><td>Lisa</td><td>2</td></tr>
+</table></div>
+</div>
+</section>
+
+<section class="slide">
+  <h2>Exempel: Bilregister</h2>
+<p>En person kan äga många bilar – varje bil har en ägare.</p>
+<pre class="mermaid utan-en exempel-er">
+%%{init: {"er": {"layoutDirection": "LR"}}}%%
+erDiagram
+    PERSON ||--o{ BIL : "äger"
+    PERSON {
+        int PersonId PK
+        string Namn
+    }
+    BIL {
+        int BilId PK
+        string Regnr
+        string Modell
+        int PersonId FK
+    }
+</pre>
+<div class="tva-kol tabellpar">
+<div class="scroll"><table>
+  <tr><th colspan="2">Person</th></tr>
+  <tr><th>PersonId (<span class="pk">PK</span>)</th><th>Namn</th></tr>
+  <tr><td>1</td><td>Anna</td></tr>
+  <tr><td>2</td><td>Omar</td></tr>
+</table></div>
+<div class="scroll"><table>
+  <tr><th colspan="4">Bil</th></tr>
+  <tr><th>BilId (<span class="pk">PK</span>)</th><th>Regnr</th><th>Modell</th><th>PersonId (<span class="fk">FK</span>)</th></tr>
+  <tr><td>100</td><td>ABC123</td><td>Volvo V60</td><td>1</td></tr>
+  <tr><td>101</td><td>XYZ789</td><td>Tesla Model 3</td><td>1</td></tr>
+  <tr><td>102</td><td>KLM456</td><td>Kia Niro</td><td>2</td></tr>
+</table></div>
+</div>
+</section>
+
+<section class="slide">
+  <h2>Exempel: Fotbollslag</h2>
+<p>Ett lag har många spelare – varje spelare spelar i ett lag.</p>
+<pre class="mermaid utan-en exempel-er">
+%%{init: {"er": {"layoutDirection": "LR"}}}%%
+erDiagram
+    LAG ||--o{ SPELARE : "har"
+    LAG {
+        int LagId PK
+        string Namn
+        string Stad
+    }
+    SPELARE {
+        int SpelareId PK
+        string Namn
+        int Nummer
+        int LagId FK
+    }
+</pre>
+<div class="tva-kol tabellpar">
+<div class="scroll"><table>
+  <tr><th colspan="3">Lag</th></tr>
+  <tr><th>LagId (<span class="pk">PK</span>)</th><th>Namn</th><th>Stad</th></tr>
+  <tr><td>1</td><td>IFK Göteborg</td><td>Göteborg</td></tr>
+  <tr><td>2</td><td>Malmö FF</td><td>Malmö</td></tr>
+</table></div>
+<div class="scroll"><table>
+  <tr><th colspan="4">Spelare</th></tr>
+  <tr><th>SpelareId (<span class="pk">PK</span>)</th><th>Namn</th><th>Nummer</th><th>LagId (<span class="fk">FK</span>)</th></tr>
+  <tr><td>7</td><td>Anna</td><td>10</td><td>1</td></tr>
+  <tr><td>8</td><td>Omar</td><td>9</td><td>1</td></tr>
+  <tr><td>9</td><td>Lisa</td><td>1</td><td>2</td></tr>
+</table></div>
+</div>
+</section>
+
+<section class="slide">
+  <h2>Exempel: Studenter och kurser (m–m)</h2>
+<p>En student läser många kurser och en kurs har många studenter – därför behövs kopplingstabellen <b>Registrering</b>.</p>
+<pre class="mermaid utan-en exempel-er">
+%%{init: {"er": {"layoutDirection": "LR"}}}%%
+erDiagram
+    STUDENT ||--o{ REGISTRERING : "har"
+    REGISTRERING }o--|| KURS : "har"
+    STUDENT {
+        int StudentId PK
+        string Namn
+    }
+    REGISTRERING {
+        int StudentId FK
+        int KursId FK
+    }
+    KURS {
+        int KursId PK
+        string Titel
+    }
+</pre>
+<div class="tva-kol tabellpar tre">
+<div class="scroll"><table>
+  <tr><th colspan="2">Student</th></tr>
+  <tr><th>StudentId (<span class="pk">PK</span>)</th><th>Namn</th></tr>
+  <tr><td>1</td><td>Anna</td></tr>
+  <tr><td>2</td><td>Omar</td></tr>
+</table></div>
+<div class="scroll"><table>
+  <tr><th colspan="2">Registrering</th></tr>
+  <tr><th>StudentId (<span class="fk">FK</span>)</th><th>KursId (<span class="fk">FK</span>)</th></tr>
+  <tr><td>1</td><td>10</td></tr>
+  <tr><td>1</td><td>11</td></tr>
+  <tr><td>2</td><td>10</td></tr>
+</table></div>
+<div class="scroll"><table>
+  <tr><th colspan="2">Kurs</th></tr>
+  <tr><th>KursId (<span class="pk">PK</span>)</th><th>Titel</th></tr>
+  <tr><td>10</td><td>Databaser</td></tr>
+  <tr><td>11</td><td>OOP med C#</td></tr>
+</table></div>
+</div>
 </section>
 
 </div>
