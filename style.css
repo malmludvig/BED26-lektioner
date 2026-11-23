@@ -102,3 +102,5 @@ th .fk { color: #5eead4; }
 @media (max-width: 640px) { .tre-typer { grid-template-columns: 1fr; } }
 .slide .tre-typer { margin-top: 40px; font-size: 1.25rem; }
 .slide .tre-typer > div { padding: 32px 18px; }
+/* Helt svart text i datatyp-korten för bättre läsbarhet */
+.tre-typer, .tre-typer *, .tre-typer .cs, .tre-typer code { color: #000; }
