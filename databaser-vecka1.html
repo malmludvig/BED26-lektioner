@@ -25,16 +25,17 @@
   <li><a href="#del3">Veckans mål</a></li>
   <li><a href="#del4">Vad är en relationsdatabas?</a></li>
   <li><a href="#del5">Centrala begrepp</a></li>
-  <li><a href="#del6">ER-diagram</a></li>
-  <li><a href="#del7">Tre sorters relationer</a></li>
-  <li><a href="#del8">Nycklar</a></li>
-  <li><a href="#del9">UML-klassdiagram eller ER-diagram?</a></li>
-  <li><a href="#del10">ER-diagram ↔ klasser i C#</a></li>
-  <li><a href="#del11">Samma databasmodell i C#</a></li>
-  <li><a href="#del12">Många till många – i ER och i C#</a></li>
-  <li><a href="#del13">Gruppövning: ER-modellering</a></li>
-  <li><a href="#del14">Förslag på gruppövningar</a></li>
-  <li><a href="#del15">Sammanfattning</a></li>
+  <li><a href="#del6">I den här kursen: SQL-databaser</a></li>
+  <li><a href="#del7">ER-diagram</a></li>
+  <li><a href="#del8">Tre sorters relationer</a></li>
+  <li><a href="#del9">Nycklar</a></li>
+  <li><a href="#del10">UML-klassdiagram eller ER-diagram?</a></li>
+  <li><a href="#del11">ER-diagram ↔ klasser i C#</a></li>
+  <li><a href="#del12">Samma databasmodell i C#</a></li>
+  <li><a href="#del13">Många till många – i ER och i C#</a></li>
+  <li><a href="#del14">Gruppövning: ER-modellering</a></li>
+  <li><a href="#del15">Förslag på gruppövningar</a></li>
+  <li><a href="#del16">Sammanfattning</a></li>
 </ol>
 <p><a href="databaser-intro-presentation.html">Presentationen</a> har samma innehåll som den här sidan.</p>
 </div>
@@ -107,7 +108,17 @@ customers.Add(new Customer { Name = "Ada" });
 <figure class="shot"><img src="db-tabell-kund.webp" alt="En tabell för entiteten Kund: kolumner (fält), rader (poster) och attribut. En SQL-tabell är som en List&lt;Kund&gt; i C#."></figure>
 </div>
 
-<h2 id="del6">6. ER-diagram</h2>
+<h2 id="del6">6. I den här kursen: SQL-databaser</h2>
+<p>Det finns många sorters databaser, men i den här kursen jobbar vi <b>bara med SQL-databaser</b> – relationsdatabaser med tabeller, rader och kolumner.</p>
+<div class="scroll"><table>
+  <tr><th></th><th>Ingår i kursen</th><th>Ingår inte</th></tr>
+  <tr><td><b>Typ</b></td><td>SQL-databaser (relationsdatabaser)</td><td>NoSQL-databaser</td></tr>
+  <tr><td><b>Exempel</b></td><td>SQL Server – det vi använder</td><td>MongoDB, Redis, Cosmos DB</td></tr>
+  <tr><td><b>Lagrar data som</b></td><td>Tabeller med relationer</td><td>Dokument, nyckel–värde, grafer …</td></tr>
+</table></div>
+<p class="box">Det ni lär er – tabeller, nycklar, relationer och SQL – fungerar likadant i PostgreSQL, MySQL och SQLite. Vecka 4 kopplar vi SQL-databasen till C# med EF Core.</p>
+
+<h2 id="del7">7. ER-diagram</h2>
 <p>Ett <b>ER-diagram</b> (Entity–Relationship) är en ritning av databasen innan man bygger den.</p>
 <ul>
   <li><b>Entitet</b> – en sak vi sparar data om (blir en tabell)</li>
@@ -130,7 +141,7 @@ erDiagram
 </pre>
 <p>En <b>rak linje</b> betyder <b>en</b>, en <b>kråkfot</b> betyder <b>många</b>. Läs: en kund lägger många ordrar – varje order läggs av en kund.</p>
 
-<h2 id="del7">7. Tre sorters relationer</h2>
+<h2 id="del8">8. Tre sorters relationer</h2>
 <div class="scroll"><table>
   <tr><th>Relation</th><th>Exempel</th></tr>
   <tr><td><b>Ett till ett</b> (1–1)</td><td>En person har ett pass</td></tr>
@@ -139,7 +150,7 @@ erDiagram
 </table></div>
 <p class="box">Fråga dig åt båda hållen: <i>"Hur många ordrar kan en kund ha?"</i> och <i>"Hur många kunder kan en order ha?"</i> Svaren ger kardinaliteten.</p>
 
-<h2 id="del8">8. Nycklar</h2>
+<h2 id="del9">9. Nycklar</h2>
 <figure class="shot"><img src="db-nycklar-pk-fk-2.webp" alt="Nycklar i en databas: Primary Key (primärnyckel) identifierar varje rad – KundID är primary key i Kund. Foreign Key (främmande nyckel) hänvisar till en nyckel i en annan tabell, KundID är foreign key i Beställning." loading="lazy"></figure>
 <p>Hur vet databasen <i>vilken</i> kund en order tillhör? Med <b>nycklar</b>.</p>
 <div class="tva-kol">
@@ -167,7 +178,7 @@ erDiagram
 </div>
 <p class="box">I C# pekar ett objekt direkt på ett annat. En tabell kan inte lagra en referens – därför sparar vi kundens <b>Id</b> i ordern. Ada har ordrar 10 och 11, Bo har order 12.</p>
 
-<h2 id="del9">9. UML-klassdiagram eller ER-diagram?</h2>
+<h2 id="del10">10. UML-klassdiagram eller ER-diagram?</h2>
 <div class="tva-kol diagrampar">
 <p><b>UML-klassdiagram</b> – hur programmet är byggt</p>
 <p><b>ER-diagram</b> – hur datan lagras</p>
@@ -210,7 +221,7 @@ erDiagram
   <tr><td><b>Arv</b></td><td>Finns: <code>class Dog : Animal</code></td><td>Finns inte direkt – måste lösas med tabeller</td></tr>
 </table></div>
 
-<h2 id="del10">10. ER-diagram ↔ klasser i C#</h2>
+<h2 id="del11">11. ER-diagram ↔ klasser i C#</h2>
 <p>Du har redan ritat UML-klassdiagram. Ett ER-diagram är nästan samma sak:</p>
 <div class="scroll"><table>
   <tr><th>ER-diagram</th><th>Databas</th><th>C#</th></tr>
@@ -221,7 +232,7 @@ erDiagram
   <tr><td>"Många"-sidan</td><td>Flera rader</td><td><code>List&lt;T&gt;</code></td></tr>
 </table></div>
 
-<h2 id="del11">11. Samma databasmodell i C#</h2>
+<h2 id="del12">12. Samma databasmodell i C#</h2>
 <div class="tva-kol modell">
 <pre class="mermaid utan-en">
 erDiagram
@@ -255,7 +266,7 @@ class Order
 </div>
 <p class="box">Entiteten blir en <b>klass</b>, attributen blir <b>egenskaper</b> och relationen blir en <b>referens</b>. I databasen blir referensen en <b>främmande nyckel</b> – på onsdag skapar vi tabellerna på riktigt.</p>
 
-<h2 id="del12">12. Många till många – i ER och i C#</h2>
+<h2 id="del13">13. Många till många – i ER och i C#</h2>
 <div class="tva-kol modell">
 <pre class="mermaid">
 erDiagram
@@ -286,7 +297,7 @@ class Course
 <p>I C# räcker det med en lista på varje sida.</p>
 <figure class="shot"><img src="db-er-diagram-stilar-3.webp" alt="Olika stilar för ER-diagram: Crow's Foot, Chen och Bachman – 1 till många, många till många och 1 till 1" loading="lazy"></figure>
 
-<h2 id="del13">13. Gruppövning: ER-modellering</h2>
+<h2 id="del14">14. Gruppövning: ER-modellering</h2>
 <p><b>I grupp:</b> Ett bibliotek vill hålla koll på böcker, författare, låntagare och lån.</p>
 <ol>
   <li>Vilka <b>entiteter</b> finns?</li>
@@ -295,7 +306,7 @@ class Course
   <li>Rita <b>ER-diagrammet</b> och skriv motsvarande <b>klasser i C#</b>.</li>
 </ol>
 
-<h2 id="del14">14. Förslag på gruppövningar</h2>
+<h2 id="del15">15. Förslag på gruppövningar</h2>
 <p>Välj en verksamhet – från listan eller en som ni själva känner till – och modellera den.</p>
 <div class="scroll"><table>
   <tr><th>Verksamhet</th><th>Tänk på</th></tr>
@@ -323,7 +334,7 @@ class Course
   <li>Var skiljer sig ert UML-diagram från ert ER-diagram?</li>
 </ul>
 
-<h2 id="del15">15. Sammanfattning</h2>
+<h2 id="del16">16. Sammanfattning</h2>
 <ul>
   <li>En <b>relationsdatabas</b> sparar data permanent i <b>tabeller</b> med rader och kolumner.</li>
   <li>Relationer är <b>1–1</b>, <b>1–N</b> eller <b>N–M</b>.</li>
