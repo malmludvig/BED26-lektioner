@@ -238,13 +238,13 @@ erDiagram
 <div>
 <div class="scroll"><table>
   <tr><th colspan="2">Customers</th></tr>
-  <tr><th>Id (PK)</th><th>Name</th></tr>
+  <tr><th>Id (<span class="pk">PK</span>)</th><th>Name</th></tr>
   <tr><td>1</td><td>Ada</td></tr>
   <tr><td>2</td><td>Bo</td></tr>
 </table></div>
 <div class="scroll"><table>
   <tr><th colspan="3">Orders</th></tr>
-  <tr><th>Id (PK)</th><th>OrderDate</th><th>CustomerId (FK)</th></tr>
+  <tr><th>Id (<span class="pk">PK</span>)</th><th>OrderDate</th><th>CustomerId (<span class="fk">FK</span>)</th></tr>
   <tr><td>10</td><td>2026-11-02</td><td>1</td></tr>
   <tr><td>11</td><td>2026-11-05</td><td>1</td></tr>
   <tr><td>12</td><td>2026-11-06</td><td>2</td></tr>
@@ -252,9 +252,9 @@ erDiagram
 </div>
 <div class="scroll"><table>
   <tr><th>Databas</th><th>C# / OOP</th></tr>
-  <tr><td><b>Primärnyckel</b> (PK) – identifierar en rad unikt</td><td>Objektets identitet. Två objekt kan ha samma namn men är ändå olika objekt.</td></tr>
-  <tr><td><b>Främmande nyckel</b> (FK) – pekar på en PK i en annan tabell</td><td>En <b>referens</b>: <code>order.Customer</code></td></tr>
-  <tr><td>Flera rader med samma FK</td><td>En <code>List&lt;Order&gt;</code> i kunden</td></tr>
+  <tr><td><b>Primärnyckel</b> (<span class="pk">PK</span>) – identifierar en rad unikt</td><td>Objektets identitet. Två objekt kan ha samma namn men är ändå olika objekt.</td></tr>
+  <tr><td><b>Främmande nyckel</b> (<span class="fk">FK</span>) – pekar på en <span class="pk">PK</span> i en annan tabell</td><td>En <b>referens</b>: <code>order.Customer</code></td></tr>
+  <tr><td>Flera rader med samma <span class="fk">FK</span></td><td>En <code>List&lt;Order&gt;</code> i kunden</td></tr>
 </table></div>
 </div>
 <p class="box">I C# pekar ett objekt direkt på ett annat. En tabell kan inte lagra en referens – därför sparar vi kundens <b>Id</b> i ordern. Ada har ordrar 10 och 11, Bo har order 12.</p>

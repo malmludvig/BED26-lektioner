@@ -82,3 +82,10 @@ nav.veckor { padding-bottom: 6px; }
 .diagrampar { align-items: stretch; row-gap: 6px; }
 .diagrampar > p { align-self: end; margin: 0; }
 .diagrampar > .mermaid { display: flex; align-items: center; justify-content: center; margin: 0; }
+
+/* Markering av primärnyckel (PK) och främmande nyckel (FK) */
+.pk, .fk { font-weight: 800; font-size: 1.15em; }
+.pk { color: #b45309; }
+.fk { color: #0f766e; }
+th .pk { color: #fbbf24; }
+th .fk { color: #5eead4; }
