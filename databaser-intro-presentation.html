@@ -16,6 +16,7 @@
   .slide .tva-kol.excel { grid-template-columns: 1.2fr 1fr; margin-block: 12px; }
   .slide .tva-kol.excel p { font-size: 1.05rem; margin: 0; }
   .slide table { font-size: 1rem; }
+  .slide table.datatyper td, .slide table.datatyper th { padding-block: 5px; }
   .slide .diagrampar .mermaid svg { max-height: 30vh; }
   .slide .tva-kol.diagrampar { grid-template-columns: 1fr 1fr; }
   .slide .diagrampar p { margin: 0 0 6px; }
@@ -209,6 +210,24 @@ erDiagram
     }
 </pre>
 <p>En <b>rak linje</b> betyder <b>en</b>, en <b>kråkfot</b> betyder <b>många</b>. Läs: en kund lägger många ordrar – varje order läggs av en kund.</p>
+</section>
+
+<section class="slide">
+  <h2>Datatyper i SQL</h2>
+<p>Varje kolumn har en <b>datatyp</b> som bestämmer vad som får stå i den – precis som varje egenskap i C# har en typ.</p>
+<div class="scroll"><table class="datatyper">
+  <tr><th>SQL Server</th><th>Innehåller</th><th>C#</th><th>Exempel</th></tr>
+  <tr><td><code>INT</code></td><td>Heltal</td><td><code>int</code></td><td><code>42</code></td></tr>
+  <tr><td><code>BIGINT</code></td><td>Stora heltal</td><td><code>long</code></td><td><code>9000000000</code></td></tr>
+  <tr><td><code>DECIMAL(10,2)</code></td><td>Exakta decimaltal, t.ex. pengar</td><td><code>decimal</code></td><td><code>199.90</code></td></tr>
+  <tr><td><code>FLOAT</code></td><td>Ungefärliga decimaltal</td><td><code>double</code></td><td><code>3.14159</code></td></tr>
+  <tr><td><code>NVARCHAR(100)</code></td><td>Text, högst 100 tecken, med å, ä, ö</td><td><code>string</code></td><td><code>N'Åsa'</code></td></tr>
+  <tr><td><code>VARCHAR(100)</code></td><td>Text utan stöd för alla tecken</td><td><code>string</code></td><td><code>'Ada'</code></td></tr>
+  <tr><td><code>BIT</code></td><td>Sant eller falskt (1 eller 0)</td><td><code>bool</code></td><td><code>1</code></td></tr>
+  <tr><td><code>DATE</code></td><td>Datum</td><td><code>DateOnly</code> / <code>DateTime</code></td><td><code>'2026-11-23'</code></td></tr>
+  <tr><td><code>DATETIME2</code></td><td>Datum och tid</td><td><code>DateTime</code></td><td><code>'2026-11-23 09:00'</code></td></tr>
+</table></div>
+<p class="box">Siffran i <code>NVARCHAR(100)</code> är max antal tecken. Använd <code>NVARCHAR</code> för svensk text. En kolumn som får vara tom (<code>NULL</code>) motsvarar en nullbar typ i C#, t.ex. <code>int?</code>.</p>
 </section>
 
 <section class="slide">
