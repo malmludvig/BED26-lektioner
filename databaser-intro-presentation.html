@@ -393,36 +393,6 @@ class Course
 </section>
 
 <section class="slide">
-  <h2>Förslag på gruppövningar</h2>
-<p>Välj en verksamhet – från listan eller en som ni själva känner till – och modellera den.</p>
-<div class="scroll"><table>
-  <tr><th>Verksamhet</th><th>Tänk på</th></tr>
-  <tr><td>Gym</td><td>Medlemmar, pass, instruktörer, bokningar – kan ett pass ha många medlemmar?</td></tr>
-  <tr><td>Restaurang</td><td>Bord, bokningar, rätter, beställningar – en beställning innehåller många rätter</td></tr>
-  <tr><td>Vårdcentral</td><td>Patienter, läkare, besök, rum – vem träffar vem, och när?</td></tr>
-  <tr><td>Streamingtjänst</td><td>Användare, filmer, serier, avsnitt, betyg – vem har sett vad?</td></tr>
-  <tr><td>Bilverkstad</td><td>Kunder, bilar, reparationer, reservdelar – en kund kan ha flera bilar</td></tr>
-  <tr><td>Fotbollsförening</td><td>Lag, spelare, tränare, matcher – kan en spelare vara med i flera lag?</td></tr>
-  <tr><td>Webbshop</td><td>Kunder, produkter, ordrar, kategorier – en order har många produkter och tvärtom</td></tr>
-</table></div>
-<p><b>Så här gör ni:</b></p>
-<ol>
-  <li><b>Beskriv</b> verksamheten med några meningar. Substantiven är kandidater till entiteter.</li>
-  <li>Kom på <b>tabellerna</b> och deras attribut. Ge varje tabell en primärnyckel.</li>
-  <li><b>Relationerna är det viktigaste:</b> hitta minst en 1–N och en N–M. Fråga åt båda hållen: "hur många … kan en … ha?"</li>
-  <li>Rita <b>ER-diagrammet</b> med kråkfot. Var behövs främmande nycklar? Var behövs en kopplingstabell?</li>
-  <li>Rita samma sak som ett <b>UML-klassdiagram</b> och skriv <b>klasserna i C#</b>.</li>
-</ol>
-<p><b>Diskutera i gruppen:</b></p>
-<ul>
-  <li>Vilka relationer blir en referens i C#, och vilka blir en <code>List&lt;T&gt;</code>?</li>
-  <li>Vilka <b>metoder</b> skulle klasserna ha – och varför syns de inte i ER-diagrammet?</li>
-  <li>Finns det <b>arv</b> i er modell (t.ex. <code>Employee</code> och <code>Customer</code> som båda är <code>Person</code>)? Hur skulle ni lagra det i tabeller?</li>
-  <li>Var skiljer sig ert UML-diagram från ert ER-diagram?</li>
-</ul>
-</section>
-
-<section class="slide">
   <h2>Sammanfattning</h2>
 <ul>
   <li>En <b>relationsdatabas</b> sparar data permanent i <b>tabeller</b> med rader och kolumner.</li>
