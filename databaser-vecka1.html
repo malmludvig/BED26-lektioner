@@ -205,6 +205,7 @@ erDiagram
 <p><b>ER-diagram</b> – hur datan lagras</p>
 <pre class="mermaid">
 classDiagram
+    direction LR
     class Customer {
         +int Id
         +string Name
@@ -219,6 +220,7 @@ classDiagram
     Customer "1" --> "0..*" Order : lägger
 </pre>
 <pre class="mermaid utan-en">
+%%{init: {"er": {"layoutDirection": "LR"}}}%%
 erDiagram
     CUSTOMER ||--o{ ORDER : "lägger"
     CUSTOMER {
