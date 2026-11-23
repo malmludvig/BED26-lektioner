@@ -109,3 +109,4 @@ th .fk { color: #5eead4; }
 .exempel-er svg { width: 100%; max-width: 100% !important; height: auto; max-height: 260px; }
 .tabellpar.tre { grid-template-columns: 1fr 1fr 1fr; }
 @media (max-width: 760px) { .tabellpar.tre { grid-template-columns: 1fr; } }
+.exempel-er.stor svg { max-height: 420px; }

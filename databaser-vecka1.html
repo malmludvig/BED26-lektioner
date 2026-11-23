@@ -502,6 +502,152 @@ erDiagram
 </table></div>
 </div>
 
+<h3>ERD-exempel: Restaurang (3 tabeller)</h3>
+<p>En kund kan göra många bokningar, och ett bord kan bokas många gånger. <b>Bokning</b> kopplar ihop kund och bord.</p>
+<pre class="mermaid utan-en exempel-er stor">
+%%{init: {"er": {"layoutDirection": "LR"}}}%%
+erDiagram
+    KUND ||--o{ BOKNING : "gör"
+    BORD ||--o{ BOKNING : "bokas i"
+    KUND {
+        int KundId PK
+        string Namn
+        string Telefon
+    }
+    BOKNING {
+        int BokningId PK
+        datetime Tid
+        int Antal
+        int KundId FK
+        int BordId FK
+    }
+    BORD {
+        int BordId PK
+        int Platser
+    }
+</pre>
+<h3>ERD-exempel: Webbshop (4 tabeller)</h3>
+<p>En kund lägger många ordrar. Varje order har många orderrader, och varje orderrad pekar på en produkt.</p>
+<pre class="mermaid utan-en exempel-er stor">
+%%{init: {"er": {"layoutDirection": "LR"}}}%%
+erDiagram
+    KUND ||--o{ ORDER : "lägger"
+    ORDER ||--o{ ORDERRAD : "innehåller"
+    PRODUKT ||--o{ ORDERRAD : "finns i"
+    KUND {
+        int KundId PK
+        string Namn
+        string Email
+    }
+    ORDER {
+        int OrderId PK
+        date Datum
+        int KundId FK
+    }
+    ORDERRAD {
+        int OrderradId PK
+        int Antal
+        int OrderId FK
+        int ProduktId FK
+    }
+    PRODUKT {
+        int ProduktId PK
+        string Namn
+        decimal Pris
+    }
+</pre>
+<h3>ERD-exempel: Gym (4 tabeller)</h3>
+<p>En instruktör leder många pass. En medlem kan boka många pass, och ett pass har många bokningar.</p>
+<pre class="mermaid utan-en exempel-er stor">
+%%{init: {"er": {"layoutDirection": "LR"}}}%%
+erDiagram
+    INSTRUKTOR ||--o{ PASS : "leder"
+    PASS ||--o{ BOKNING : "har"
+    MEDLEM ||--o{ BOKNING : "gör"
+    INSTRUKTOR {
+        int InstruktorId PK
+        string Namn
+    }
+    PASS {
+        int PassId PK
+        string Namn
+        datetime Start
+        int InstruktorId FK
+    }
+    BOKNING {
+        int BokningId PK
+        int PassId FK
+        int MedlemId FK
+    }
+    MEDLEM {
+        int MedlemId PK
+        string Namn
+        string Email
+    }
+</pre>
+<h3>ERD-exempel: Skola med betyg (4 tabeller)</h3>
+<p>En klass har många elever. En elev får betyg i många kurser – <b>Betyg</b> är en kopplingstabell med ett eget attribut.</p>
+<pre class="mermaid utan-en exempel-er stor">
+%%{init: {"er": {"layoutDirection": "LR"}}}%%
+erDiagram
+    KLASS ||--o{ ELEV : "har"
+    ELEV ||--o{ BETYG : "får"
+    KURS ||--o{ BETYG : "ger"
+    KLASS {
+        int KlassId PK
+        string Namn
+    }
+    ELEV {
+        int ElevId PK
+        string Namn
+        int KlassId FK
+    }
+    BETYG {
+        int ElevId FK
+        int KursId FK
+        string Betyg
+    }
+    KURS {
+        int KursId PK
+        string Titel
+    }
+</pre>
+<h3>ERD-exempel: Bio (5 tabeller)</h3>
+<p>En film visas många gånger i olika salonger. Varje visning säljer många biljetter, och en kund kan köpa många biljetter.</p>
+<pre class="mermaid utan-en exempel-er stor">
+%%{init: {"er": {"layoutDirection": "LR"}}}%%
+erDiagram
+    FILM ||--o{ VISNING : "visas"
+    SALONG ||--o{ VISNING : "har"
+    VISNING ||--o{ BILJETT : "säljer"
+    KUND ||--o{ BILJETT : "köper"
+    FILM {
+        int FilmId PK
+        string Titel
+        int Minuter
+    }
+    SALONG {
+        int SalongId PK
+        int Platser
+    }
+    VISNING {
+        int VisningId PK
+        datetime Start
+        int FilmId FK
+        int SalongId FK
+    }
+    BILJETT {
+        int BiljettId PK
+        int Plats
+        int VisningId FK
+        int KundId FK
+    }
+    KUND {
+        int KundId PK
+        string Namn
+    }
+</pre>
+
 <h2 id="del20">20. DBMS – databashanterare</h2>
 <p><b>DBMS</b> står för <b>Database Management System</b> – på svenska <i>databashanterare</i>. Det är <b>programmet</b> som lagrar, hämtar och skyddar datan.</p>
 <div class="scroll"><table>
