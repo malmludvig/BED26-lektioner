@@ -89,3 +89,5 @@ nav.veckor { padding-bottom: 6px; }
 .fk { color: #0f766e; }
 th .pk { color: #fbbf24; }
 th .fk { color: #5eead4; }
+/* Två tabeller bredvid varandra (Customers och Orders) */
+.tabellpar { grid-template-columns: 1fr 1.5fr; align-items: start; margin-bottom: 12px; }

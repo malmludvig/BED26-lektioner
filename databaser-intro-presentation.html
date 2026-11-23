@@ -234,8 +234,7 @@ erDiagram
 <section class="slide">
   <h2>Nycklar</h2>
 <p>Hur vet databasen <i>vilken</i> kund en order tillhör? Med <b>nycklar</b>.</p>
-<div class="tva-kol">
-<div>
+<div class="tva-kol tabellpar">
 <div class="scroll"><table>
   <tr><th colspan="2">Customers</th></tr>
   <tr><th>Id (<span class="pk">PK</span>)</th><th>Name</th></tr>
@@ -256,7 +255,6 @@ erDiagram
   <tr><td><b>Främmande nyckel</b> (<span class="fk">FK</span>) – pekar på en <span class="pk">PK</span> i en annan tabell</td><td>En <b>referens</b>: <code>order.Customer</code></td></tr>
   <tr><td>Flera rader med samma <span class="fk">FK</span></td><td>En <code>List&lt;Order&gt;</code> i kunden</td></tr>
 </table></div>
-</div>
 <p class="box">I C# pekar ett objekt direkt på ett annat. En tabell kan inte lagra en referens – därför sparar vi kundens <b>Id</b> i ordern. Ada har ordrar 10 och 11, Bo har order 12.</p>
 </section>
 
