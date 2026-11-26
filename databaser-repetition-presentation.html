@@ -790,16 +790,16 @@ erDiagram
 <section class="slide">
   <h2>Exempel: räkna och döpa kolumner</h2>
 <pre><code class="sql nohighlight">SELECT Name,
-       Bytes / 1024.0 / 1024 AS MB
+       Milliseconds / 1000 AS Sekunder
 FROM Track
 WHERE AlbumId = 1;</code></pre>
 <div class="scroll"><table>
-  <tr><th>Name</th><th>MB</th></tr>
-  <tr><td>For Those About To Rock (We Salute You)</td><td>10.65…</td></tr>
-  <tr><td>Put The Finger On You</td><td>6.40…</td></tr>
+  <tr><th>Name</th><th>Sekunder</th></tr>
+  <tr><td>For Those About To Rock (We Salute You)</td><td>343</td></tr>
+  <tr><td>Put The Finger On You</td><td>205</td></tr>
   <tr><td>…</td><td>…</td></tr>
 </table></div>
-<p class="box"><b>Heltalsfällan:</b> <code>Bytes / 1024</code> är heltal delat med heltal – då kapas decimalerna, precis som <code>7 / 2</code> blir <code>3</code> i C#. Skriv <code>1024.0</code> så blir svaret ett decimaltal.</p>
+<p class="box"><b>Heltalsfällan:</b> <code>Milliseconds / 1000</code> är heltal delat med heltal – då kapas decimalerna: 343719 / 1000 blir <code>343</code>, precis som <code>7 / 2</code> blir <code>3</code> i C#. Skriv <code>1000.0</code> om du vill ha decimaler.</p>
 </section>
 
 <section class="slide">
