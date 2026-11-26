@@ -44,6 +44,12 @@
   .quiz details[open] p { color: var(--ink); }
   .quiz details pre { margin: 8px 0 4px; font-size: clamp(13px, 1.6vw, 16px); }
   details.tips summary { color: var(--accent); }
+  /* Ikoner för SQL och LINQ */
+  .ikonrad { display: flex; align-items: center; justify-content: space-between; margin: 4px 0 8px; }
+  .ikonrad figure { margin: 0; display: flex; align-items: center; gap: 12px; }
+  .ikonrad img { height: 64px; width: 64px; border-radius: 10px; }
+  .ikonrad figcaption { font-weight: 600; }
+  .ikonrad span { font-size: 2rem; color: var(--muted); }
 
   /* SQL-färger som i SSMS (mörkt tema) */
   .sq-k { color: #569cd6; } .sq-s { color: #d69d85; } .sq-c { color: #57a64a; } .sq-n { color: #b5cea8; } .sq-f { color: #d8a0df; }
@@ -503,6 +509,11 @@ ORDER BY Title;
 
 <section class="slide">
   <h2>SQL ↔ LINQ</h2>
+<div class="ikonrad">
+  <figure><img src="ikon-sql.svg" alt="SQL-ikon"><figcaption>SQL – mot tabeller</figcaption></figure>
+  <span aria-hidden="true">↔</span>
+  <figure><img src="ikon-dotnet.svg" alt=".NET-logotyp"><figcaption>LINQ i .NET – mot listor</figcaption></figure>
+</div>
 <p>Ni har redan skrivit frågor mot listor med LINQ. SQL gör samma sak mot tabeller.</p>
 <div class="scroll"><table>
   <tr><th>Vill du …</th><th>SQL</th><th>LINQ</th></tr>
