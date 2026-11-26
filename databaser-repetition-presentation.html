@@ -1,0 +1,1004 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="claude:viewport-fit-sides" content="cover">
+<title>Repetition: databaser och SQL</title>
+<link rel="stylesheet" href="style.css">
+<style>
+  /* Bildspel: en bild i taget, stor text (samma som Databaser intro) */
+  .slides { min-height: 60vh; display: flex; flex-direction: column; justify-content: center; }
+  .slide { display: block; margin-bottom: 48px; font-size: 1.25rem; }
+  .slides.ready .slide { display: none; margin: 0; }
+  .slides.ready .slide.active { display: block; }
+  .slide h1 { font-size: clamp(2.2rem, 7vw, 3.6rem); margin: 0 0 8px; }
+  .slide h2 { margin-top: 0; font-size: clamp(1.6rem, 4.5vw, 2.2rem); }
+  .slide pre { font-size: clamp(14px, 2.2vw, 18px); }
+  .slide table { font-size: 1rem; }
+  .slide .scroll { margin-block: 12px; }
+  .slide ol, .slide ul { margin-block: 6px; }
+  .slide .tva-kol { grid-template-columns: 1fr 1fr; align-items: start; }
+  .slide .tva-kol pre { margin: 0; }
+  .slide .tva-kol.modell { grid-template-columns: 1fr 1.4fr; }
+  .slide .mermaid svg { width: 100%; max-width: 100% !important; height: auto; max-height: 52vh; }
+  .slide .mermaid.stor svg { max-height: 64vh; }
+  .slide .mermaid.liten svg { max-height: 30vh; }
+  .slide .tabellpar { grid-template-columns: 1fr 1.5fr; }
+  @media (max-width: 760px) { .slide .tva-kol, .slide .tva-kol.modell, .slide .tabellpar { grid-template-columns: 1fr; } }
+  .big { font-size: clamp(1.4rem, 4vw, 2rem); text-align: center; }
+  .etikett { color: var(--muted); font-size: .95rem; margin: 0 0 4px; font-weight: 600; }
+
+  /* Avsnittsbilder */
+  .slide.sektion { text-align: center; padding-block: 8vh; }
+  .slide.sektion .nr { color: var(--accent); font-weight: 700; letter-spacing: .08em; text-transform: uppercase; font-size: 1rem; }
+  .slide.sektion h2 { border: 0; font-size: clamp(2rem, 6vw, 3rem); margin: 8px 0; }
+
+  /* Quiz: svaren döljs tills man klickar */
+  .quiz { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 20px; }
+  @media (max-width: 760px) { .quiz { grid-template-columns: 1fr; } }
+  .quiz details { background: var(--card); border: 1px solid var(--line); border-radius: 8px; padding: 8px 14px; margin: 0; }
+  .quiz summary { color: var(--ink); font-weight: 600; }
+  .quiz summary::marker { color: var(--accent); }
+  .quiz details p { margin: 8px 0 4px; color: var(--muted); }
+  .quiz details[open] p { color: var(--ink); }
+  details.tips summary { color: var(--accent); }
+
+  /* SQL-färger som i SSMS (mörkt tema) */
+  .sq-k { color: #569cd6; } .sq-s { color: #d69d85; } .sq-c { color: #57a64a; } .sq-n { color: #b5cea8; } .sq-f { color: #d8a0df; }
+  /* Felmeddelanden från SSMS */
+  pre.fel { background: #1e1e1e; color: #f48771; font-size: clamp(13px, 1.8vw, 16px); white-space: pre-wrap; }
+  .null { color: var(--muted); font-style: italic; }
+
+  .controls { display: flex; align-items: center; justify-content: space-between; gap: 12px; border-top: 1px solid var(--line); padding-top: 12px; margin-top: 24px; }
+  .controls button { font: inherit; font-weight: 600; background: var(--card); color: var(--ink); border: 1px solid var(--line); border-radius: 8px; padding: 8px 16px; cursor: pointer; }
+  .controls button:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
+  .controls button:disabled { opacity: .4; cursor: default; }
+  .counter { color: var(--muted); font-variant-numeric: tabular-nums; }
+  .hint { color: var(--muted); font-size: .9rem; text-align: center; }
+  #show:fullscreen { padding-inline: max(16px, calc((100% - 1100px) / 2)); }
+  :fullscreen main { max-width: 1100px; }
+  :fullscreen { background: var(--bg); overflow: auto; }
+</style>
+</head>
+<body>
+<header class="sidhuvud">BED26 Lektionsmaterial</header>
+<nav class="kurser"><a href="databaser-vecka1.html" aria-current="true">Databaser</a><span aria-hidden="true">|</span><a href="vecka43.html">Objektorienterad programmering med C#</a></nav>
+<nav class="veckor"><a href="databaser-vecka1.html" aria-current="true">Lektioner vecka 1</a></nav>
+<nav class="undermeny"><a href="databaser-intro-presentation.html">Presentation: Databaser intro</a><a href="databaser-vecka1.html">Databaser intro</a><a href="databaser-repetition-presentation.html" aria-current="page">Presentation: Repetition och SQL</a></nav>
+<main id="show">
+
+<div class="slides">
+
+<!-- ================= START ================= -->
+
+<section class="slide">
+  <h1>Repetition: databaser och SQL</h1>
+  <p class="lead">Torsdag vecka 1 · digitalt. Vi repeterar måndag och onsdag, kopplar ihop databasrader med C#-objekt – och tränar SQL på en riktig databas.</p>
+</section>
+
+<section class="slide">
+  <h2>Dagens upplägg</h2>
+<div class="scroll"><table>
+  <tr><th>Ungefär</th><th>Vad</th><th>Hur</th></tr>
+  <tr><td>09.00</td><td>Snabbquiz: måndagens begrepp och ER-diagram</td><td>Alla, i chatten</td></tr>
+  <tr><td>09.40</td><td>Repetition onsdag: från ER-diagram till tabeller</td><td>Genomgång</td></tr>
+  <tr><td>10.30</td><td>Rader och objekt – databasen jämförd med C#</td><td>Genomgång och frågor</td></tr>
+  <tr><td>11.15</td><td>Kom igång med Chinook och utforska schemat</td><td>Breakout rooms</td></tr>
+  <tr><td>12.00</td><td><i>Lunch</i></td><td></td></tr>
+  <tr><td>13.00</td><td>SQL-verktygslådan med exempel</td><td>Gemensam kodning</td></tr>
+  <tr><td>13.45</td><td>SQL-övningar med Chinook (A1–A13)</td><td>Breakout rooms, i par</td></tr>
+  <tr><td>15.00</td><td>SQL Murder Mystery</td><td>I par</td></tr>
+  <tr><td>15.40</td><td>Reflektion och frågor inför fredag</td><td>Alla</td></tr>
+</table></div>
+<p class="box">Ingen JOIN idag – den kommer nästa vecka. Allt vi gör idag går att lösa med en tabell i taget.</p>
+</section>
+
+<section class="slide">
+  <h2>Veckans mål – var är vi?</h2>
+<ol>
+  <li><b>Förklara</b> centrala databasbegrepp. <span class="etikett">– måndag</span></li>
+  <li><b>Förstå</b> och rita ett ER-diagram. <span class="etikett">– måndag</span></li>
+  <li><b>Skapa</b> en lokal databas med tabeller och nycklar. <span class="etikett">– onsdag</span></li>
+</ol>
+<p class="box">Idag repeterar vi alla tre – och lägger till det som behövs för att <b>hämta</b> data på ett smart sätt: <code>WHERE</code>, <code>ORDER BY</code>, <code>TOP</code>, <code>DISTINCT</code>, <code>LIKE</code> och <code>NULL</code>.</p>
+</section>
+
+<!-- ================= REPETITION MÅNDAG ================= -->
+
+<section class="slide sektion">
+  <p class="nr">Del 1</p>
+  <h2>Repetition måndag</h2>
+  <p class="lead">Begrepp, nycklar och ER-diagram</p>
+</section>
+
+<section class="slide">
+  <h2>Snabbquiz 1: begrepp</h2>
+<p>Skriv ditt svar i chatten först – klicka sedan för att se svaret.</p>
+<div class="quiz">
+  <details><summary>1. Vad är skillnaden mellan en tabell, en rad och en kolumn?</summary><p>Tabellen samlar data om en sorts sak (<code>Customer</code>). En rad är en sak (kunden Ada). En kolumn är en egenskap som alla rader har (<code>Email</code>).</p></details>
+  <details><summary>2. Vad gör en primärnyckel (PK)?</summary><p>Den identifierar varje rad unikt. Två rader får aldrig ha samma PK – även om de har samma namn.</p></details>
+  <details><summary>3. Vad är en främmande nyckel (FK) – och vad motsvarar den i C#?</summary><p>En kolumn som pekar på en PK i en annan tabell. I C# motsvarar den en <b>referens</b>, t.ex. <code>order.Customer</code>.</p></details>
+  <details><summary>4. Vad betyder kardinalitet?</summary><p><i>Antal</i>: hur många av den ena saken som kan höra ihop med den andra – en eller många.</p></details>
+  <details><summary>5. Hur löser man många till många i en databas?</summary><p>Med en <b>kopplingstabell</b> som har två främmande nycklar, t.ex. <code>Registrering(StudentId, KursId)</code>.</p></details>
+  <details><summary>6. UML-klassdiagram eller ER-diagram – vad är skillnaden?</summary><p>UML beskriver klasserna i programmet, med metoder. ER beskriver hur datan lagras – bara attribut, inget beteende.</p></details>
+  <details><summary>7. Vad är ett DBMS?</summary><p>Programmet som lagrar, hämtar och skyddar datan, t.ex. <b>SQL Server</b>, PostgreSQL eller SQLite.</p></details>
+  <details><summary>8. Varför <code>NVARCHAR</code> och inte <code>VARCHAR</code>?</summary><p><code>NVARCHAR</code> klarar alla tecken – å, ä, ö, emoji och andra alfabet.</p></details>
+</div>
+</section>
+
+<section class="slide">
+  <h2>Snabbquiz 2: läs ER-diagrammet</h2>
+<pre class="mermaid utan-en liten">
+%%{init: {"er": {"layoutDirection": "LR"}}}%%
+erDiagram
+    ARTIST ||--o{ ALBUM : "har"
+    ALBUM ||--o{ TRACK : "innehåller"
+    ARTIST {
+        int ArtistId PK
+        string Name
+    }
+    ALBUM {
+        int AlbumId PK
+        string Title
+        int ArtistId FK
+    }
+    TRACK {
+        int TrackId PK
+        string Name
+        int AlbumId FK
+    }
+</pre>
+<div class="quiz">
+  <details><summary>1. Hur många album kan en artist ha?</summary><p>Många – kråkfoten står vid <code>ALBUM</code>.</p></details>
+  <details><summary>2. Hur många artister har ett album?</summary><p>En – rak linje vid <code>ARTIST</code>.</p></details>
+  <details><summary>3. Varför ligger <code>ArtistId</code> i <code>ALBUM</code> och inte tvärtom?</summary><p>FK ligger alltid på <b>många-sidan</b>. Ett album har en artist – men en artist kan inte ha en kolumn för varje album.</p></details>
+  <details><summary>4. Hur skulle <code>Album</code> se ut som C#-klass?</summary><p><code>int AlbumId</code>, <code>string Title</code> och en referens <code>Artist Artist</code> – plus <code>List&lt;Track&gt; Tracks</code>.</p></details>
+</div>
+</section>
+
+<section class="slide">
+  <h2>Regeln att komma ihåg: FK på många-sidan</h2>
+<p>En kund har många ordrar. Därför får varje order en kolumn som säger vilken kund den tillhör.</p>
+<div class="tva-kol tabellpar">
+<div class="scroll"><table>
+  <tr><th colspan="2">Customers</th></tr>
+  <tr><th>Id (<span class="pk">PK</span>)</th><th>Name</th></tr>
+  <tr><td>1</td><td>Ada</td></tr>
+  <tr><td>2</td><td>Bo</td></tr>
+</table></div>
+<div class="scroll"><table>
+  <tr><th colspan="3">Orders</th></tr>
+  <tr><th>Id (<span class="pk">PK</span>)</th><th>OrderDate</th><th>CustomerId (<span class="fk">FK</span>)</th></tr>
+  <tr><td>10</td><td>2026-11-02</td><td>1</td></tr>
+  <tr><td>11</td><td>2026-11-05</td><td>1</td></tr>
+  <tr><td>12</td><td>2026-11-06</td><td>2</td></tr>
+</table></div>
+</div>
+<div class="scroll"><table>
+  <tr><th>Relation</th><th>Var hamnar nyckeln?</th></tr>
+  <tr><td><b>1–N</b> (kund – ordrar)</td><td>FK i tabellen på många-sidan: <code>Orders.CustomerId</code></td></tr>
+  <tr><td><b>m–m</b> (student – kurser)</td><td>Ny kopplingstabell med två FK: <code>Registrering(StudentId, KursId)</code></td></tr>
+  <tr><td><b>1–1</b> (person – pass)</td><td>FK på en av sidorna, ofta den som "hör till" den andra: <code>Pass.PersonId</code></td></tr>
+</table></div>
+</section>
+
+<!-- ================= REPETITION ONSDAG ================= -->
+
+<section class="slide sektion">
+  <p class="nr">Del 2</p>
+  <h2>Repetition onsdag</h2>
+  <p class="lead">Från modell till tabeller i SQL Server</p>
+</section>
+
+<section class="slide">
+  <h2>Från ER-diagram till CREATE TABLE</h2>
+<div class="tva-kol modell">
+<pre class="mermaid utan-en">
+erDiagram
+    KLASS ||--o{ ELEV : "har"
+    KLASS {
+        int KlassId PK
+        string Namn
+    }
+    ELEV {
+        int ElevId PK
+        string Namn
+        date Fodd
+        int KlassId FK
+    }
+</pre>
+<pre><code class="sql nohighlight">CREATE TABLE Klass (
+    KlassId INT PRIMARY KEY,
+    Namn    NVARCHAR(50) NOT NULL
+);
+
+CREATE TABLE Elev (
+    ElevId  INT PRIMARY KEY,
+    Namn    NVARCHAR(50) NOT NULL,
+    Fodd    DATE,
+    KlassId INT NOT NULL
+        FOREIGN KEY REFERENCES Klass(KlassId)
+);</code></pre>
+</div>
+<p class="box">Entitet → <code>CREATE TABLE</code>. Attribut → kolumn med datatyp. PK → <code>PRIMARY KEY</code>. Relation → <code>FOREIGN KEY REFERENCES</code>. Skapa tabellen på <b>en</b>-sidan först – annars finns inget att peka på.</p>
+</section>
+
+<section class="slide">
+  <h2>CREATE DATABASE och USE</h2>
+<pre><code class="sql nohighlight">CREATE DATABASE Skola;
+GO
+
+USE Skola;   -- alla frågor efter det här körs mot Skola
+GO</code></pre>
+<div class="scroll"><table>
+  <tr><th>Kommando</th><th>Gör</th></tr>
+  <tr><td><code>CREATE DATABASE</code></td><td>Skapar en ny, tom databas</td></tr>
+  <tr><td><code>USE</code></td><td>Väljer vilken databas frågorna ska köras mot – samma som databasväljaren i SSMS</td></tr>
+  <tr><td><code>GO</code></td><td>Inget SQL – säger åt SSMS att skicka allt ovanför som en egen omgång</td></tr>
+</table></div>
+<p class="box">Vanligaste felet: frågan körs mot <code>master</code> i stället för din databas. Kolla alltid databasväljaren uppe till vänster i SSMS.</p>
+</section>
+
+<section class="slide">
+  <h2>INSERT INTO</h2>
+<pre><code class="sql nohighlight">INSERT INTO Klass (KlassId, Namn)
+VALUES (1, N'BED26'),
+       (2, N'JAVA26');
+
+INSERT INTO Elev (ElevId, Namn, Fodd, KlassId)
+VALUES (10, N'Anna', '2001-04-12', 1),
+       (11, N'Omar', '1999-09-30', 1),
+       (12, N'Lisa', NULL,         2);</code></pre>
+<ul>
+  <li>Lista kolumnerna – då spelar ordningen i tabellen ingen roll.</li>
+  <li>Text och datum inom <b>enkla</b> citattecken: <code>'2001-04-12'</code>. <code>N'…'</code> för text med å, ä, ö.</li>
+  <li>Lägg in raderna på <b>en</b>-sidan först: klassen måste finnas innan eleven kan peka på den.</li>
+</ul>
+</section>
+
+<section class="slide">
+  <h2>Nycklarna skyddar datan</h2>
+<p>Det här är bra fel – databasen vägrar spara data som inte hänger ihop.</p>
+<p class="etikett">Klass 99 finns inte:</p>
+<pre><code class="sql nohighlight">INSERT INTO Elev (ElevId, Namn, KlassId) VALUES (13, N'Kim', 99);</code></pre>
+<pre class="fel">Msg 547, Level 16, State 0
+The INSERT statement conflicted with the FOREIGN KEY constraint "FK__Elev__KlassId__3B75D760".
+The conflict occurred in database "Skola", table "dbo.Klass", column 'KlassId'.</pre>
+<p class="etikett">Id 1 är redan upptaget:</p>
+<pre><code class="sql nohighlight">INSERT INTO Klass (KlassId, Namn) VALUES (1, N'NET26');</code></pre>
+<pre class="fel">Msg 2627, Level 14, State 1
+Violation of PRIMARY KEY constraint 'PK__Klass__…'. Cannot insert duplicate key in object 'dbo.Klass'.
+The duplicate key value is (1).</pre>
+</section>
+
+<section class="slide">
+  <h2>SELECT och WHERE</h2>
+<div class="tva-kol">
+<pre><code class="sql nohighlight">-- Allt i tabellen
+SELECT * FROM Elev;
+
+-- Bara vissa kolumner
+SELECT Namn, Fodd FROM Elev;
+
+-- Bara vissa rader
+SELECT Namn
+FROM Elev
+WHERE KlassId = 1;</code></pre>
+<div class="scroll"><table>
+  <tr><th colspan="2">Resultat av sista frågan</th></tr>
+  <tr><th>Namn</th><th></th></tr>
+  <tr><td>Anna</td><td></td></tr>
+  <tr><td>Omar</td><td></td></tr>
+</table>
+<p style="font-size:1.05rem"><code>SELECT</code> väljer <b>kolumner</b>. <code>WHERE</code> väljer <b>rader</b>. <code>FROM</code> säger vilken tabell.</p>
+</div>
+</div>
+</section>
+
+<!-- ================= RADER OCH OBJEKT ================= -->
+
+<section class="slide sektion">
+  <p class="nr">Del 3</p>
+  <h2>Rader och objekt</h2>
+  <p class="lead">Du kan redan det mesta – det heter bara något annat i databasen</p>
+</section>
+
+<section class="slide">
+  <h2>En rad = ett objekt</h2>
+<p>En rad i tabellen <code>Customer</code> i Chinook-databasen:</p>
+<div class="scroll"><table>
+  <tr><th>CustomerId (<span class="pk">PK</span>)</th><th>FirstName</th><th>LastName</th><th>Company</th><th>City</th><th>Country</th><th>SupportRepId (<span class="fk">FK</span>)</th></tr>
+  <tr><td>51</td><td>Joakim</td><td>Johansson</td><td class="null">NULL</td><td>Stockholm</td><td>Sweden</td><td>5</td></tr>
+</table></div>
+<p>Samma sak som ett objekt i C#:</p>
+<pre><code>var joakim = new Customer
+{
+    CustomerId   = 51,
+    FirstName    = "Joakim",
+    LastName     = "Johansson",
+    Company      = null,
+    City         = "Stockholm",
+    Country      = "Sweden",
+    SupportRepId = 5
+};</code></pre>
+</section>
+
+<section class="slide">
+  <h2>En tabell = en lista med objekt</h2>
+<div class="tva-kol">
+<div>
+<p class="etikett">C#</p>
+<pre><code>List&lt;Customer&gt; customers = …;
+
+// Alla kunder
+customers
+
+// Lägg till en kund
+customers.Add(joakim);</code></pre>
+</div>
+<div>
+<p class="etikett">SQL</p>
+<pre><code class="sql nohighlight">-- Tabellen Customer
+
+
+SELECT * FROM Customer;
+
+
+INSERT INTO Customer (…) VALUES (…);</code></pre>
+</div>
+</div>
+<div class="scroll"><table>
+  <tr><th>Databas</th><th>C#</th></tr>
+  <tr><td>Tabell</td><td>Klass – och alla rader tillsammans är som en <code>List&lt;T&gt;</code></td></tr>
+  <tr><td>Rad</td><td>Ett objekt</td></tr>
+  <tr><td>Kolumn</td><td>Egenskap (property)</td></tr>
+  <tr><td>Primärnyckel</td><td>Objektets identitet</td></tr>
+  <tr><td>Främmande nyckel</td><td>Referens till ett annat objekt – men sparad som ett id</td></tr>
+</table></div>
+<p class="box">Skillnaden: listan försvinner när programmet stängs. Tabellen finns kvar.</p>
+</section>
+
+<section class="slide">
+  <h2>Kolumnens datatyp = egenskapens typ</h2>
+<p>Ur Chinooks egna <code>CREATE TABLE</code>-skript:</p>
+<div class="scroll"><table class="datatyper">
+  <tr><th>Kolumn i Chinook</th><th>SQL Server</th><th>C#</th></tr>
+  <tr><td><code>Customer.CustomerId</code></td><td><code>INT NOT NULL</code></td><td><code>int</code></td></tr>
+  <tr><td><code>Customer.FirstName</code></td><td><code>NVARCHAR(40) NOT NULL</code></td><td><code>string</code></td></tr>
+  <tr><td><code>Customer.Company</code></td><td><code>NVARCHAR(80)</code> (får vara <code>NULL</code>)</td><td><code>string?</code></td></tr>
+  <tr><td><code>Customer.SupportRepId</code></td><td><code>INT</code> (får vara <code>NULL</code>)</td><td><code>int?</code></td></tr>
+  <tr><td><code>Track.UnitPrice</code></td><td><code>NUMERIC(10,2) NOT NULL</code></td><td><code>decimal</code></td></tr>
+  <tr><td><code>Invoice.InvoiceDate</code></td><td><code>DATETIME NOT NULL</code></td><td><code>DateTime</code></td></tr>
+</table></div>
+<p class="box"><code>NOT NULL</code> = måste ha ett värde. Utan <code>NOT NULL</code> får kolumnen vara tom – precis som <code>int?</code> och <code>string?</code> i C#. <code>NUMERIC</code> är samma sak som <code>DECIMAL</code>.</p>
+</section>
+
+<section class="slide">
+  <h2>NULL – inget värde</h2>
+<div class="tva-kol">
+<div>
+<p><code>NULL</code> betyder <b>"vet inte / finns inte"</b>. Det är inte samma sak som <code>0</code> eller tom text <code>''</code>.</p>
+<p>Joakim har inget företag – därför är <code>Company</code> <code>NULL</code>.</p>
+<p class="box">Man kan inte jämföra med <code>NULL</code> med <code>=</code>. Använd <code>IS NULL</code> eller <code>IS NOT NULL</code>.</p>
+</div>
+<div>
+<p class="etikett">C#</p>
+<pre><code>if (customer.Company == null) …</code></pre>
+<p class="etikett">SQL – rätt</p>
+<pre><code class="sql nohighlight">SELECT Name
+FROM Track
+WHERE Composer IS NULL;</code></pre>
+<p class="etikett">SQL – ger alltid noll rader</p>
+<pre><code class="sql nohighlight">WHERE Composer = NULL</code></pre>
+</div>
+</div>
+</section>
+
+<section class="slide">
+  <h2>Klass → tabell</h2>
+<div class="tva-kol">
+<div>
+<p class="etikett">C#-klassen</p>
+<pre><code>class Track
+{
+    public int TrackId { get; set; }
+    public string Name { get; set; }
+    public string? Composer { get; set; }
+    public int Milliseconds { get; set; }
+    public decimal UnitPrice { get; set; }
+
+    public Album? Album { get; set; }
+}</code></pre>
+</div>
+<div>
+<p class="etikett">Tabellen i Chinook (förkortad)</p>
+<pre><code class="sql nohighlight">CREATE TABLE Track (
+    TrackId      INT NOT NULL PRIMARY KEY,
+    Name         NVARCHAR(200) NOT NULL,
+    Composer     NVARCHAR(220),
+    Milliseconds INT NOT NULL,
+    UnitPrice    NUMERIC(10,2) NOT NULL,
+
+    AlbumId      INT   -- FK till Album
+);</code></pre>
+</div>
+</div>
+<p class="box">Referensen <code>Album</code> i C# blir kolumnen <code>AlbumId</code> i databasen. En tabell kan inte spara ett objekt – bara id:t som pekar på det.</p>
+</section>
+
+<section class="slide">
+  <h2>Främmande nyckel = referens som id</h2>
+<div class="tva-kol tabellpar">
+<div class="scroll"><table>
+  <tr><th colspan="2">Artist</th></tr>
+  <tr><th>ArtistId (<span class="pk">PK</span>)</th><th>Name</th></tr>
+  <tr><td>1</td><td>AC/DC</td></tr>
+  <tr><td>2</td><td>Accept</td></tr>
+  <tr><td>3</td><td>Aerosmith</td></tr>
+</table></div>
+<div class="scroll"><table>
+  <tr><th colspan="3">Album</th></tr>
+  <tr><th>AlbumId (<span class="pk">PK</span>)</th><th>Title</th><th>ArtistId (<span class="fk">FK</span>)</th></tr>
+  <tr><td>1</td><td>For Those About To Rock We Salute You</td><td>1</td></tr>
+  <tr><td>4</td><td>Let There Be Rock</td><td>1</td></tr>
+</table></div>
+</div>
+<div class="tva-kol">
+<pre><code>// C#: följ referensen direkt
+album.Artist.Name     // "AC/DC"
+acdc.Albums           // två album</code></pre>
+<pre><code class="sql nohighlight">-- SQL: följ id:t
+SELECT Name FROM Artist WHERE ArtistId = 1;
+SELECT Title FROM Album WHERE ArtistId = 1;</code></pre>
+</div>
+</section>
+
+<section class="slide">
+  <h2>Följa en främmande nyckel för hand</h2>
+<p><i>Vilka album har Iron Maiden?</i> Svaret finns i två tabeller – idag tar vi det i två steg.</p>
+<div class="tva-kol">
+<div>
+<p class="etikett">Steg 1: hitta artistens id</p>
+<pre><code class="sql nohighlight">SELECT ArtistId
+FROM Artist
+WHERE Name = 'Iron Maiden';
+-- 90</code></pre>
+</div>
+<div>
+<p class="etikett">Steg 2: använd id:t i nästa fråga</p>
+<pre><code class="sql nohighlight">SELECT Title
+FROM Album
+WHERE ArtistId = 90
+ORDER BY Title;
+-- 21 album</code></pre>
+</div>
+</div>
+<p class="box">Det är precis så databasen "tänker": en främmande nyckel är bara ett tal som pekar på en rad i en annan tabell. Nästa vecka lär vi oss göra det i <b>en</b> fråga – idag räcker två.</p>
+</section>
+
+<section class="slide">
+  <h2>SQL ↔ LINQ</h2>
+<p>Ni har redan skrivit frågor mot listor med LINQ. SQL gör samma sak mot tabeller.</p>
+<div class="scroll"><table>
+  <tr><th>Vill du …</th><th>SQL</th><th>LINQ</th></tr>
+  <tr><td>Välja kolumner</td><td><code>SELECT Name, Country</code></td><td><code>.Select(c =&gt; new { c.Name, c.Country })</code></td></tr>
+  <tr><td>Filtrera rader</td><td><code>WHERE Country = 'Sweden'</code></td><td><code>.Where(c =&gt; c.Country == "Sweden")</code></td></tr>
+  <tr><td>Sortera</td><td><code>ORDER BY LastName</code></td><td><code>.OrderBy(c =&gt; c.LastName)</code></td></tr>
+  <tr><td>Sortera fallande</td><td><code>ORDER BY Total DESC</code></td><td><code>.OrderByDescending(i =&gt; i.Total)</code></td></tr>
+  <tr><td>Ta de första</td><td><code>SELECT TOP 10 …</code></td><td><code>.Take(10)</code></td></tr>
+  <tr><td>Ta bort dubbletter</td><td><code>SELECT DISTINCT Country</code></td><td><code>.Select(c =&gt; c.Country).Distinct()</code></td></tr>
+  <tr><td>Börjar med</td><td><code>WHERE Name LIKE 'Love%'</code></td><td><code>.Where(t =&gt; t.Name.StartsWith("Love"))</code></td></tr>
+  <tr><td>Saknar värde</td><td><code>WHERE Company IS NULL</code></td><td><code>.Where(c =&gt; c.Company == null)</code></td></tr>
+  <tr><td>Finns i en lista</td><td><code>WHERE Country IN ('Sweden', 'Norway')</code></td><td><code>.Where(c =&gt; list.Contains(c.Country))</code></td></tr>
+  <tr><td>Lägga till</td><td><code>INSERT INTO …</code></td><td><code>list.Add(…)</code></td></tr>
+</table></div>
+</section>
+
+<section class="slide">
+  <h2>Samma fråga i SQL och C#</h2>
+<p><i>De fem längsta låtarna i genren Metal (GenreId 3).</i></p>
+<div class="tva-kol">
+<div>
+<p class="etikett">SQL</p>
+<pre><code class="sql nohighlight">SELECT TOP 5 Name, Milliseconds
+FROM Track
+WHERE GenreId = 3
+ORDER BY Milliseconds DESC;</code></pre>
+</div>
+<div>
+<p class="etikett">LINQ</p>
+<pre><code>var svar = tracks
+    .Where(t =&gt; t.GenreId == 3)
+    .OrderByDescending(t =&gt; t.Milliseconds)
+    .Take(5)
+    .Select(t =&gt; new { t.Name, t.Milliseconds });</code></pre>
+</div>
+</div>
+<p class="box">Lägg märke till ordningen i LINQ: först filtrera, sedan sortera, sist välja kolumner. Det är faktiskt den ordningen databasen också kör SQL-frågan i – fast man <i>skriver</i> <code>SELECT</code> först.</p>
+</section>
+
+<section class="slide">
+  <h2>I vilken ordning körs en SQL-fråga?</h2>
+<div class="scroll"><table>
+  <tr><th>Skrivs</th><th>Körs</th><th>Gör</th></tr>
+  <tr><td>1. <code>SELECT</code></td><td>3</td><td>Väljer kolumner och räknar ut nya</td></tr>
+  <tr><td>2. <code>FROM</code></td><td>1</td><td>Hämtar tabellen</td></tr>
+  <tr><td>3. <code>WHERE</code></td><td>2</td><td>Filtrerar rader</td></tr>
+  <tr><td>4. <code>ORDER BY</code></td><td>4</td><td>Sorterar resultatet</td></tr>
+</table></div>
+<pre><code class="sql nohighlight">SELECT Name, Bytes / 1024.0 / 1024 AS MB
+FROM Track
+WHERE Bytes / 1024.0 / 1024 &gt; 100   -- här finns inte MB än
+ORDER BY MB DESC;                   -- här finns MB</code></pre>
+<p class="box">Därför kan du använda ett alias (<code>AS MB</code>) i <code>ORDER BY</code> men inte i <code>WHERE</code>.</p>
+</section>
+
+<!-- ================= CHINOOK ================= -->
+
+<section class="slide sektion">
+  <p class="nr">Del 4</p>
+  <h2>Chinook</h2>
+  <p class="lead">En riktig databas att öva på</p>
+</section>
+
+<section class="slide">
+  <h2>Chinook – en digital musikbutik</h2>
+<p>En exempeldatabas med artister, album, låtar, spellistor, kunder, anställda och fakturor. 275 artister, 3 503 låtar, 59 kunder och fakturor från 2021–2025.</p>
+<ol>
+  <li>Ladda ned <code>Chinook_SqlServer.sql</code> från senaste releasen på <a href="https://github.com/lerocha/chinook-database/releases" target="_blank" rel="noopener">github.com/lerocha/chinook-database</a>.</li>
+  <li>Öppna filen i SSMS och kör hela skriptet. <b>Obs:</b> det tar bort en befintlig databas som heter Chinook.</li>
+  <li>Välj Chinook i databasväljaren, eller kör <code>USE Chinook;</code></li>
+</ol>
+<p class="box">Kör du Mac? Använd VS Code mot din SQL Server. Id-kolumnerna saknar <code>IDENTITY</code> – vid <code>INSERT</code> anger du id själv.</p>
+</section>
+
+<section class="slide">
+  <h2>Chinook: musiken</h2>
+<pre class="mermaid utan-en stor">
+%%{init: {"er": {"layoutDirection": "LR"}}}%%
+erDiagram
+    ARTIST ||--o{ ALBUM : "har"
+    ALBUM ||--o{ TRACK : "innehåller"
+    GENRE ||--o{ TRACK : "har"
+    MEDIATYPE ||--o{ TRACK : "har"
+    TRACK ||--o{ PLAYLISTTRACK : "finns i"
+    PLAYLIST ||--o{ PLAYLISTTRACK : "innehåller"
+    ARTIST {
+        int ArtistId PK
+        string Name
+    }
+    ALBUM {
+        int AlbumId PK
+        string Title
+        int ArtistId FK
+    }
+    GENRE {
+        int GenreId PK
+        string Name
+    }
+    MEDIATYPE {
+        int MediaTypeId PK
+        string Name
+    }
+    TRACK {
+        int TrackId PK
+        string Name
+        string Composer
+        int Milliseconds
+        decimal UnitPrice
+        int AlbumId FK
+        int GenreId FK
+        int MediaTypeId FK
+    }
+    PLAYLISTTRACK {
+        int PlaylistId FK
+        int TrackId FK
+    }
+    PLAYLIST {
+        int PlaylistId PK
+        string Name
+    }
+</pre>
+</section>
+
+<section class="slide">
+  <h2>Chinook: försäljningen</h2>
+<pre class="mermaid utan-en stor">
+%%{init: {"er": {"layoutDirection": "LR"}}}%%
+erDiagram
+    EMPLOYEE ||--o{ EMPLOYEE : "är chef för"
+    EMPLOYEE ||--o{ CUSTOMER : "är kontakt för"
+    CUSTOMER ||--o{ INVOICE : "har"
+    INVOICE ||--o{ INVOICELINE : "har"
+    TRACK ||--o{ INVOICELINE : "säljs i"
+    EMPLOYEE {
+        int EmployeeId PK
+        string FirstName
+        string LastName
+        string Title
+        int ReportsTo FK
+    }
+    CUSTOMER {
+        int CustomerId PK
+        string FirstName
+        string LastName
+        string Company
+        string Country
+        int SupportRepId FK
+    }
+    INVOICE {
+        int InvoiceId PK
+        datetime InvoiceDate
+        decimal Total
+        int CustomerId FK
+    }
+    INVOICELINE {
+        int InvoiceLineId PK
+        decimal UnitPrice
+        int Quantity
+        int InvoiceId FK
+        int TrackId FK
+    }
+    TRACK {
+        int TrackId PK
+        string Name
+    }
+</pre>
+</section>
+
+<section class="slide">
+  <h2>Breakout: utforska Chinook</h2>
+<p>Installera databasen och öppna <b>Tables → Keys</b> i Object Explorer. Diskutera i gruppen:</p>
+<div class="quiz">
+  <details><summary>1. Vilken tabell är en kopplingstabell för många till många?</summary><p><code>PlaylistTrack</code> – en spellista har många låtar, en låt finns i många spellistor.</p></details>
+  <details><summary>2. <code>InvoiceLine</code> kopplar också ihop två tabeller. Vilka – och vad har den mer?</summary><p><code>Invoice</code> och <code>Track</code>. Den har egna attribut: <code>UnitPrice</code> och <code>Quantity</code> – som <code>Betyg</code> i skolexemplet.</p></details>
+  <details><summary>3. <code>Employee.ReportsTo</code> pekar på … vad?</summary><p>På <code>Employee</code> själv. En anställd har en chef, som också är en anställd. I C#: <code>public Employee? Manager</code>.</p></details>
+  <details><summary>4. Vilka kolumner i <code>Customer</code> får vara <code>NULL</code>?</summary><p>Allt utom <code>CustomerId</code>, <code>FirstName</code>, <code>LastName</code> och <code>Email</code>. Kolla under <b>Columns</b> i Object Explorer.</p></details>
+  <details><summary>5. Skriv C#-klassen för <code>Album</code>.</summary><p><code>int AlbumId</code>, <code>string Title</code>, <code>Artist Artist</code> och <code>List&lt;Track&gt; Tracks</code>.</p></details>
+  <details><summary>6. Varför har <code>Invoice</code> egna adresskolumner i stället för att bara använda kundens?</summary><p>Fakturan ska visa adressen <i>när köpet gjordes</i> – även om kunden flyttar senare.</p></details>
+</div>
+</section>
+
+<!-- ================= SQL-VERKTYGSLÅDAN ================= -->
+
+<section class="slide sektion">
+  <p class="nr">Del 5</p>
+  <h2>SQL-verktygslådan</h2>
+  <p class="lead">Allt du behöver för dagens övningar</p>
+</section>
+
+<section class="slide">
+  <h2>Verktygslådan på en bild</h2>
+<div class="scroll"><table>
+  <tr><th>Verktyg</th><th>Exempel</th><th>Gör</th></tr>
+  <tr><td><code>SELECT</code> / <code>*</code></td><td><code>SELECT Name, Composer</code></td><td>Väljer kolumner – <code>*</code> = alla</td></tr>
+  <tr><td><code>AS</code></td><td><code>Milliseconds / 1000 AS Sekunder</code></td><td>Döper en kolumn</td></tr>
+  <tr><td><code>WHERE</code></td><td><code>WHERE Country = 'Canada'</code></td><td>Filtrerar rader</td></tr>
+  <tr><td><code>AND</code> / <code>OR</code> / <code>NOT</code></td><td><code>WHERE GenreId = 1 AND UnitPrice &gt; 1</code></td><td>Kombinerar villkor</td></tr>
+  <tr><td><code>&lt;&gt;</code></td><td><code>WHERE Country &lt;&gt; 'USA'</code></td><td>Inte lika med</td></tr>
+  <tr><td><code>IN</code></td><td><code>WHERE Name IN ('Rock', 'Jazz')</code></td><td>Något av flera värden</td></tr>
+  <tr><td><code>BETWEEN</code></td><td><code>WHERE Total BETWEEN 5 AND 8</code></td><td>Inom ett intervall, gränserna inräknade</td></tr>
+  <tr><td><code>LIKE</code></td><td><code>WHERE Name LIKE 'The %'</code></td><td>Mönster: <code>%</code> = vad som helst, <code>_</code> = ett tecken</td></tr>
+  <tr><td><code>IS NULL</code></td><td><code>WHERE Composer IS NULL</code></td><td>Saknar värde</td></tr>
+  <tr><td><code>ORDER BY</code></td><td><code>ORDER BY Country, LastName DESC</code></td><td>Sorterar – <code>ASC</code> (standard) eller <code>DESC</code></td></tr>
+  <tr><td><code>TOP</code></td><td><code>SELECT TOP 5 …</code></td><td>Bara de första raderna</td></tr>
+  <tr><td><code>DISTINCT</code></td><td><code>SELECT DISTINCT Title</code></td><td>Tar bort dubbletter</td></tr>
+  <tr><td><code>YEAR()</code></td><td><code>WHERE YEAR(HireDate) = 2003</code></td><td>Plockar ut året ur ett datum</td></tr>
+</table></div>
+</section>
+
+<section class="slide">
+  <h2>Exempel: WHERE med IN, LIKE och NULL</h2>
+<div class="tva-kol">
+<pre><code class="sql nohighlight">-- Tre utvalda genrer
+SELECT *
+FROM Genre
+WHERE Name IN ('Rock', 'Metal', 'Jazz');
+
+-- Artister som börjar med "The "
+SELECT Name
+FROM Artist
+WHERE Name LIKE 'The %';    -- 14 st
+
+-- Låtar utan kompositör
+SELECT Name
+FROM Track
+WHERE Composer IS NULL;     -- 977 st</code></pre>
+<div>
+<div class="scroll"><table>
+  <tr><th>Mönster</th><th>Matchar</th></tr>
+  <tr><td><code>'The %'</code></td><td>Börjar med "The " – The Doors, The Who</td></tr>
+  <tr><td><code>'%Greatest%'</code></td><td>Innehåller "Greatest" någonstans</td></tr>
+  <tr><td><code>'%Live'</code></td><td>Slutar med "Live"</td></tr>
+  <tr><td><code>'_a%'</code></td><td>Andra bokstaven är a</td></tr>
+</table></div>
+<p style="font-size:1.05rem">Tänk på mellanslaget: <code>'Love%'</code> matchar även <i>Lovely</i>. <code>'Love %'</code> matchar bara när Love är ett eget ord.</p>
+</div>
+</div>
+</section>
+
+<section class="slide">
+  <h2>Exempel: räkna och döpa kolumner</h2>
+<pre><code class="sql nohighlight">SELECT Name,
+       Bytes / 1024.0 / 1024 AS MB
+FROM Track
+WHERE AlbumId = 1;</code></pre>
+<div class="scroll"><table>
+  <tr><th>Name</th><th>MB</th></tr>
+  <tr><td>For Those About To Rock (We Salute You)</td><td>10.65…</td></tr>
+  <tr><td>Put The Finger On You</td><td>6.40…</td></tr>
+  <tr><td>…</td><td>…</td></tr>
+</table></div>
+<p class="box"><b>Heltalsfällan:</b> <code>Bytes / 1024</code> är heltal delat med heltal – då kapas decimalerna, precis som <code>7 / 2</code> blir <code>3</code> i C#. Skriv <code>1024.0</code> så blir svaret ett decimaltal.</p>
+</section>
+
+<section class="slide">
+  <h2>Exempel: ORDER BY, TOP och DISTINCT</h2>
+<div class="tva-kol">
+<div>
+<p class="etikett">De tre senast anställda</p>
+<pre><code class="sql nohighlight">SELECT TOP 3 FirstName, LastName, HireDate
+FROM Employee
+ORDER BY HireDate DESC;</code></pre>
+<div class="scroll"><table>
+  <tr><th>FirstName</th><th>LastName</th><th>HireDate</th></tr>
+  <tr><td>Laura</td><td>Callahan</td><td>2004-03-04</td></tr>
+  <tr><td>Robert</td><td>King</td><td>2004-01-02</td></tr>
+  <tr><td>Steve</td><td>Johnson</td><td>2003-10-17</td></tr>
+</table></div>
+</div>
+<div>
+<p class="etikett">Vilka titlar finns bland de anställda?</p>
+<pre><code class="sql nohighlight">SELECT DISTINCT Title
+FROM Employee
+ORDER BY Title;</code></pre>
+<div class="scroll"><table>
+  <tr><th>Title</th></tr>
+  <tr><td>General Manager</td></tr>
+  <tr><td>IT Manager</td></tr>
+  <tr><td>IT Staff</td></tr>
+  <tr><td>Sales Manager</td></tr>
+  <tr><td>Sales Support Agent</td></tr>
+</table></div>
+</div>
+</div>
+<p class="box"><code>TOP</code> utan <code>ORDER BY</code> ger "några" rader – inte de största eller minsta. Sortera alltid först.</p>
+</section>
+
+<section class="slide">
+  <h2>Exempel: datum</h2>
+<div class="tva-kol">
+<div>
+<p class="etikett">Med YEAR()</p>
+<pre><code class="sql nohighlight">SELECT FirstName, HireDate
+FROM Employee
+WHERE YEAR(HireDate) = 2003;</code></pre>
+</div>
+<div>
+<p class="etikett">Med ett intervall</p>
+<pre><code class="sql nohighlight">SELECT FirstName, HireDate
+FROM Employee
+WHERE HireDate &gt;= '2003-01-01'
+  AND HireDate &lt;  '2004-01-01';</code></pre>
+</div>
+</div>
+<p>Båda ger Margaret, Steve och Michael. Skriv datum som text i formatet <code>'ÅÅÅÅ-MM-DD'</code>.</p>
+<p class="box">Varför <code>&lt; '2004-01-01'</code> och inte <code>&lt;= '2003-12-31'</code>? En <code>DATETIME</code> har också klockslag – <code>'2003-12-31 15:00'</code> är större än <code>'2003-12-31'</code> och skulle missas.</p>
+</section>
+
+<section class="slide">
+  <h2>Exempel: INSERT i Chinook</h2>
+<p>Id räknas inte upp automatiskt i Chinook. Ta reda på det högsta id:t först:</p>
+<div class="tva-kol">
+<div>
+<p class="etikett">1. Vilket är högsta id?</p>
+<pre><code class="sql nohighlight">SELECT TOP 1 ArtistId
+FROM Artist
+ORDER BY ArtistId DESC;
+-- 275</code></pre>
+</div>
+<div>
+<p class="etikett">2. Lägg till med nästa id</p>
+<pre><code class="sql nohighlight">INSERT INTO Artist (ArtistId, Name)
+VALUES (276, N'Kent');
+
+-- 3. Kontrollera
+SELECT * FROM Artist
+WHERE ArtistId = 276;</code></pre>
+</div>
+</div>
+<p class="box">Kör du samma <code>INSERT</code> två gånger får du felet om <i>duplicate key</i> – primärnyckeln skyddar dig. På onsdag nästa vecka kommer <code>UPDATE</code> och <code>DELETE</code>.</p>
+</section>
+
+<section class="slide">
+  <h2>Vanliga fel</h2>
+<div class="scroll"><table>
+  <tr><th>Du skriver</th><th>Det blir</th><th>Rätta till</th></tr>
+  <tr><td><code>WHERE Country = "Sweden"</code></td><td><i>Invalid column name 'Sweden'</i></td><td>Enkla citattecken: <code>'Sweden'</code></td></tr>
+  <tr><td><code>SELECT * FROM Customer</code></td><td><i>Invalid object name 'Customer'</i></td><td>Fel databas – kör <code>USE Chinook;</code></td></tr>
+  <tr><td><code>WHERE Company = NULL</code></td><td>Noll rader, inget fel</td><td><code>IS NULL</code></td></tr>
+  <tr><td><code>Milliseconds / 60000</code></td><td>Hela minuter, decimalerna försvinner</td><td><code>60000.0</code></td></tr>
+  <tr><td><code>'Let's Get It Up'</code></td><td>Texten tar slut efter <i>Let</i></td><td>Dubbla apostrofen: <code>'Let''s Get It Up'</code></td></tr>
+  <tr><td><code>VALUES (26, 'Göteborgsrock')</code></td><td>Risk för konstiga tecken</td><td><code>N'Göteborgsrock'</code></td></tr>
+  <tr><td><code>ORDER BY …</code> före <code>WHERE …</code></td><td><i>Incorrect syntax near the keyword 'WHERE'</i></td><td>Ordningen: <code>SELECT – FROM – WHERE – ORDER BY</code></td></tr>
+</table></div>
+<p class="box">SQL Server bryr sig oftast inte om stora eller små bokstäver i texten: <code>'sweden'</code> hittar <code>Sweden</code>. Det beror på databasens inställning (<i>collation</i>).</p>
+</section>
+
+<!-- ================= ÖVNINGAR ================= -->
+
+<section class="slide sektion">
+  <p class="nr">Del 6</p>
+  <h2>Övningar</h2>
+  <p class="lead">I par i breakout rooms – byt vem som skriver efter varje uppgift</p>
+</section>
+
+<section class="slide">
+  <h2>SQL-övningar med Chinook – vecka 1</h2>
+<div class="tva-kol">
+<ol style="margin:0">
+  <li>Visa alla genrer.</li>
+  <li>Visa förnamn, efternamn och land för alla kunder.</li>
+  <li>Visa alla kunder som bor i Sverige.</li>
+  <li>Visa alla kunder som inte har angett något företag.</li>
+  <li>Visa kunder i Sverige, Norge, Danmark och Finland, sorterade på land och sedan efternamn.</li>
+  <li>Visa namn och längd i minuter för alla låtar som är längre än tio minuter.</li>
+  <li>Visa de tio längsta låtarna.</li>
+</ol>
+<ol start="8" style="margin:0">
+  <li>Visa alla låtar vars namn börjar med ordet Love.</li>
+  <li>Visa alla fakturor från 2023.</li>
+  <li>Visa fakturor där totalsumman ligger mellan 10 och 15, dyraste först.</li>
+  <li>Vilka länder har kunder? Varje land en gång, i bokstavsordning.</li>
+  <li>Vilken anställd rapporterar inte till någon?</li>
+  <li>Lägg till en ny genre som heter Svensk pop.</li>
+</ol>
+</div>
+<p style="font-size:1rem;color:var(--muted)">Uppgifterna heter A1–A13 i Christoffers övning på Learnpoint. Längden lagras i millisekunder.</p>
+<details class="tips"><summary>Fastnat? Vilket verktyg behövs?</summary>
+<p style="font-size:1rem">A3 <code>WHERE</code> · A4 <code>IS NULL</code> · A5 <code>IN</code> + <code>ORDER BY</code> med två kolumner · A6 räkna och döpa, se upp för heltalsfällan · A7 <code>TOP</code> + <code>ORDER BY … DESC</code> · A8 <code>LIKE</code> – tänk på mellanslaget · A9 <code>YEAR()</code> eller intervall · A10 <code>BETWEEN</code> · A11 <code>DISTINCT</code> · A12 <code>IS NULL</code> på rätt kolumn · A13 hitta högsta id först</p>
+</details>
+</section>
+
+<section class="slide">
+  <h2>Klar? SQL Murder Mystery</h2>
+<p class="big">Det har skett ett mord i <b>SQL City</b> den 15 januari 2018.<br>Lös det – med SQL.</p>
+<p>Gå till <a href="https://mystery.knightlab.com/" target="_blank" rel="noopener">mystery.knightlab.com</a>. Allt körs i webbläsaren – inget att installera. Börja med att hämta brottsplatsrapporten från polisens databas.</p>
+<p class="box">Jobba i par. Skriv ner varje ledtråd du hittar – och vilken fråga som gav den. Ni kommer att behöva id:n från en fråga i nästa.</p>
+</section>
+
+<section class="slide">
+  <h2>Murder Mystery: tips</h2>
+<div class="scroll"><table>
+  <tr><th>Tips</th><th>Varför</th></tr>
+  <tr><td>Lös det <b>utan JOIN</b>: kopiera id:n från ett svar till nästa fråga</td><td>Precis som Iron Maiden-exemplet – följ nycklarna för hand</td></tr>
+  <tr><td>Klicka på länken till schemat (ER-diagrammet) på sidan</td><td>Då ser du vilka kolumner som pekar på vilka tabeller</td></tr>
+  <tr><td>Databasen är <b>SQLite</b>, inte SQL Server</td><td>Det mesta är likadant – men några saker skiljer</td></tr>
+  <tr><td><code>LIMIT 1</code> i slutet i stället för <code>TOP 1</code></td><td>SQLite har inte <code>TOP</code></td></tr>
+  <tr><td>Datum är heltal, t.ex. <code>20180115</code></td><td>Jämför med tal – inga citattecken, ingen <code>YEAR()</code></td></tr>
+  <tr><td><code>LIKE</code> och <code>ORDER BY … DESC</code> kommer väl till pass</td><td>Ett vittne bor "i sista huset på gatan" …</td></tr>
+</table></div>
+<p class="box">Hittat mördaren? Kolla svaret med frågan i rutan <i>Check your solution</i> längst ner på sidan. Det finns en bonusfråga efter det …</p>
+</section>
+
+<!-- ================= AVSLUT ================= -->
+
+<section class="slide">
+  <h2>Reflektion</h2>
+<p>Svara i chatten – en mening räcker:</p>
+<ol>
+  <li>Förklara med C#-ord vad en <b>rad</b>, en <b>kolumn</b> och en <b>främmande nyckel</b> är.</li>
+  <li>Vilken av dagens övningar var svårast – och varför?</li>
+  <li>Vilket SQL-fel stötte du på idag, och hur löste du det?</li>
+  <li>En fråga du vill ha svar på imorgon.</li>
+</ol>
+<p class="box">Imorgon (fredag): repetition, quiz och kodgranskning med Christoffer. Ta med dina Chinook-lösningar.</p>
+</section>
+
+<section class="slide">
+  <h2>Sammanfattning</h2>
+<ul>
+  <li>En <b>tabell</b> är som en klass, en <b>rad</b> är ett objekt och en <b>kolumn</b> är en egenskap.</li>
+  <li><b>PK</b> är radens identitet. <b>FK</b> är en referens – sparad som ett id, alltid på många-sidan.</li>
+  <li><code>NULL</code> = inget värde. Kolumner utan <code>NOT NULL</code> är som <code>int?</code> och <code>string?</code>. Jämför med <code>IS NULL</code>.</li>
+  <li><code>SELECT</code> väljer kolumner, <code>WHERE</code> väljer rader, <code>ORDER BY</code> sorterar, <code>TOP</code> och <code>DISTINCT</code> begränsar.</li>
+  <li>SQL och LINQ gör samma sak: <code>WHERE</code> = <code>.Where()</code>, <code>ORDER BY</code> = <code>.OrderBy()</code>, <code>TOP</code> = <code>.Take()</code>.</li>
+  <li>Data i flera tabeller? Idag: följ nyckeln i två frågor. Nästa vecka: ett smidigare sätt.</li>
+</ul>
+</section>
+
+</div>
+
+<div class="controls">
+  <button id="prev" type="button">← Föregående</button>
+  <span class="counter" id="counter"></span>
+  <button id="next" type="button">Nästa →</button>
+</div>
+<p class="hint">Piltangenterna byter bild · <button id="fs" type="button" style="font:inherit;background:none;border:0;color:var(--accent);cursor:pointer;padding:0">Helskärm (F)</button></p>
+
+</main>
+<script src="vs.js"></script>
+<script>
+  // Färgkodar SQL som i SSMS (mörkt tema)
+  const sqlOrd = "SELECT|FROM|WHERE|AND|OR|NOT|IN|BETWEEN|LIKE|IS|NULL|ORDER|BY|ASC|DESC|TOP|DISTINCT|AS|INSERT|INTO|VALUES|CREATE|DATABASE|TABLE|USE|GO|PRIMARY|FOREIGN|KEY|REFERENCES|INT|NVARCHAR|VARCHAR|DATE|DATETIME|NUMERIC|DECIMAL|LIMIT";
+  const sqlMönster = new RegExp(`(--.*)|(N?'(?:[^']|'')*')|\\b(\\d+(?:\\.\\d+)?)\\b|\\b(YEAR)(?=\\()|\\b(${sqlOrd})\\b`, "g");
+  const sqlEsc = s => s.replace(/&/g, "&amp;").replace(/</g, "&lt;");
+  document.querySelectorAll("code.sql").forEach(b => {
+    const text = b.textContent;
+    let html = "", sist = 0;
+    for (const m of text.matchAll(sqlMönster)) {
+      const [t, kom, str, tal, fn] = m;
+      html += sqlEsc(text.slice(sist, m.index));
+      sist = m.index + t.length;
+      const klass = kom ? "sq-c" : str ? "sq-s" : tal ? "sq-n" : fn ? "sq-f" : "sq-k";
+      html += `<span class="${klass}">${sqlEsc(t)}</span>`;
+    }
+    b.innerHTML = html + sqlEsc(text.slice(sist));
+  });
+</script>
+<script type="module">
+  import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.esm.min.mjs";
+  mermaid.initialize({ startOnLoad: false, theme: "neutral" });
+  try { await mermaid.run(); } catch (e) { }   // rita diagrammen medan alla bilder syns
+
+  // Mermaid ger markörerna samma id i alla diagram – gör dem unika per diagram
+  // och byt till förenklad kråkfot: ett streck = en, kråkfot = många (min anges inte)
+  const ENKEL = {
+    EN_START:     { w: 18, refX: 0,  d: "M9,0 L9,18" },
+    EN_END:       { w: 18, refX: 18, d: "M9,0 L9,18" },
+    MANGA_START:  { w: 20, refX: 0,  d: "M0,1 L16,9 M0,17 L16,9 M0,9 L16,9" },
+    MANGA_END:    { w: 20, refX: 20, d: "M20,1 L4,9 M20,17 L4,9 M20,9 L4,9" },
+  };
+  document.querySelectorAll(".mermaid svg").forEach((svg, n) => {
+    svg.querySelectorAll("marker[id]").forEach(m => {
+      const old = m.id, nu = old + "_" + n;
+      m.id = nu;
+      svg.querySelectorAll(`[marker-start="url(#${old})"]`).forEach(e => e.setAttribute("marker-start", `url(#${nu})`));
+      svg.querySelectorAll(`[marker-end="url(#${old})"]`).forEach(e => e.setAttribute("marker-end", `url(#${nu})`));
+      const typ = /^(ONLY_ONE|ZERO_OR_ONE)_(START|END)/.exec(old) ? "EN_" + RegExp.$2
+                : /^(ONE_OR_MORE|ZERO_OR_MORE)_(START|END)/.exec(old) ? "MANGA_" + RegExp.$2 : null;
+      if (!typ) return;
+      if (typ.startsWith("EN_") && svg.closest(".utan-en")) { m.innerHTML = ""; return; }   // bara kråkfoten: -----<
+      const k = ENKEL[typ];
+      m.setAttribute("markerWidth", k.w); m.setAttribute("markerHeight", 18);
+      m.setAttribute("refX", k.refX); m.setAttribute("refY", 9);
+      m.innerHTML = `<path d="${k.d}" fill="none" stroke="gray"></path>`;
+    });
+  });
+  document.querySelector(".slides").classList.add("ready");
+
+  const slides = [...document.querySelectorAll(".slide")];
+  const prev = document.getElementById("prev"), next = document.getElementById("next");
+  let current = 0;
+
+  function show(i) {
+    current = Math.max(0, Math.min(slides.length - 1, i));
+    slides.forEach((s, n) => s.classList.toggle("active", n === current));
+    document.getElementById("counter").textContent = `${current + 1} / ${slides.length}`;
+    prev.disabled = current === 0;
+    next.disabled = current === slides.length - 1;
+    history.replaceState(null, "", "#" + (current + 1));
+  }
+
+  function fullscreen() {
+    try {
+      if (document.fullscreenElement) document.exitFullscreen();
+      else document.getElementById("show").requestFullscreen();
+    } catch (e) { }
+  }
+
+  prev.onclick = () => show(current - 1);
+  next.onclick = () => show(current + 1);
+  document.getElementById("fs").onclick = fullscreen;
+  document.addEventListener("keydown", e => {
+    if (e.target.closest && e.target.closest("summary")) return;   // mellanslag öppnar svaret i quizet
+    if (e.key === "ArrowRight" || e.key === " " || e.key === "PageDown") { e.preventDefault(); show(current + 1); }
+    if (e.key === "ArrowLeft" || e.key === "PageUp") { e.preventDefault(); show(current - 1); }
+    if (e.key === "f" || e.key === "F") fullscreen();
+  });
+
+  show((parseInt(location.hash.slice(1)) || 1) - 1);
+</script>
+</body>
+</html>
