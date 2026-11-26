@@ -619,15 +619,15 @@ ORDER BY Milliseconds DESC;</code></pre>
 <ol>
   <li><code>FROM</code> först – utan en tabell finns inga rader att arbeta med.</li>
   <li><code>WHERE</code> sedan – rader som inte behövs sorteras bort tidigt, så blir det mindre att räkna på. Här finns bara tabellens egna kolumner.</li>
-  <li><code>SELECT</code> därefter – bygger resultatets kolumner. Det är här nya kolumner och alias som <code>MB</code> skapas.</li>
+  <li><code>SELECT</code> därefter – bygger resultatets kolumner. Det är här nya kolumner och alias som <code>Sekunder</code> skapas.</li>
   <li><code>ORDER BY</code> sist – sorterar det färdiga resultatet, så alla kolumner från <code>SELECT</code> finns redan.</li>
 </ol>
 <p>Att vi <i>skriver</i> <code>SELECT</code> först är för att frågan ska läsas som en mening: ”välj namn från Track där …”. Du beskriver <b>vad</b> du vill ha – databasen bestämmer <b>hur</b>.</p>
-<pre><code class="sql nohighlight">SELECT Name, Bytes / 1024.0 / 1024 AS MB
+<pre><code class="sql nohighlight">SELECT Name, Milliseconds / 1000 AS Sekunder
 FROM Track
-WHERE Bytes / 1024.0 / 1024 &gt; 100   -- här finns inte MB än
-ORDER BY MB DESC;                   -- här finns MB</code></pre>
-<p class="box">Därför kan du använda ett alias (<code>AS MB</code>) i <code>ORDER BY</code> men inte i <code>WHERE</code>.</p>
+WHERE Milliseconds / 1000 &gt; 300   -- här finns inte Sekunder än
+ORDER BY Sekunder DESC;            -- här finns Sekunder</code></pre>
+<p class="box">Därför kan du använda ett alias (<code>AS Sekunder</code>) i <code>ORDER BY</code> men inte i <code>WHERE</code>.</p>
 </section>
 
 <!-- ================= CHINOOK ================= -->
