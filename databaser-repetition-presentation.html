@@ -312,12 +312,12 @@ The duplicate key value is (1).</pre>
 <p>En <b>constraint</b> är en regel på en kolumn eller tabell. Databasen vägrar spara data som bryter mot regeln – oavsett vilket program som försöker.</p>
 <div class="scroll"><table style="font-size:.95rem">
   <tr><th>Constraint</th><th>Betyder</th><th>Exempel</th><th>Ungefär som i C#</th></tr>
-  <tr><td><code>PRIMARY KEY</code></td><td>Unikt id för varje rad – aldrig <code>NULL</code></td><td><code>ProduktId INT PRIMARY KEY</code></td><td>Objektets identitet</td></tr>
-  <tr><td><code>FOREIGN KEY</code></td><td>Måste peka på en rad som finns</td><td><code>KategoriId INT REFERENCES Kategori(KategoriId)</code></td><td>En referens som inte får peka på något som inte finns</td></tr>
-  <tr><td><code>NOT NULL</code></td><td>Måste ha ett värde</td><td><code>Namn NVARCHAR(100) NOT NULL</code></td><td><code>string</code> i stället för <code>string?</code></td></tr>
-  <tr><td><code>UNIQUE</code></td><td>Samma värde får inte finnas två gånger</td><td><code>Artikelnr NVARCHAR(20) UNIQUE</code></td><td>Som nycklarna i en <code>Dictionary</code></td></tr>
-  <tr><td><code>CHECK</code></td><td>Värdet måste uppfylla ett villkor</td><td><code>CHECK (Pris &gt;= 0)</code></td><td><code>if (pris &lt; 0) throw …</code></td></tr>
-  <tr><td><code>DEFAULT</code></td><td>Värde som används om inget anges</td><td><code>Aktiv BIT DEFAULT 1</code></td><td>Startvärde: <code>public bool Aktiv { get; set; } = true;</code></td></tr>
+  <tr><td><b><code>PRIMARY KEY</code></b></td><td>Unikt id för varje rad – aldrig <code>NULL</code></td><td><code>ProduktId INT PRIMARY KEY</code></td><td>Objektets identitet</td></tr>
+  <tr><td><b><code>FOREIGN KEY</code></b></td><td>Måste peka på en rad som finns</td><td><code>KategoriId INT REFERENCES Kategori(KategoriId)</code></td><td>En referens som inte får peka på något som inte finns</td></tr>
+  <tr><td><b><code>NOT NULL</code></b></td><td>Måste ha ett värde</td><td><code>Namn NVARCHAR(100) NOT NULL</code></td><td><code>string</code> i stället för <code>string?</code></td></tr>
+  <tr><td><b><code>UNIQUE</code></b></td><td>Samma värde får inte finnas två gånger</td><td><code>Artikelnr NVARCHAR(20) UNIQUE</code></td><td>Som nycklarna i en <code>Dictionary</code></td></tr>
+  <tr><td><b><code>CHECK</code></b></td><td>Värdet måste uppfylla ett villkor</td><td><code>CHECK (Pris &gt;= 0)</code></td><td><code>if (pris &lt; 0) throw …</code></td></tr>
+  <tr><td><b><code>DEFAULT</code></b></td><td>Värde som används om inget anges</td><td><code>Aktiv BIT DEFAULT 1</code></td><td>Startvärde: <code>public bool Aktiv { get; set; } = true;</code></td></tr>
 </table></div>
 <div class="tva-kol">
 <pre><code class="sql nohighlight">CREATE TABLE Produkt (
