@@ -42,6 +42,7 @@
   .quiz summary::marker { color: var(--accent); }
   .quiz details p { margin: 8px 0 4px; color: var(--muted); }
   .quiz details[open] p { color: var(--ink); }
+  .quiz details pre { margin: 8px 0 4px; font-size: clamp(13px, 1.6vw, 16px); }
   details.tips summary { color: var(--accent); }
 
   /* SQL-färger som i SSMS (mörkt tema) */
@@ -152,7 +153,14 @@ erDiagram
   <details><summary>1. Hur många album kan en artist ha?</summary><p>Många – kråkfoten står vid <code>ALBUM</code>.</p></details>
   <details><summary>2. Hur många artister har ett album?</summary><p>En – rak linje vid <code>ARTIST</code>.</p></details>
   <details><summary>3. Varför ligger <code>ArtistId</code> i <code>ALBUM</code> och inte tvärtom?</summary><p>FK ligger alltid på <b>många-sidan</b>. Ett album har en artist – men en artist kan inte ha en kolumn för varje album.</p></details>
-  <details><summary>4. Hur skulle <code>Album</code> se ut som C#-klass?</summary><p><code>int AlbumId</code>, <code>string Title</code> och en referens <code>Artist Artist</code> – plus <code>List&lt;Track&gt; Tracks</code>.</p></details>
+  <details><summary>4. Hur skulle <code>Album</code> se ut som C#-klass?</summary><pre><code>class Album
+{
+    public int AlbumId { get; set; }
+    public string Title { get; set; }
+
+    public Artist Artist { get; set; }
+    public List&lt;Track&gt; Tracks { get; set; } = new();
+}</code></pre></details>
 </div>
 </section>
 
