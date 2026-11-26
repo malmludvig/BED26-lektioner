@@ -51,10 +51,11 @@
   .ikonrad figcaption { font-weight: 600; }
   .ikonrad span { font-size: 2rem; color: var(--muted); }
 
-  /* SQL-färger som i SSMS (mörkt tema) */
-  .sq-k { color: #569cd6; } .sq-s { color: #d69d85; } .sq-c { color: #57a64a; } .sq-n { color: #b5cea8; } .sq-f { color: #d8a0df; }
+  /* SQL i ljust tema som i SSMS – C# är mörkt, så de går lätt att skilja åt */
+  pre:has(code.sql) { background: #ffffff; color: #000000; border: 1px solid var(--line); }
+  .sq-k { color: #0000ff; } .sq-o { color: #808080; } .sq-s { color: #ff0000; } .sq-c { color: #008000; } .sq-n { color: #000000; } .sq-f { color: #ff00ff; }
   /* Felmeddelanden från SSMS */
-  pre.fel { background: #1e1e1e; color: #f48771; font-size: clamp(13px, 1.8vw, 16px); white-space: pre-wrap; }
+  pre.fel { background: #ffffff; color: #ff0000; border: 1px solid var(--line); font-size: clamp(13px, 1.8vw, 16px); white-space: pre-wrap; }
   .null { color: var(--muted); font-style: italic; }
 
   .controls { display: flex; align-items: center; justify-content: space-between; gap: 12px; border-top: 1px solid var(--line); padding-top: 12px; margin-top: 24px; }
@@ -955,18 +956,19 @@ WHERE ArtistId = 276;</code></pre>
 </main>
 <script src="vs.js"></script>
 <script>
-  // Färgkodar SQL som i SSMS (mörkt tema)
-  const sqlOrd = "SELECT|FROM|WHERE|AND|OR|NOT|IN|BETWEEN|LIKE|IS|NULL|ORDER|BY|ASC|DESC|TOP|DISTINCT|AS|INSERT|INTO|VALUES|CREATE|DATABASE|TABLE|USE|GO|PRIMARY|FOREIGN|KEY|REFERENCES|INT|NVARCHAR|VARCHAR|DATE|DATETIME|NUMERIC|DECIMAL|LIMIT";
-  const sqlMönster = new RegExp(`(--.*)|(N?'(?:[^']|'')*')|\\b(\\d+(?:\\.\\d+)?)\\b|\\b(YEAR)(?=\\()|\\b(${sqlOrd})\\b`, "g");
+  // Färgkodar SQL som i SSMS (ljust tema): nyckelord blå, operatorer grå, text röd, kommentarer gröna
+  const sqlOrd = "SELECT|FROM|WHERE|ORDER|BY|ASC|DESC|TOP|DISTINCT|AS|INSERT|INTO|VALUES|CREATE|DATABASE|TABLE|USE|GO|PRIMARY|FOREIGN|KEY|REFERENCES|INT|NVARCHAR|VARCHAR|DATE|DATETIME|NUMERIC|DECIMAL|LIMIT";
+  const sqlOp = "AND|OR|NOT|IN|BETWEEN|LIKE|IS|NULL";
+  const sqlMönster = new RegExp(`(--.*)|(N?'(?:[^']|'')*')|\\b(\\d+(?:\\.\\d+)?)\\b|\\b(YEAR)(?=\\()|\\b(${sqlOrd})\\b|\\b(${sqlOp})\\b|([=<>*+/(),;]|-(?!-))`, "g");
   const sqlEsc = s => s.replace(/&/g, "&amp;").replace(/</g, "&lt;");
   document.querySelectorAll("code.sql").forEach(b => {
     const text = b.textContent;
     let html = "", sist = 0;
     for (const m of text.matchAll(sqlMönster)) {
-      const [t, kom, str, tal, fn] = m;
+      const [t, kom, str, tal, fn, ord] = m;
       html += sqlEsc(text.slice(sist, m.index));
       sist = m.index + t.length;
-      const klass = kom ? "sq-c" : str ? "sq-s" : tal ? "sq-n" : fn ? "sq-f" : "sq-k";
+      const klass = kom ? "sq-c" : str ? "sq-s" : tal ? "sq-n" : fn ? "sq-f" : ord ? "sq-k" : "sq-o";
       html += `<span class="${klass}">${sqlEsc(t)}</span>`;
     }
     b.innerHTML = html + sqlEsc(text.slice(sist));
