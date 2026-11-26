@@ -313,6 +313,37 @@ The duplicate key value is (1).</pre>
 </section>
 
 <section class="slide">
+  <h2>Constraints – regler som skyddar datan</h2>
+<p>En <b>constraint</b> är en regel på en kolumn eller tabell. Databasen vägrar spara data som bryter mot regeln – oavsett vilket program som försöker.</p>
+<div class="scroll"><table style="font-size:.95rem">
+  <tr><th>Constraint</th><th>Betyder</th><th>Exempel</th><th>Ungefär som i C#</th></tr>
+  <tr><td><code>PRIMARY KEY</code></td><td>Unikt id för varje rad – aldrig <code>NULL</code></td><td><code>ProduktId INT PRIMARY KEY</code></td><td>Objektets identitet</td></tr>
+  <tr><td><code>FOREIGN KEY</code></td><td>Måste peka på en rad som finns</td><td><code>KategoriId INT REFERENCES Kategori(KategoriId)</code></td><td>En referens som inte får peka på något som inte finns</td></tr>
+  <tr><td><code>NOT NULL</code></td><td>Måste ha ett värde</td><td><code>Namn NVARCHAR(100) NOT NULL</code></td><td><code>string</code> i stället för <code>string?</code></td></tr>
+  <tr><td><code>UNIQUE</code></td><td>Samma värde får inte finnas två gånger</td><td><code>Artikelnr NVARCHAR(20) UNIQUE</code></td><td>Som nycklarna i en <code>Dictionary</code></td></tr>
+  <tr><td><code>CHECK</code></td><td>Värdet måste uppfylla ett villkor</td><td><code>CHECK (Pris &gt;= 0)</code></td><td><code>if (pris &lt; 0) throw …</code></td></tr>
+  <tr><td><code>DEFAULT</code></td><td>Värde som används om inget anges</td><td><code>Aktiv BIT DEFAULT 1</code></td><td>Startvärde: <code>public bool Aktiv { get; set; } = true;</code></td></tr>
+</table></div>
+<div class="tva-kol">
+<pre><code class="sql nohighlight">CREATE TABLE Produkt (
+    ProduktId  INT PRIMARY KEY,
+    Artikelnr  NVARCHAR(20) NOT NULL UNIQUE,
+    Namn       NVARCHAR(100) NOT NULL,
+    Pris       DECIMAL(10,2) NOT NULL CHECK (Pris &gt;= 0),
+    Aktiv      BIT NOT NULL DEFAULT 1,
+    KategoriId INT REFERENCES Kategori(KategoriId)
+);</code></pre>
+<div>
+<pre><code class="sql nohighlight">INSERT INTO Produkt (ProduktId, Artikelnr, Namn, Pris)
+VALUES (1, N'A-100', N'Kaffe', -5);</code></pre>
+<pre class="fel">Msg 547, Level 16, State 0
+The INSERT statement conflicted with the CHECK constraint "CK__Produkt__Pris__4AB81AF0". The conflict occurred in database "Butik", table "dbo.Produkt", column 'Pris'.</pre>
+</div>
+</div>
+<p class="box"><b>Varför i databasen och inte bara i C#?</b> Många program kan skriva till samma databas – en webbsida, en app, ett importskript. En constraint gäller för alla, alltid. Mer om constraints på måndag.</p>
+</section>
+
+<section class="slide">
   <h2>SELECT och WHERE</h2>
 <div class="tva-kol">
 <pre><code class="sql nohighlight">-- Allt i tabellen
