@@ -44,6 +44,8 @@
   .quiz details[open] p { color: var(--ink); }
   .quiz details pre { margin: 8px 0 4px; font-size: clamp(13px, 1.6vw, 16px); }
   details.tips summary { color: var(--accent); }
+  /* Felmeddelanden i tabellen Vanliga fel */
+  .felmed { color: #ff0000; font-family: ui-monospace, Consolas, monospace; font-size: .95em; }
   /* Facit upp och ned – syns direkt men går inte att läsa i förbifarten */
   .facit-quiz > div { background: var(--card); border: 1px solid var(--line); border-radius: 8px; padding: 8px 14px; }
   .facit-quiz .fraga { font-weight: 600; margin: 0 0 6px; }
@@ -856,13 +858,13 @@ WHERE ArtistId = 276;</code></pre>
   <h2>Vanliga fel</h2>
 <div class="scroll"><table>
   <tr><th>Du skriver</th><th>Det blir</th><th>Rätta till</th></tr>
-  <tr><td><code>WHERE Country = "Sweden"</code></td><td><i>Invalid column name 'Sweden'</i></td><td>Enkla citattecken: <code>'Sweden'</code></td></tr>
-  <tr><td><code>SELECT * FROM Customer</code></td><td><i>Invalid object name 'Customer'</i></td><td>Fel databas – kör <code>USE Chinook;</code></td></tr>
+  <tr><td><code>WHERE Country = "Sweden"</code></td><td><span class="felmed">Invalid column name 'Sweden'</span></td><td>Enkla citattecken: <code>'Sweden'</code></td></tr>
+  <tr><td><code>SELECT * FROM Customer</code></td><td><span class="felmed">Invalid object name 'Customer'</span></td><td>Fel databas – kör <code>USE Chinook;</code></td></tr>
   <tr><td><code>WHERE Company = NULL</code></td><td>Noll rader, inget fel</td><td><code>IS NULL</code></td></tr>
   <tr><td><code>Milliseconds / 60000</code></td><td>Hela minuter, decimalerna försvinner</td><td><code>60000.0</code></td></tr>
-  <tr><td><code>'Let's Get It Up'</code></td><td>Texten tar slut efter <i>Let</i></td><td>Dubbla apostrofen: <code>'Let''s Get It Up'</code></td></tr>
+  <tr><td><code>'Let's Get It Up'</code></td><td><span class="felmed">Unclosed quotation mark after the character string …</span></td><td>Dubbla apostrofen: <code>'Let''s Get It Up'</code></td></tr>
   <tr><td><code>VALUES (26, 'Göteborgsrock')</code></td><td>Risk för konstiga tecken</td><td><code>N'Göteborgsrock'</code></td></tr>
-  <tr><td><code>ORDER BY …</code> före <code>WHERE …</code></td><td><i>Incorrect syntax near the keyword 'WHERE'</i></td><td>Ordningen: <code>SELECT – FROM – WHERE – ORDER BY</code></td></tr>
+  <tr><td><code>ORDER BY …</code> före <code>WHERE …</code></td><td><span class="felmed">Incorrect syntax near the keyword 'WHERE'</span></td><td>Ordningen: <code>SELECT – FROM – WHERE – ORDER BY</code></td></tr>
 </table></div>
 <p class="box">SQL Server bryr sig oftast inte om stora eller små bokstäver i texten: <code>'sweden'</code> hittar <code>Sweden</code>. Det beror på databasens inställning (<i>collation</i>).</p>
 </section>
