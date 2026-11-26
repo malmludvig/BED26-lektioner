@@ -781,36 +781,6 @@ erDiagram
 </section>
 
 <section class="slide">
-  <h2>Exempel: WHERE med IN, LIKE och NULL</h2>
-<div class="tva-kol">
-<pre><code class="sql nohighlight">-- Tre utvalda genrer
-SELECT *
-FROM Genre
-WHERE Name IN ('Rock', 'Metal', 'Jazz');
-
--- Artister som börjar med "The "
-SELECT Name
-FROM Artist
-WHERE Name LIKE 'The %';    -- 14 st
-
--- Låtar utan kompositör
-SELECT Name
-FROM Track
-WHERE Composer IS NULL;     -- 977 st</code></pre>
-<div>
-<div class="scroll"><table>
-  <tr><th>Mönster</th><th>Matchar</th></tr>
-  <tr><td><code>'The %'</code></td><td>Börjar med "The " – The Doors, The Who</td></tr>
-  <tr><td><code>'%Greatest%'</code></td><td>Innehåller "Greatest" någonstans</td></tr>
-  <tr><td><code>'%Live'</code></td><td>Slutar med "Live"</td></tr>
-  <tr><td><code>'_a%'</code></td><td>Andra bokstaven är a</td></tr>
-</table></div>
-<p style="font-size:1.05rem">Tänk på mellanslaget: <code>'Love%'</code> matchar även <i>Lovely</i>. <code>'Love %'</code> matchar bara när Love är ett eget ord.</p>
-</div>
-</div>
-</section>
-
-<section class="slide">
   <h2>Exempel: räkna och döpa kolumner</h2>
 <pre><code class="sql nohighlight">SELECT Name,
        Bytes / 1024.0 / 1024 AS MB
