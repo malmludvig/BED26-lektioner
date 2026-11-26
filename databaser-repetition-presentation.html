@@ -743,12 +743,13 @@ erDiagram
   <h2>Breakout: utforska Chinook</h2>
 <p>Installera databasen och öppna <b>Tables → Keys</b> i Object Explorer. Diskutera i gruppen:</p>
 <div class="quiz facit-quiz">
-  <details><summary>1. Vilken tabell är en kopplingstabell för många till många?</summary><p class="facit"><code>PlaylistTrack</code> – en spellista har många låtar, en låt finns i många spellistor.</p></details>
-  <details><summary>2. <code>InvoiceLine</code> kopplar också ihop två tabeller. Vilka – och vad har den mer?</summary><p class="facit"><code>Invoice</code> och <code>Track</code>. Den har egna attribut: <code>UnitPrice</code> och <code>Quantity</code> – som <code>Betyg</code> i skolexemplet.</p></details>
-  <details><summary>3. <code>Employee.ReportsTo</code> pekar på … vad?</summary><p class="facit">På <code>Employee</code> själv. En anställd har en chef, som också är en anställd. I C#: <code>public Employee? Manager</code>.</p></details>
-  <details><summary>4. Vilka kolumner i <code>Customer</code> får vara <code>NULL</code>?</summary><p class="facit">Allt utom <code>CustomerId</code>, <code>FirstName</code>, <code>LastName</code> och <code>Email</code>. Kolla under <b>Columns</b> i Object Explorer.</p></details>
-  <details><summary>5. Skriv C#-klassen för <code>Album</code>.</summary><p class="facit"><code>int AlbumId</code>, <code>string Title</code>, <code>Artist Artist</code> och <code>List&lt;Track&gt; Tracks</code>.</p></details>
-  <details><summary>6. Varför har <code>Invoice</code> egna adresskolumner i stället för att bara använda kundens?</summary><p class="facit">Fakturan ska visa adressen <i>när köpet gjordes</i> – även om kunden flyttar senare.</p></details>
+  <details><summary>1. Hur många tabeller finns det i Chinook?</summary><p class="facit">11: <code>Album</code>, <code>Artist</code>, <code>Customer</code>, <code>Employee</code>, <code>Genre</code>, <code>Invoice</code>, <code>InvoiceLine</code>, <code>MediaType</code>, <code>Playlist</code>, <code>PlaylistTrack</code> och <code>Track</code>.</p></details>
+  <details><summary>2. Vilken tabell är en kopplingstabell för många till många?</summary><p class="facit"><code>PlaylistTrack</code> – en spellista har många låtar, en låt finns i många spellistor.</p></details>
+  <details><summary>3. <code>InvoiceLine</code> kopplar också ihop två tabeller. Vilka – och vad har den mer?</summary><p class="facit"><code>Invoice</code> och <code>Track</code>. Den har egna attribut: <code>UnitPrice</code> och <code>Quantity</code> – som <code>Betyg</code> i skolexemplet.</p></details>
+  <details><summary>4. <code>Employee.ReportsTo</code> pekar på … vad?</summary><p class="facit">På <code>Employee</code> själv. En anställd har en chef, som också är en anställd. I C#: <code>public Employee? Manager</code>.</p></details>
+  <details><summary>5. Vilka kolumner i <code>Customer</code> får vara <code>NULL</code>?</summary><p class="facit">Allt utom <code>CustomerId</code>, <code>FirstName</code>, <code>LastName</code> och <code>Email</code>. Kolla under <b>Columns</b> i Object Explorer.</p></details>
+  <details><summary>6. Skriv C#-klassen för <code>Album</code>.</summary><p class="facit"><code>int AlbumId</code>, <code>string Title</code>, <code>Artist Artist</code> och <code>List&lt;Track&gt; Tracks</code>.</p></details>
+  <details><summary>7. Varför har <code>Invoice</code> egna adresskolumner i stället för att bara använda kundens?</summary><p class="facit">Fakturan ska visa adressen <i>när köpet gjordes</i> – även om kunden flyttar senare.</p></details>
 </div>
 </section>
 
