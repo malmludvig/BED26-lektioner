@@ -301,6 +301,23 @@ WHERE KlassId = 1;</code></pre>
 <p style="font-size:1.05rem"><code>SELECT</code> väljer <b>kolumner</b>. <code>WHERE</code> väljer <b>rader</b>. <code>FROM</code> säger vilken tabell.</p>
 </div>
 </div>
+<div class="quiz" style="grid-template-columns:1fr;margin-top:12px">
+  <details><summary>Hur skulle man skriva detta i C#-kod?</summary>
+<pre><code>List&lt;Elev&gt; elever = …;
+
+// Allt i listan
+var alla = elever;
+
+// Bara vissa egenskaper
+var namnOchFodd = elever.Select(e =&gt; new { e.Namn, e.Fodd });
+
+// Bara vissa objekt
+var klass1 = elever
+    .Where(e =&gt; e.KlassId == 1)
+    .Select(e =&gt; e.Namn);</code></pre>
+<p><code>SELECT</code> blir <code>.Select()</code>, <code>WHERE</code> blir <code>.Where()</code> och <code>FROM Elev</code> är listan <code>elever</code>.</p>
+  </details>
+</div>
 </section>
 
 <!-- ================= RADER OCH OBJEKT ================= -->
