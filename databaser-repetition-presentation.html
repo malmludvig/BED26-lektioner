@@ -419,19 +419,18 @@ customers.Add(joakim);</code></pre>
 </section>
 
 <section class="slide">
-  <h2>En tabell = en lista med objekt</h2>
-<div class="tva-kol">
-<div>
-<p class="etikett">SQL</p>
+  <h2>En tabell = en lista med objekt: SQL</h2>
 <pre><code class="sql nohighlight">-- Tabellen Customer
 
-
+-- Alla kunder
 SELECT * FROM Customer;
 
-
+-- Lägg till en kund
 INSERT INTO Customer (…) VALUES (…);</code></pre>
-</div>
-</div>
+</section>
+
+<section class="slide">
+  <h2>En tabell = en lista med objekt</h2>
 <div class="scroll"><table>
   <tr><th>Databas</th><th>C#</th></tr>
   <tr><td>Tabell</td><td>Klass – och alla rader tillsammans är som en <code>List&lt;T&gt;</code></td></tr>
