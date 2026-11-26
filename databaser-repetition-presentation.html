@@ -615,6 +615,14 @@ ORDER BY Milliseconds DESC;</code></pre>
   <tr><td>3. <code>WHERE</code></td><td>2</td><td>Filtrerar rader</td></tr>
   <tr><td>4. <code>ORDER BY</code></td><td>4</td><td>Sorterar resultatet</td></tr>
 </table></div>
+<p><b>Varför just den ordningen?</b> Varje steg bygger på resultatet från steget före:</p>
+<ol>
+  <li><code>FROM</code> först – utan en tabell finns inga rader att arbeta med.</li>
+  <li><code>WHERE</code> sedan – rader som inte behövs sorteras bort tidigt, så blir det mindre att räkna på. Här finns bara tabellens egna kolumner.</li>
+  <li><code>SELECT</code> därefter – bygger resultatets kolumner. Det är här nya kolumner och alias som <code>MB</code> skapas.</li>
+  <li><code>ORDER BY</code> sist – sorterar det färdiga resultatet, så alla kolumner från <code>SELECT</code> finns redan.</li>
+</ol>
+<p>Att vi <i>skriver</i> <code>SELECT</code> först är för att frågan ska läsas som en mening: ”välj namn från Track där …”. Du beskriver <b>vad</b> du vill ha – databasen bestämmer <b>hur</b>.</p>
 <pre><code class="sql nohighlight">SELECT Name, Bytes / 1024.0 / 1024 AS MB
 FROM Track
 WHERE Bytes / 1024.0 / 1024 &gt; 100   -- här finns inte MB än
