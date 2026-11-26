@@ -644,7 +644,7 @@ erDiagram
 
 <section class="slide">
   <h2>Chinook: försäljningen</h2>
-<pre class="mermaid utan-en stor">
+<pre class="mermaid utan-en">
 %%{init: {"er": {"layoutDirection": "LR"}}}%%
 erDiagram
     EMPLOYEE ||--o{ EMPLOYEE : "är chef för"
@@ -685,6 +685,7 @@ erDiagram
         string Name
     }
 </pre>
+<p class="box"><b>Employee → Employee</b> är en <b>rekursiv relation</b> (<i>Recursive Relationship</i>), även kallad <b>självrefererande relation</b> (<i>Self-referencing Relationship</i>) eller <b>unär relation</b> (<i>Unary Relationship</i>). Kolumnen <code>ReportsTo</code> pekar på <code>EmployeeId</code> i <b>samma</b> tabell: en anställd har en chef – som också är en anställd.</p>
 </section>
 
 <section class="slide">
