@@ -67,9 +67,7 @@
   /* Felmeddelanden i tabellen Vanliga fel */
   .felmed { color: #ff0000; font-family: ui-monospace, Consolas, monospace; font-size: .95em; }
   /* Facit upp och ned – syns direkt men går inte att läsa i förbifarten */
-  .facit-quiz > div { background: var(--card); border: 1px solid var(--line); border-radius: 8px; padding: 8px 14px; }
-  .facit-quiz .fraga { font-weight: 600; margin: 0 0 6px; }
-  .facit-quiz .facit { transform: rotate(180deg); color: var(--muted); font-size: 1rem; margin: 0; border-top: 1px dashed var(--line); padding-top: 6px; }
+  .facit-quiz .facit { transform: rotate(180deg); font-size: 1rem; border-top: 1px dashed var(--line); padding-top: 6px; }
   /* Ikoner för SQL och LINQ */
   .ikonrad { display: flex; align-items: center; justify-content: space-between; margin: 4px 0 8px; }
   .ikonrad figure { margin: 0; display: flex; align-items: center; gap: 12px; }
@@ -745,12 +743,12 @@ erDiagram
   <h2>Breakout: utforska Chinook</h2>
 <p>Installera databasen och öppna <b>Tables → Keys</b> i Object Explorer. Diskutera i gruppen:</p>
 <div class="quiz facit-quiz">
-  <div><p class="fraga">1. Vilken tabell är en kopplingstabell för många till många?</p><p class="facit"><code>PlaylistTrack</code> – en spellista har många låtar, en låt finns i många spellistor.</p></div>
-  <div><p class="fraga">2. <code>InvoiceLine</code> kopplar också ihop två tabeller. Vilka – och vad har den mer?</p><p class="facit"><code>Invoice</code> och <code>Track</code>. Den har egna attribut: <code>UnitPrice</code> och <code>Quantity</code> – som <code>Betyg</code> i skolexemplet.</p></div>
-  <div><p class="fraga">3. <code>Employee.ReportsTo</code> pekar på … vad?</p><p class="facit">På <code>Employee</code> själv. En anställd har en chef, som också är en anställd. I C#: <code>public Employee? Manager</code>.</p></div>
-  <div><p class="fraga">4. Vilka kolumner i <code>Customer</code> får vara <code>NULL</code>?</p><p class="facit">Allt utom <code>CustomerId</code>, <code>FirstName</code>, <code>LastName</code> och <code>Email</code>. Kolla under <b>Columns</b> i Object Explorer.</p></div>
-  <div><p class="fraga">5. Skriv C#-klassen för <code>Album</code>.</p><p class="facit"><code>int AlbumId</code>, <code>string Title</code>, <code>Artist Artist</code> och <code>List&lt;Track&gt; Tracks</code>.</p></div>
-  <div><p class="fraga">6. Varför har <code>Invoice</code> egna adresskolumner i stället för att bara använda kundens?</p><p class="facit">Fakturan ska visa adressen <i>när köpet gjordes</i> – även om kunden flyttar senare.</p></div>
+  <details><summary>1. Vilken tabell är en kopplingstabell för många till många?</summary><p class="facit"><code>PlaylistTrack</code> – en spellista har många låtar, en låt finns i många spellistor.</p></details>
+  <details><summary>2. <code>InvoiceLine</code> kopplar också ihop två tabeller. Vilka – och vad har den mer?</summary><p class="facit"><code>Invoice</code> och <code>Track</code>. Den har egna attribut: <code>UnitPrice</code> och <code>Quantity</code> – som <code>Betyg</code> i skolexemplet.</p></details>
+  <details><summary>3. <code>Employee.ReportsTo</code> pekar på … vad?</summary><p class="facit">På <code>Employee</code> själv. En anställd har en chef, som också är en anställd. I C#: <code>public Employee? Manager</code>.</p></details>
+  <details><summary>4. Vilka kolumner i <code>Customer</code> får vara <code>NULL</code>?</summary><p class="facit">Allt utom <code>CustomerId</code>, <code>FirstName</code>, <code>LastName</code> och <code>Email</code>. Kolla under <b>Columns</b> i Object Explorer.</p></details>
+  <details><summary>5. Skriv C#-klassen för <code>Album</code>.</summary><p class="facit"><code>int AlbumId</code>, <code>string Title</code>, <code>Artist Artist</code> och <code>List&lt;Track&gt; Tracks</code>.</p></details>
+  <details><summary>6. Varför har <code>Invoice</code> egna adresskolumner i stället för att bara använda kundens?</summary><p class="facit">Fakturan ska visa adressen <i>när köpet gjordes</i> – även om kunden flyttar senare.</p></details>
 </div>
 </section>
 
