@@ -325,6 +325,74 @@ priser[(65, 2100)] // (InvoiceId, TrackId) → UnitPrice</code></pre>
 <p>Ett klassiskt sätt att minnas reglerna, som en ed i rätten: varje kolumn ska bero på <b>nyckeln</b> (1NF), på <b>hela nyckeln</b> (2NF) och på <b>inget annat än nyckeln</b> (3NF).</p>
 <p class="box">Normalformerna beskrevs av <b>Edgar F. Codd</b> på IBM, samme person som uppfann relationsmodellen 1970. Det finns fler normalformer (BCNF, 4NF, 5NF), men i praktiken räcker 3NF för nästan alla system – och det är 3NF som kursen kräver.</p>
 
+<h2 id="del7">7. 1NF – ett värde per cell</h2>
+<p>Före 1NF kallas en tabell ibland för <b>onormaliserad</b> (0NF). Så här kunde Joakims faktura 65 se ut om man sparade den som en rad:</p>
+<div class="scroll"><table>
+  <tr><th>InvoiceId</th><th>InvoiceDate</th><th>Customer</th><th>Tracks</th></tr>
+  <tr><td>65</td><td>2021-10-08</td><td>Joakim Johansson</td><td class="fel-varde">I Don't Know, Flying High Again, No More Tears, Crazy Train</td></tr>
+</table></div>
+<ul>
+  <li>Hur hittar man alla fakturor med <i>Crazy Train</i>? Med <code>LIKE '%Crazy Train%'</code> – och hoppas att ingen har stavat fel.</li>
+  <li>Hur räknar man antalet låtar, eller sätter ett pris per låt?</li>
+  <li>En lista kan inte innehålla främmande nycklar – det finns inget <code>TrackId</code> att peka med.</li>
+</ul>
+<p>Lika dåligt är att lösa det med kolumnerna <code>Track1</code>, <code>Track2</code>, <code>Track3</code> och <code>Track4</code>. Joakims faktura 271 har 14 låtar – ska tabellen ha 14 kolumner? Och hur söker man i alla på en gång?</p>
+<p><b>Lösningen i 1NF:</b> en rad per låt på fakturan – precis som kvittotabellen i avsnitt 3. Varje cell har ett värde.</p>
+<p>Varje rad måste också gå att skilja från de andra med en <b>primärnyckel</b>. Varken <code>InvoiceId</code> eller <code>TrackId</code> räcker ensam: faktura 65 har fyra rader, och samma låt kan finnas på många fakturor. Men <b>tillsammans</b> är de unika:</p>
+<p class="box">Kvittotabellens primärnyckel: <b>(InvoiceId, TrackId)</b> – en <b>sammansatt nyckel</b> (<i>composite key</i>). Kvittotabellen är nu i 1NF – men fortfarande full av upprepningar.</p>
+<div class="tva-kol">
+<p><b>I C#</b> skulle du aldrig spara låtarna som en sträng med kommatecken – du skulle använda en lista. I en databas blir en lista <b>fler rader</b>.</p>
+<pre><code>// 0NF
+public string Tracks { get; set; }   // "I Don't Know, Flying High Again, …"
+
+// 1NF-tänk
+public List&lt;Track&gt; Tracks { get; set; } = new();</code></pre>
+</div>
+
+<h2 id="del8">8. 1NF i Chinook: kolumnen Composer</h2>
+<p>Chinook är en välgjord databas – men den har ett ställe som bryter mot 1NF. Titta på kolumnen <code>Composer</code> i <code>Track</code>:</p>
+<pre><code class="sql nohighlight">SELECT TrackId, Name, Composer
+FROM Track
+WHERE TrackId IN (1, 2, 3);</code></pre>
+<div class="scroll"><table>
+  <tr><th>TrackId</th><th>Name</th><th>Composer</th></tr>
+  <tr><td>1</td><td>For Those About To Rock (We Salute You)</td><td>Angus Young, Malcolm Young, Brian Johnson</td></tr>
+  <tr><td>2</td><td>Balls to the Wall</td><td>U. <b>Dirkschneider</b>, W. <b>Hoffmann</b>, H. Frank, P. Baltes, S. <b>Kaufmann</b>, G. Hoffmann</td></tr>
+  <tr><td>3</td><td>Fast As a Shark</td><td>F. Baltes, S. <b>Kaufman</b>, U. <b>Dirkscneider</b> &amp; W. <b>Hoffman</b></td></tr>
+</table></div>
+<p>En cell innehåller en <b>lista</b> med upphovspersoner – över 1 200 låtar i Chinook har flera namn i samma cell. Och se på låt 2 och 3: samma personer är stavade på olika sätt, och listan är ibland separerad med komma och ibland med <code>&amp;</code>.</p>
+<pre><code class="sql nohighlight">SELECT Name
+FROM Track
+WHERE Composer LIKE '%Dirkschneider%';
+-- 1 rad: bara Balls to the Wall. Låt 3 och 4 missas på grund av stavfelet.</code></pre>
+<p class="box">Det här är uppdateringsanomalin i verkligheten: samma uppgift har skrivits in på många ställen, för hand, och har glidit isär. Hade varje person funnits på <b>en</b> rad i en egen tabell hade stavfelet inte kunnat uppstå.</p>
+<p><b>Lösningen:</b> en låt kan ha många upphovspersoner och en person kan ha skrivit många låtar – en <b>många till många</b>-relation. Den löses med en kopplingstabell, precis som <code>PlaylistTrack</code>:</p>
+<pre class="mermaid utan-en exempel-er stor">
+%%{init: {"er": {"layoutDirection": "LR"}}}%%
+erDiagram
+    TRACK ||--o{ TRACKCOMPOSER : "skrivs av"
+    COMPOSER ||--o{ TRACKCOMPOSER : "har skrivit"
+    TRACK {
+        int TrackId PK
+        string Name
+    }
+    TRACKCOMPOSER {
+        int TrackId PK, FK
+        int ComposerId PK, FK
+    }
+    COMPOSER {
+        int ComposerId PK
+        string Name
+    }
+</pre>
+<pre><code>class Track
+{
+    public int TrackId { get; set; }
+    public string Name { get; set; }
+    public List&lt;Composer&gt; Composers { get; set; } = new();   // i stället för string Composer
+}</code></pre>
+<p>Vi skriver <code>CREATE TABLE</code> för de två nya tabellerna i <a href="#del15">avsnitt 15</a>, när vi har gått igenom constraints.</p>
+
 </main>
 <script type="module">
   import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.esm.min.mjs";
