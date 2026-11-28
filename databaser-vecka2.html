@@ -225,6 +225,69 @@ SELECT * FROM Genre WHERE GenreId = 26;</code></pre>
   <tr><td>A13</td><td><code>INSERT INTO Genre … VALUES (26, N'Svensk pop')</code></td><td><code>genres.Add(new Genre { GenreId = 26, Name = "Svensk pop" })</code></td></tr>
 </table></div>
 
+<h2 id="del3">3. Varför normalisering? Joakims kvitton</h2>
+<p>Tänk dig att någon har exporterat Joakim Johanssons två första köp till <b>ett enda</b> Excel-ark. Allt finns med – men titta på hur mycket som upprepas.</p>
+<div class="scroll bred"><table>
+  <tr><th>InvoiceId</th><th>InvoiceDate</th><th>CustomerId</th><th>Customer</th><th>Email</th><th>TrackId</th><th>Track</th><th>Album</th><th>Artist</th><th>Genre</th><th>UnitPrice</th><th>Quantity</th></tr>
+  <tr><td>42</td><td>2021-07-06</td><td class="upprepad">51</td><td class="upprepad">Joakim Johansson</td><td class="upprepad">joakim.johansson@yahoo.se</td><td>1391</td><td>Invaders</td><td>The Number of The Beast</td><td>Iron Maiden</td><td>Metal</td><td>0.99</td><td>1</td></tr>
+  <tr><td>42</td><td>2021-07-06</td><td class="upprepad">51</td><td class="upprepad">Joakim Johansson</td><td class="upprepad">joakim.johansson@yahoo.se</td><td>1392</td><td>Run to the Hills</td><td>The Number of The Beast</td><td>Iron Maiden</td><td>Metal</td><td>0.99</td><td>1</td></tr>
+  <tr><td>65</td><td>2021-10-08</td><td class="upprepad">51</td><td class="upprepad">Joakim Johansson</td><td class="upprepad">joakim.johansson@yahoo.se</td><td>2094</td><td>I Don't Know</td><td>Blizzard of Ozz</td><td>Ozzy Osbourne</td><td>Rock</td><td>0.99</td><td>1</td></tr>
+  <tr><td>65</td><td>2021-10-08</td><td class="upprepad">51</td><td class="upprepad">Joakim Johansson</td><td class="upprepad">joakim.johansson@yahoo.se</td><td>2096</td><td>Flying High Again</td><td>Diary of a Madman (Remastered)</td><td>Ozzy Osbourne</td><td>Rock</td><td>0.99</td><td>1</td></tr>
+  <tr><td>65</td><td>2021-10-08</td><td class="upprepad">51</td><td class="upprepad">Joakim Johansson</td><td class="upprepad">joakim.johansson@yahoo.se</td><td>2098</td><td>No More Tears</td><td>No More Tears (Remastered)</td><td>Ozzy Osbourne</td><td>Rock</td><td>0.99</td><td>1</td></tr>
+  <tr><td>65</td><td>2021-10-08</td><td class="upprepad">51</td><td class="upprepad">Joakim Johansson</td><td class="upprepad">joakim.johansson@yahoo.se</td><td>2100</td><td>Crazy Train</td><td>Tribute</td><td>Ozzy Osbourne</td><td>Metal</td><td>0.99</td><td>1</td></tr>
+</table></div>
+<p>Datan är hämtad ur Chinook – fakturorna 42 och 65. Joakims namn och e-post står <b>sex gånger</b>, <i>Ozzy Osbourne</i> fyra gånger och varje fakturadatum flera gånger. Och det här är bara två fakturor av Joakims sju, och Joakim är en kund av 59.</p>
+
+<p><b>Normalisering</b> betyder att dela upp en tabell i flera mindre, så att varje uppgift sparas på <b>ett</b> ställe. Det är inte bara för att spara plats – upprepningen ställer till tre problem, så kallade <b>anomalier</b>:</p>
+<div class="scroll"><table>
+  <tr><th>Anomali</th><th>Vad händer i kvittotabellen?</th></tr>
+  <tr><td><b>Uppdateringsanomali</b> (<i>update anomaly</i>)</td><td>Joakim byter e-post. Då måste <b>sex rader</b> ändras – missar man en finns det två olika e-postadresser, och ingen vet vilken som är rätt.</td></tr>
+  <tr><td><b>Insättningsanomali</b> (<i>insert anomaly</i>)</td><td>En ny kund registrerar sig men har inte köpt något än. Var sparas hen? Det går inte utan en faktura och en låt. Samma sak med en ny låt som ingen har köpt.</td></tr>
+  <tr><td><b>Borttagningsanomali</b> (<i>delete anomaly</i>)</td><td>Faktura 42 makuleras och raderna tas bort. Då försvinner också uppgiften att <i>Invaders</i> och <i>Run to the Hills</i> finns, att de ligger på <i>The Number of The Beast</i> och att Iron Maiden spelar Metal.</td></tr>
+</table></div>
+<p class="etikett">Uppdateringsanomali: någon missade en rad</p>
+<div class="scroll"><table>
+  <tr><th>InvoiceId</th><th>TrackId</th><th>Customer</th><th>Email</th></tr>
+  <tr><td>42</td><td>1391</td><td>Joakim Johansson</td><td>joakim@nymail.se</td></tr>
+  <tr><td>42</td><td>1392</td><td>Joakim Johansson</td><td>joakim@nymail.se</td></tr>
+  <tr><td>65</td><td>2094</td><td>Joakim Johansson</td><td class="fel-varde">joakim.johansson@yahoo.se</td></tr>
+  <tr><td>65</td><td>2096</td><td>Joakim Johansson</td><td>joakim@nymail.se</td></tr>
+</table></div>
+<p class="box">Grundregeln: <b>varje uppgift ska finnas på ett ställe.</b> Då kan den inte bli motsägelsefull, den kan sparas när den uppstår och den försvinner inte av misstag.</p>
+
+<h2 id="del4">4. Samma problem i C#: kopior i stället för referenser</h2>
+<p>På torsdagen såg vi att en rad är ett objekt och att en främmande nyckel är en referens. Kvittotabellen motsvarar en klass där varje objekt har en egen <b>kopia</b> av kunden:</p>
+<pre><code>class Kvittorad
+{
+    public int InvoiceId { get; set; }
+    public DateTime InvoiceDate { get; set; }
+    public string CustomerName { get; set; }
+    public string CustomerEmail { get; set; }
+    public string TrackName { get; set; }
+    public string ArtistName { get; set; }
+    public decimal UnitPrice { get; set; }
+}
+
+// Sex objekt – sex kopior av Joakims e-post.
+// Byter han adress måste du hitta och ändra alla sex.
+foreach (var rad in rader.Where(r =&gt; r.CustomerName == "Joakim Johansson"))
+    rad.CustomerEmail = "joakim@nymail.se";</code></pre>
+<p>Så skulle du aldrig skriva det i C#. Du skulle ha <b>ett</b> kundobjekt och låta fakturorna <b>referera</b> till det:</p>
+<pre><code>var joakim = new Customer { CustomerId = 51, Email = "joakim.johansson@yahoo.se" };
+
+var faktura42 = new Invoice { InvoiceId = 42, Customer = joakim };
+var faktura65 = new Invoice { InvoiceId = 65, Customer = joakim };
+
+joakim.Email = "joakim@nymail.se";   // ändras på ett ställe – syns i båda fakturorna</code></pre>
+<div class="scroll"><table>
+  <tr><th>C#</th><th>Databas</th></tr>
+  <tr><td>En kopia av ett värde i varje objekt</td><td>En upprepad kolumn i varje rad</td></tr>
+  <tr><td>En referens till ett gemensamt objekt</td><td>En främmande nyckel till en rad i en annan tabell</td></tr>
+  <tr><td>En klass ska ha ett ansvar (<i>Single Responsibility</i>)</td><td>En tabell ska handla om en sak</td></tr>
+  <tr><td>Upprepa inte dig själv (<i>DRY – Don't Repeat Yourself</i>)</td><td>Spara varje uppgift på ett ställe</td></tr>
+</table></div>
+<p class="box"><b>Normalisering = byt kopior mot referenser.</b> Du gör redan det i C# – idag lär vi oss reglerna för att göra det i en databas.</p>
+
 </main>
 <script type="module">
   import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.esm.min.mjs";
