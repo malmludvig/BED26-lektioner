@@ -321,84 +321,92 @@ VALUES (26, N'Svensk pop');</code></pre>
 <section class="slide sektion">
   <p class="nr">Del 2</p>
   <h2>Varför normalisering?</h2>
-  <p class="lead">Joakims kvitton i en enda tabell</p>
+  <p class="lead">Tänk om Chinook var byggd på ett annat sätt …</p>
 </section>
 
 <section class="slide">
-  <h2>Joakims kvitton i ett Excel-ark</h2>
-<p>Joakim Johanssons två första köp – fakturorna 42 och 65 ur Chinook – i <b>en</b> tabell:</p>
-<div class="scroll bred"><table>
-  <tr><th>InvoiceId</th><th>InvoiceDate</th><th>CustomerId</th><th>Customer</th><th>Email</th><th>TrackId</th><th>Track</th><th>Album</th><th>Artist</th><th>Genre</th><th>UnitPrice</th><th>Quantity</th></tr>
-  <tr><td>42</td><td>2021-07-06</td><td class="upprepad">51</td><td class="upprepad">Joakim Johansson</td><td class="upprepad">joakim.johansson@yahoo.se</td><td>1391</td><td>Invaders</td><td>The Number of The Beast</td><td>Iron Maiden</td><td>Metal</td><td>0.99</td><td>1</td></tr>
-  <tr><td>42</td><td>2021-07-06</td><td class="upprepad">51</td><td class="upprepad">Joakim Johansson</td><td class="upprepad">joakim.johansson@yahoo.se</td><td>1392</td><td>Run to the Hills</td><td>The Number of The Beast</td><td>Iron Maiden</td><td>Metal</td><td>0.99</td><td>1</td></tr>
-  <tr><td>65</td><td>2021-10-08</td><td class="upprepad">51</td><td class="upprepad">Joakim Johansson</td><td class="upprepad">joakim.johansson@yahoo.se</td><td>2094</td><td>I Don't Know</td><td>Blizzard of Ozz</td><td>Ozzy Osbourne</td><td>Rock</td><td>0.99</td><td>1</td></tr>
-  <tr><td>65</td><td>2021-10-08</td><td class="upprepad">51</td><td class="upprepad">Joakim Johansson</td><td class="upprepad">joakim.johansson@yahoo.se</td><td>2096</td><td>Flying High Again</td><td>Diary of a Madman (Remastered)</td><td>Ozzy Osbourne</td><td>Rock</td><td>0.99</td><td>1</td></tr>
-  <tr><td>65</td><td>2021-10-08</td><td class="upprepad">51</td><td class="upprepad">Joakim Johansson</td><td class="upprepad">joakim.johansson@yahoo.se</td><td>2098</td><td>No More Tears</td><td>No More Tears (Remastered)</td><td>Ozzy Osbourne</td><td>Rock</td><td>0.99</td><td>1</td></tr>
-  <tr><td>65</td><td>2021-10-08</td><td class="upprepad">51</td><td class="upprepad">Joakim Johansson</td><td class="upprepad">joakim.johansson@yahoo.se</td><td>2100</td><td>Crazy Train</td><td>Tribute</td><td>Ozzy Osbourne</td><td>Metal</td><td>0.99</td><td>1</td></tr>
-</table></div>
-<p>Vad upprepas? Skriv i chatten.</p>
-<p class="box">Namn och e-post <b>sex gånger</b>, <i>Ozzy Osbourne</i> fyra gånger, datumen flera gånger. Och det är bara två av Joakims sju fakturor – och Joakim är en kund av 59.</p>
-</section>
-
-<section class="slide">
-  <h2>Tre anomalier</h2>
-<p><b>Normalisering</b> = dela upp en tabell i flera mindre, så att varje uppgift sparas på <b>ett</b> ställe. Annars får man tre problem:</p>
+  <h2>Tänk om Album såg ut så här</h2>
+<p>Artistens namn står direkt i tabellen <code>Album</code>:</p>
 <div class="scroll"><table>
-  <tr><th>Anomali</th><th>I kvittotabellen</th></tr>
-  <tr><td><b>Uppdatering</b><br><i>update anomaly</i></td><td>Joakim byter e-post: <b>sex rader</b> ska ändras. Missar man en finns två adresser – vilken är rätt?</td></tr>
-  <tr><td><b>Insättning</b><br><i>insert anomaly</i></td><td>En ny kund som inte har köpt något – var sparas hen? Samma med en låt som ingen har köpt.</td></tr>
-  <tr><td><b>Borttagning</b><br><i>delete anomaly</i></td><td>Faktura 42 makuleras. Då försvinner också att <i>Invaders</i> finns och att Iron Maiden spelar Metal.</td></tr>
+  <tr><th>AlbumId</th><th>Title</th><th>Artist</th></tr>
+  <tr><td>1</td><td>For Those About To Rock We Salute You</td><td class="upprepad">AC/DC</td></tr>
+  <tr><td>4</td><td>Let There Be Rock</td><td class="upprepad">AC/DC</td></tr>
+  <tr><td>2</td><td>Balls to the Wall</td><td class="upprepad">Accept</td></tr>
+  <tr><td>3</td><td>Restless and Wild</td><td class="upprepad">Accept</td></tr>
+  <tr><td>5</td><td>Big Ones</td><td>Aerosmith</td></tr>
 </table></div>
+<p class="big">Vad är problemet?</p>
 </section>
 
 <section class="slide">
-  <h2>Uppdateringsanomali: någon missade en rad</h2>
+  <h2>Problem 1: ändra</h2>
+<p>AC/DC ska stavas om. Då måste <b>alla</b> deras album ändras. Missar man ett:</p>
 <div class="scroll"><table>
-  <tr><th>InvoiceId</th><th>TrackId</th><th>Customer</th><th>Email</th></tr>
-  <tr><td>42</td><td>1391</td><td>Joakim Johansson</td><td>joakim@nymail.se</td></tr>
-  <tr><td>42</td><td>1392</td><td>Joakim Johansson</td><td>joakim@nymail.se</td></tr>
-  <tr><td>65</td><td>2094</td><td>Joakim Johansson</td><td class="fel-varde">joakim.johansson@yahoo.se</td></tr>
-  <tr><td>65</td><td>2096</td><td>Joakim Johansson</td><td>joakim@nymail.se</td></tr>
+  <tr><th>AlbumId</th><th>Title</th><th>Artist</th></tr>
+  <tr><td>1</td><td>For Those About To Rock We Salute You</td><td>AC-DC</td></tr>
+  <tr><td>4</td><td>Let There Be Rock</td><td class="fel-varde">AC/DC</td></tr>
 </table></div>
-<p class="big">Grundregeln: <b>varje uppgift ska finnas på ett ställe.</b></p>
-<p style="text-align:center">Då kan den inte bli motsägelsefull, den kan sparas när den uppstår och den försvinner inte av misstag.</p>
+<p class="box">Nu finns två namn. Vilket är rätt? Iron Maiden har 21 album – 21 rader att ändra.</p>
 </section>
 
 <section class="slide">
-  <h2>Samma problem i C#: kopior</h2>
-<p>Kvittotabellen motsvarar en klass där varje objekt har en egen <b>kopia</b> av kunden:</p>
-<pre><code>class Kvittorad
-{
-    public int InvoiceId { get; set; }
-    public DateTime InvoiceDate { get; set; }
-    public string CustomerName { get; set; }
-    public string CustomerEmail { get; set; }
-    public string TrackName { get; set; }
-    public string ArtistName { get; set; }
-    public decimal UnitPrice { get; set; }
-}
-
-// Sex objekt – sex kopior av Joakims e-post
-foreach (var rad in rader.Where(r =&gt; r.CustomerName == "Joakim Johansson"))
-    rad.CustomerEmail = "joakim@nymail.se";</code></pre>
+  <h2>Problem 2: lägga till</h2>
+<p class="big">En ny artist som inte har något album än.</p>
+<p class="big">Var ska namnet stå?</p>
+<p class="box">Det går inte – det finns ingen albumrad att skriva det på. I riktiga Chinook finns 71 artister utan album.</p>
 </section>
 
 <section class="slide">
-  <h2>Så skriver du det i C#: referenser</h2>
-<pre><code>var joakim = new Customer { CustomerId = 51, Email = "joakim.johansson@yahoo.se" };
+  <h2>Problem 3: ta bort</h2>
+<p class="big">Vi tar bort albumet <i>Big Ones</i>.</p>
+<p class="big">Då försvinner också <b>Aerosmith</b>.</p>
+<p class="box">Det var Aerosmiths enda album. Nu finns artisten inte någonstans i databasen.</p>
+</section>
 
-var faktura42 = new Invoice { InvoiceId = 42, Customer = joakim };
-var faktura65 = new Invoice { InvoiceId = 65, Customer = joakim };
-
-joakim.Email = "joakim@nymail.se";   // ändras på ett ställe – syns i båda fakturorna</code></pre>
+<section class="slide">
+  <h2>Lösningen: två tabeller</h2>
+<div class="tva-kol tabellpar">
 <div class="scroll"><table>
-  <tr><th>C#</th><th>Databas</th></tr>
-  <tr><td>En kopia av ett värde i varje objekt</td><td>En upprepad kolumn i varje rad</td></tr>
-  <tr><td>En referens till ett gemensamt objekt</td><td>En främmande nyckel</td></tr>
-  <tr><td>En klass – ett ansvar (<i>Single Responsibility</i>)</td><td>En tabell – en sak</td></tr>
-  <tr><td><i>DRY – Don't Repeat Yourself</i></td><td>Varje uppgift på ett ställe</td></tr>
+  <tr><th colspan="2">Artist</th></tr>
+  <tr><th>ArtistId (<span class="pk">PK</span>)</th><th>Name</th></tr>
+  <tr><td>1</td><td>AC/DC</td></tr>
+  <tr><td>2</td><td>Accept</td></tr>
+  <tr><td>3</td><td>Aerosmith</td></tr>
 </table></div>
-<p class="box"><b>Normalisering = byt kopior mot referenser.</b></p>
+<div class="scroll"><table>
+  <tr><th colspan="3">Album</th></tr>
+  <tr><th>AlbumId (<span class="pk">PK</span>)</th><th>Title</th><th>ArtistId (<span class="fk">FK</span>)</th></tr>
+  <tr><td>1</td><td>For Those About To Rock …</td><td>1</td></tr>
+  <tr><td>4</td><td>Let There Be Rock</td><td>1</td></tr>
+  <tr><td>2</td><td>Balls to the Wall</td><td>2</td></tr>
+  <tr><td>5</td><td>Big Ones</td><td>3</td></tr>
+</table></div>
+</div>
+<p class="box">Namnet står på <b>ett</b> ställe. Albumen pekar på artisten med <code>ArtistId</code>. Så ser riktiga Chinook ut.</p>
+</section>
+
+<section class="slide">
+  <h2>Normalisering</h2>
+<p class="big">Varje uppgift ska finnas på <b>ett</b> ställe.</p>
+<p class="big">Normalisering = dela upp en tabell tills det stämmer.</p>
+</section>
+
+<section class="slide">
+  <h2>Samma sak i C#</h2>
+<div class="tva-kol">
+<div>
+<p class="etikett">Kopia – namnet i varje album</p>
+<pre><code>album1.ArtistName = "AC/DC";
+album4.ArtistName = "AC/DC";</code></pre>
+</div>
+<div>
+<p class="etikett">Referens – ett gemensamt objekt</p>
+<pre><code>var acdc = new Artist { Name = "AC/DC" };
+album1.Artist = acdc;
+album4.Artist = acdc;</code></pre>
+</div>
+</div>
+<p class="box">I C# använder du redan referenser. I databasen är referensen en <b>främmande nyckel</b>.</p>
 </section>
 
 <!-- ================= NORMALFORMER ================= -->
