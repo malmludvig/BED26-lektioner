@@ -754,6 +754,94 @@ ROLLBACK;   -- ångra allt sedan BEGIN TRANSACTION …
 -- COMMIT;  -- … eller spara ändringen</code></pre>
 <p class="box">En transaktion är som ett utkast: inget sparas på riktigt förrän du skriver <code>COMMIT</code>. Glöm inte att avsluta med <code>COMMIT</code> eller <code>ROLLBACK</code> – annars låser din öppna transaktion raderna för andra.</p>
 
+<h2 id="del20">20. JOIN – normaliseringen baklänges</h2>
+<p>Normaliseringen delade upp datan i många tabeller. <code>JOIN</code> sätter ihop dem igen när vi läser. I torsdags tog vi Iron Maidens album i två steg: först artistens id, sedan albumen. Med <code>JOIN</code> blir det <b>en</b> fråga:</p>
+<div class="tva-kol">
+<div>
+<p class="etikett">Torsdag: två frågor</p>
+<pre><code class="sql nohighlight">SELECT ArtistId
+FROM Artist
+WHERE Name = 'Iron Maiden';
+-- 90
+
+SELECT Title
+FROM Album
+WHERE ArtistId = 90;</code></pre>
+</div>
+<div>
+<p class="etikett">Idag: en fråga</p>
+<pre><code class="sql nohighlight">SELECT Album.Title
+FROM Album
+INNER JOIN Artist
+    ON Album.ArtistId = Artist.ArtistId
+WHERE Artist.Name = 'Iron Maiden'
+ORDER BY Album.Title;
+-- 21 album</code></pre>
+</div>
+</div>
+
+<h3>Hur fungerar det?</h3>
+<p><code>JOIN</code> parar ihop varje rad i <code>Album</code> med den rad i <code>Artist</code> där villkoret efter <code>ON</code> stämmer – nästan alltid <b>främmande nyckel = primärnyckel</b>. Resultatet blir en ny, bredare tabell:</p>
+<div class="scroll"><table>
+  <tr><th>Album.AlbumId</th><th>Album.Title</th><th>Album.ArtistId (<span class="fk">FK</span>)</th><th>Artist.ArtistId (<span class="pk">PK</span>)</th><th>Artist.Name</th></tr>
+  <tr><td>1</td><td>For Those About To Rock We Salute You</td><td>1</td><td>1</td><td>AC/DC</td></tr>
+  <tr><td>2</td><td>Balls to the Wall</td><td>2</td><td>2</td><td>Accept</td></tr>
+  <tr><td>3</td><td>Restless and Wild</td><td>2</td><td>2</td><td>Accept</td></tr>
+  <tr><td>4</td><td>Let There Be Rock</td><td>1</td><td>1</td><td>AC/DC</td></tr>
+  <tr><td>…</td><td>…</td><td>…</td><td>…</td><td>…</td></tr>
+</table></div>
+<p>Sedan körs <code>WHERE</code>, <code>SELECT</code> och <code>ORDER BY</code> på den hopsatta tabellen – precis som vanligt.</p>
+<div class="tva-kol">
+<div>
+<p><b>I C#</b> följer du referensen direkt: <code>album.Artist.Name</code>. Har du bara id:n, som i databasen, finns <code>Join</code> i LINQ:</p>
+</div>
+<pre><code>var svar = albums
+    .Join(artists,
+          al =&gt; al.ArtistId,      // FK
+          ar =&gt; ar.ArtistId,      // PK
+          (al, ar) =&gt; new { al.Title, Artist = ar.Name })
+    .Where(x =&gt; x.Artist == "Iron Maiden")
+    .OrderBy(x =&gt; x.Title);</code></pre>
+</div>
+
+<h3>Alias och tvetydiga kolumner</h3>
+<p>Både <code>Track</code> och <code>Genre</code> har en kolumn som heter <code>Name</code>. Då måste du säga vilken du menar:</p>
+<pre><code class="sql nohighlight">SELECT Name
+FROM Track
+JOIN Genre ON Track.GenreId = Genre.GenreId;</code></pre>
+<pre class="fel">Msg 209, Level 16, State 1, Line 1
+Ambiguous column name 'Name'.</pre>
+<p>Ge tabellerna korta <b>alias</b> och skriv alias framför varje kolumn. <code>JOIN</code> är samma sak som <code>INNER JOIN</code>.</p>
+<pre><code class="sql nohighlight">SELECT t.Name, g.Name AS Genre
+FROM Track t
+JOIN Genre g ON t.GenreId = g.GenreId
+WHERE t.AlbumId = 1;</code></pre>
+<p class="box"><b>INNER JOIN</b> tar bara med rader som har en matchning. 71 av Chinooks 275 artister har inga album – de syns inte i en <code>INNER JOIN</code> mellan <code>Artist</code> och <code>Album</code>. För att få med dem behövs <code>LEFT JOIN</code>, som kommer senare i kursen.</p>
+
+<h3>Bygg ihop Joakims kvitto igen</h3>
+<p>Med en <code>JOIN</code> per främmande nyckel får vi tillbaka kvittotabellen från avsnitt 3 – fast datan nu ligger i sju tabeller:</p>
+<pre><code class="sql nohighlight">SELECT i.InvoiceId, i.InvoiceDate, c.FirstName, c.LastName, c.Email,
+       t.Name AS Track, al.Title AS Album, ar.Name AS Artist, g.Name AS Genre,
+       il.UnitPrice, il.Quantity
+FROM Invoice i
+JOIN Customer c     ON i.CustomerId = c.CustomerId
+JOIN InvoiceLine il ON il.InvoiceId = i.InvoiceId
+JOIN Track t        ON il.TrackId   = t.TrackId
+JOIN Album al       ON t.AlbumId    = al.AlbumId
+JOIN Artist ar      ON al.ArtistId  = ar.ArtistId
+JOIN Genre g        ON t.GenreId    = g.GenreId
+WHERE i.InvoiceId IN (42, 65);</code></pre>
+<div class="scroll"><table>
+  <tr><th>InvoiceId</th><th>FirstName</th><th>Track</th><th>Artist</th><th>Genre</th><th>…</th></tr>
+  <tr><td>42</td><td>Joakim</td><td>Invaders</td><td>Iron Maiden</td><td>Metal</td><td>…</td></tr>
+  <tr><td>42</td><td>Joakim</td><td>Run to the Hills</td><td>Iron Maiden</td><td>Metal</td><td>…</td></tr>
+  <tr><td>65</td><td>Joakim</td><td>I Don't Know</td><td>Ozzy Osbourne</td><td>Rock</td><td>…</td></tr>
+  <tr><td>65</td><td>Joakim</td><td>Flying High Again</td><td>Ozzy Osbourne</td><td>Rock</td><td>…</td></tr>
+  <tr><td>65</td><td>Joakim</td><td>No More Tears</td><td>Ozzy Osbourne</td><td>Rock</td><td>…</td></tr>
+  <tr><td>65</td><td>Joakim</td><td>Crazy Train</td><td>Ozzy Osbourne</td><td>Metal</td><td>…</td></tr>
+</table></div>
+<p class="box"><b>Spara normaliserat – läs med JOIN.</b> Varje uppgift ligger på ett ställe och kan inte bli motsägelsefull, men du kan alltid få fram den "platta" tabellen när du behöver den. Tips: börja med <code>FROM</code> och lägg till en <code>JOIN</code> i taget. Följ kråkfötterna i ER-diagrammet – varje linje blir ett <code>ON</code>.</p>
+
 </main>
 <script type="module">
   import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.esm.min.mjs";
