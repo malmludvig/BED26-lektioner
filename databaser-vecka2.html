@@ -393,6 +393,144 @@ erDiagram
 }</code></pre>
 <p>Vi skriver <code>CREATE TABLE</code> för de två nya tabellerna i <a href="#del15">avsnitt 15</a>, när vi har gått igenom constraints.</p>
 
+<h2 id="del9">9. 2NF – hela nyckeln</h2>
+<p>Kvittotabellen är i 1NF med nyckeln <b>(InvoiceId, TrackId)</b>. 2NF kräver att varje kolumn beror på <b>hela</b> nyckeln. Gå igenom kolumnerna:</p>
+<div class="scroll"><table>
+  <tr><th>Kolumner</th><th>Beror på</th><th>Hela nyckeln?</th></tr>
+  <tr><td><code>InvoiceDate</code>, <code>CustomerId</code>, <code>Customer</code>, <code>Email</code></td><td>Bara <code>InvoiceId</code></td><td>Nej – <b>partiellt beroende</b></td></tr>
+  <tr><td><code>Track</code>, <code>Album</code>, <code>Artist</code>, <code>Genre</code></td><td>Bara <code>TrackId</code></td><td>Nej – <b>partiellt beroende</b></td></tr>
+  <tr><td><code>UnitPrice</code>, <code>Quantity</code></td><td><code>InvoiceId</code> <b>och</b> <code>TrackId</code></td><td>Ja</td></tr>
+</table></div>
+<p>Datumet för faktura 65 har ingenting med <i>Crazy Train</i> att göra – därför upprepas det på varje rad. <b>Lösningen:</b> flytta varje grupp till en egen tabell med den del av nyckeln som den beror på.</p>
+<div class="tva-kol tabellpar">
+<div class="scroll"><table>
+  <tr><th colspan="5">Invoice</th></tr>
+  <tr><th>InvoiceId (<span class="pk">PK</span>)</th><th>InvoiceDate</th><th>CustomerId</th><th>Customer</th><th>Email</th></tr>
+  <tr><td>42</td><td>2021-07-06</td><td>51</td><td>Joakim Johansson</td><td>joakim.johansson@yahoo.se</td></tr>
+  <tr><td>65</td><td>2021-10-08</td><td>51</td><td>Joakim Johansson</td><td>joakim.johansson@yahoo.se</td></tr>
+</table></div>
+<div class="scroll"><table>
+  <tr><th colspan="4">InvoiceLine</th></tr>
+  <tr><th>InvoiceId (<span class="pk">PK</span>, <span class="fk">FK</span>)</th><th>TrackId (<span class="pk">PK</span>, <span class="fk">FK</span>)</th><th>UnitPrice</th><th>Quantity</th></tr>
+  <tr><td>42</td><td>1391</td><td>0.99</td><td>1</td></tr>
+  <tr><td>42</td><td>1392</td><td>0.99</td><td>1</td></tr>
+  <tr><td>65</td><td>2094</td><td>0.99</td><td>1</td></tr>
+  <tr><td>…</td><td>…</td><td>…</td><td>…</td></tr>
+</table></div>
+</div>
+<div class="scroll bred"><table>
+  <tr><th colspan="5">Track</th></tr>
+  <tr><th>TrackId (<span class="pk">PK</span>)</th><th>Name</th><th>Album</th><th>Artist</th><th>Genre</th></tr>
+  <tr><td>1391</td><td>Invaders</td><td>The Number of The Beast</td><td>Iron Maiden</td><td>Metal</td></tr>
+  <tr><td>1392</td><td>Run to the Hills</td><td>The Number of The Beast</td><td>Iron Maiden</td><td>Metal</td></tr>
+  <tr><td>2094</td><td>I Don't Know</td><td>Blizzard of Ozz</td><td>Ozzy Osbourne</td><td>Rock</td></tr>
+  <tr><td>2096</td><td>Flying High Again</td><td>Diary of a Madman (Remastered)</td><td>Ozzy Osbourne</td><td>Rock</td></tr>
+  <tr><td>…</td><td>…</td><td>…</td><td>…</td><td>…</td></tr>
+</table></div>
+<p class="box"><b>Varför ligger <code>UnitPrice</code> kvar i <code>InvoiceLine</code>?</b> Det är priset <i>när köpet gjordes</i> – det beror på både fakturan och låten. Ändras låtens pris imorgon ska Joakims gamla kvitto inte ändras. Chinook har dessutom ett eget id för varje fakturarad, <code>InvoiceLineId</code>, i stället för den sammansatta nyckeln – tanken är densamma.</p>
+<p>Nu står Joakims e-post två gånger i stället för sex. Bättre – men inte bra. Det leder oss till 3NF.</p>
+
+<h2 id="del10">10. 3NF – inget annat än nyckeln</h2>
+<p>3NF kräver att ingen kolumn beror på en annan kolumn som <b>inte</b> är nyckel. Ett sådant beroende "i två steg" kallas <b>transitivt beroende</b>:</p>
+<div class="scroll"><table>
+  <tr><th>Tabell</th><th>Transitivt beroende</th><th>Problem</th></tr>
+  <tr><td><code>Invoice</code></td><td><code>InvoiceId → CustomerId → Customer, Email</code></td><td>Kunduppgifterna upprepas på varje faktura</td></tr>
+  <tr><td><code>Track</code></td><td><code>TrackId → Album → Artist</code></td><td>Artisten upprepas på varje låt på albumet</td></tr>
+</table></div>
+<p>E-posten handlar om <b>kunden</b>, inte om fakturan. Artisten handlar om <b>albumet</b>, inte om låten. <b>Lösningen:</b> flytta ut dem till egna tabeller och lämna kvar en främmande nyckel.</p>
+<ul>
+  <li><code>Customer</code> och <code>Email</code> flyttar till tabellen <code>Customer</code>. Kvar i <code>Invoice</code> blir <code>CustomerId</code> (<span class="fk">FK</span>).</li>
+  <li><code>Album</code> och <code>Artist</code> blir tabellerna <code>Album</code> och <code>Artist</code>. Kvar i <code>Track</code> blir <code>AlbumId</code> (<span class="fk">FK</span>), och i <code>Album</code> ligger <code>ArtistId</code> (<span class="fk">FK</span>).</li>
+  <li><code>Genre</code> får också en egen tabell. Strikt taget beror genrenamnet direkt på låten, så 3NF kräver det inte – men med en egen tabell kan ingen skriva <i>Metal</i> på ett ställe och <i>metal</i> på ett annat, och en ny genre kan finnas innan någon låt har den.</li>
+</ul>
+<pre class="mermaid utan-en stor">
+%%{init: {"er": {"layoutDirection": "LR"}}}%%
+erDiagram
+    CUSTOMER ||--o{ INVOICE : "har"
+    INVOICE ||--o{ INVOICELINE : "har"
+    TRACK ||--o{ INVOICELINE : "säljs i"
+    ALBUM ||--o{ TRACK : "innehåller"
+    ARTIST ||--o{ ALBUM : "har"
+    GENRE ||--o{ TRACK : "har"
+    CUSTOMER {
+        int CustomerId PK
+        string FirstName
+        string LastName
+        string Email
+    }
+    INVOICE {
+        int InvoiceId PK
+        datetime InvoiceDate
+        int CustomerId FK
+    }
+    INVOICELINE {
+        int InvoiceLineId PK
+        int InvoiceId FK
+        int TrackId FK
+        decimal UnitPrice
+        int Quantity
+    }
+    TRACK {
+        int TrackId PK
+        string Name
+        int AlbumId FK
+        int GenreId FK
+    }
+    ALBUM {
+        int AlbumId PK
+        string Title
+        int ArtistId FK
+    }
+    ARTIST {
+        int ArtistId PK
+        string Name
+    }
+    GENRE {
+        int GenreId PK
+        string Name
+    }
+</pre>
+<p class="box">Känner du igen det? Det är <b>Chinook</b>. Vi har normaliserat kvittotabellen och kommit fram till samma tabeller som finns i databasen ni installerade i torsdags.</p>
+
+<h2 id="del11">11. Resultatet: från en tabell till Chinook</h2>
+<div class="scroll"><table>
+  <tr><th>Problem i kvittotabellen</th><th>Efter normalisering till 3NF</th></tr>
+  <tr><td>Joakims e-post på sex rader</td><td>På <b>en</b> rad i <code>Customer</code></td></tr>
+  <tr><td>En ny kund kan inte sparas utan ett köp</td><td>Lägg till en rad i <code>Customer</code> – ingen faktura behövs</td></tr>
+  <tr><td>Makulerad faktura tar med sig låtarna</td><td>Ta bort raderna i <code>InvoiceLine</code> och <code>Invoice</code> – låtarna finns kvar i <code>Track</code></td></tr>
+  <tr><td>Iron Maiden upprepas på varje låt</td><td>En rad i <code>Artist</code>, refererad från <code>Album</code></td></tr>
+</table></div>
+<p><b>Priset</b> för en normaliserad databas: datan ligger i flera tabeller, så för att visa ett kvitto måste man sätta ihop dem igen. Det gör man med <code>JOIN</code> – längre fram idag.</p>
+<p><b>Arbetsgång – använd den i parövningen:</b></p>
+<ol>
+  <li>Lista alla kolumner och hitta något som gör varje rad unik – det är primärnyckeln.</li>
+  <li><b>1NF:</b> dela upp listor och upprepade kolumner till fler rader.</li>
+  <li>Skriv ner alla funktionella beroenden: <i>vad bestämmer vad?</i></li>
+  <li><b>2NF:</b> flytta kolumner som bara beror på en del av nyckeln till en egen tabell.</li>
+  <li><b>3NF:</b> flytta kolumner som beror på något annat än nyckeln till en egen tabell.</li>
+  <li>Ge varje ny tabell en primärnyckel, koppla ihop dem med främmande nycklar och rita ER-diagrammet.</li>
+</ol>
+
+<h2 id="del12">12. Medveten denormalisering</h2>
+<p>Chinook är normaliserad – men inte överallt. Ibland är det ett medvetet val att spara samma sak på två ställen:</p>
+<div class="scroll"><table>
+  <tr><th>I Chinook</th><th>Varför?</th></tr>
+  <tr><td><code>Invoice</code> har egna adresskolumner: <code>BillingAddress</code>, <code>BillingCity</code> …</td><td>Fakturan ska visa adressen <i>när köpet gjordes</i>, även om kunden flyttar. Det är en annan uppgift än "kundens adress nu".</td></tr>
+  <tr><td><code>InvoiceLine.UnitPrice</code> och <code>Track.UnitPrice</code></td><td>Priset vid köpet respektive dagens pris. Också två olika uppgifter.</td></tr>
+  <tr><td><code>Customer</code> har både <code>PostalCode</code> och <code>City</code></td><td>Postnumret bestämmer egentligen orten – ett transitivt beroende. Men en egen tabell med alla världens postnummer vore mer jobb än nytta.</td></tr>
+</table></div>
+<p class="box"><b>Normalisera först – denormalisera medvetet.</b> Det är okej att avvika från 3NF om du kan förklara varför. Det är precis det kursmålet menar med att <i>motivera valen</i>.</p>
+
+<h2 id="del13">13. Snabbquiz: vilken normalform bryts?</h2>
+<p>Primärnyckeln är <u>understruken</u>. Klicka för att se svaret.</p>
+<details><summary>1. <code>Student(<u>StudentId</u>, Namn, Telefon)</code> där Telefon kan vara <i>"070-123 45 67, 073-765 43 21"</i></summary><p><b>1NF</b> – två värden i samma cell. Lösning: en tabell <code>Telefon(StudentId, Nummer)</code>.</p></details>
+<details><summary>2. <code>Betyg(<u>ElevId</u>, <u>KursId</u>, Betyg, Kursnamn)</code></summary><p><b>2NF</b> – <code>Kursnamn</code> beror bara på <code>KursId</code>, en del av nyckeln. Flytta det till <code>Kurs</code>.</p></details>
+<details><summary>3. <code>Elev(<u>ElevId</u>, Namn, KlassId, Klassnamn)</code></summary><p><b>3NF</b> – <code>ElevId → KlassId → Klassnamn</code>. Flytta <code>Klassnamn</code> till <code>Klass</code>.</p></details>
+<details><summary>4. <code>Album(<u>AlbumId</u>, Title, ArtistId)</code></summary><p><b>Ingen</b> – tabellen är i 3NF. <code>ArtistId</code> är en främmande nyckel, inte en kopia av artistens uppgifter.</p></details>
+<details><summary>5. <code>PlaylistTrack(<u>PlaylistId</u>, <u>TrackId</u>, PlaylistName)</code></summary><p><b>2NF</b> – <code>PlaylistName</code> beror bara på <code>PlaylistId</code>. Det ska ligga i <code>Playlist</code>, där det också ligger i Chinook.</p></details>
+<details><summary>6. <code>Invoice(<u>InvoiceId</u>, InvoiceDate, CustomerId, CustomerEmail)</code></summary><p><b>3NF</b> – <code>InvoiceId → CustomerId → CustomerEmail</code>. E-posten hör hemma i <code>Customer</code>.</p></details>
+<details><summary>7. <code>Anstalld(<u>Id</u>, Namn, Barn1, Barn2, Barn3)</code></summary><p><b>1NF</b> – upprepade kolumner. Vad händer när någon får ett fjärde barn? Lösning: en tabell <code>Barn(AnstalldId, Namn)</code>.</p></details>
+
 </main>
 <script type="module">
   import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.esm.min.mjs";
