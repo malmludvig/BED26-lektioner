@@ -7,7 +7,7 @@
 <title>Normalisering och CRUD</title>
 <link rel="stylesheet" href="style.css">
 <style>
-  /* Breda tabeller, t.ex. kvittotabellen med tolv kolumner */
+  /* Breda tabeller, t.ex. konsertbokningarna i parövningen */
   .bred table { font-size: .82rem; }
   .bred th, .bred td { padding: 4px 6px; white-space: nowrap; }
   .upprepad { background: #fde68a; color: #1c2433; }
@@ -39,17 +39,17 @@
 <ol>
   <li><a href="#del1">Dagens upplägg och veckans mål</a></li>
   <li><a href="#del2">Facit: övningarna från vecka 1</a></li>
-  <li><a href="#del3">Varför normalisering? Joakims kvitton</a></li>
-  <li><a href="#del4">Samma problem i C#: kopior i stället för referenser</a></li>
+  <li><a href="#del3">Varför normalisering?</a></li>
+  <li><a href="#del4">Samma sak i C#</a></li>
   <li><a href="#del5">Funktionellt beroende</a></li>
-  <li><a href="#del6">Normalformerna 1NF, 2NF och 3NF</a></li>
+  <li><a href="#del6">Tre regler: 1NF, 2NF och 3NF</a></li>
   <li><a href="#del7">1NF – ett värde per cell</a></li>
-  <li><a href="#del8">1NF i Chinook: kolumnen Composer</a></li>
+  <li><a href="#del8">Chinook bryter mot 1NF: Composer</a></li>
   <li><a href="#del9">2NF – hela nyckeln</a></li>
-  <li><a href="#del10">3NF – inget annat än nyckeln</a></li>
-  <li><a href="#del11">Resultatet: från en tabell till Chinook</a></li>
-  <li><a href="#del12">Medveten denormalisering</a></li>
-  <li><a href="#del13">Snabbquiz: vilken normalform bryts?</a></li>
+  <li><a href="#del10">3NF – bara nyckeln</a></li>
+  <li><a href="#del11">Resultatet: därför ser Chinook ut så här</a></li>
+  <li><a href="#del12">Ibland sparar man dubbelt med flit</a></li>
+  <li><a href="#del13">Quiz: vilken regel bryts?</a></li>
   <li><a href="#del14">Constraints</a></li>
   <li><a href="#del15">Allt ihop: tabellerna för Composer</a></li>
   <li><a href="#del16">CRUD</a></li>
@@ -68,7 +68,7 @@
 <div class="scroll"><table>
   <tr><th>Vad</th><th>Hur</th></tr>
   <tr><td>Facit till förra veckans övningar A1–A13</td><td>Genomgång och frågor</td></tr>
-  <tr><td>Varför normalisera? Joakims kvitton i en enda tabell</td><td>Genomgång och dialog</td></tr>
+  <tr><td>Varför normalisera? Exempel ur Chinook</td><td>Genomgång och dialog</td></tr>
   <tr><td>Funktionellt beroende, 1NF, 2NF och 3NF</td><td>Genomgång, quiz i chatten</td></tr>
   <tr><td>Constraints: <code>NOT NULL</code>, <code>UNIQUE</code>, <code>CHECK</code>, <code>DEFAULT</code></td><td>Gemensam kodning</td></tr>
   <tr><td>CRUD: <code>UPDATE</code> och <code>DELETE</code> – på ett säkert sätt</td><td>Gemensam kodning</td></tr>
@@ -225,149 +225,102 @@ SELECT * FROM Genre WHERE GenreId = 26;</code></pre>
   <tr><td>A13</td><td><code>INSERT INTO Genre … VALUES (26, N'Svensk pop')</code></td><td><code class="cs">genres.Add(new Genre { GenreId = 26, Name = "Svensk pop" })</code></td></tr>
 </table></div>
 
-<h2 id="del3">3. Varför normalisering? Joakims kvitton</h2>
-<p>Tänk dig att någon har exporterat Joakim Johanssons två första köp till <b>ett enda</b> Excel-ark. Allt finns med – men titta på hur mycket som upprepas.</p>
-<div class="scroll bred"><table>
-  <tr><th>InvoiceId</th><th>InvoiceDate</th><th>CustomerId</th><th>Customer</th><th>Email</th><th>TrackId</th><th>Track</th><th>Album</th><th>Artist</th><th>Genre</th><th>UnitPrice</th><th>Quantity</th></tr>
-  <tr><td>42</td><td>2021-07-06</td><td class="upprepad">51</td><td class="upprepad">Joakim Johansson</td><td class="upprepad">joakim.johansson@yahoo.se</td><td>1391</td><td>Invaders</td><td>The Number of The Beast</td><td>Iron Maiden</td><td>Metal</td><td>0.99</td><td>1</td></tr>
-  <tr><td>42</td><td>2021-07-06</td><td class="upprepad">51</td><td class="upprepad">Joakim Johansson</td><td class="upprepad">joakim.johansson@yahoo.se</td><td>1392</td><td>Run to the Hills</td><td>The Number of The Beast</td><td>Iron Maiden</td><td>Metal</td><td>0.99</td><td>1</td></tr>
-  <tr><td>65</td><td>2021-10-08</td><td class="upprepad">51</td><td class="upprepad">Joakim Johansson</td><td class="upprepad">joakim.johansson@yahoo.se</td><td>2094</td><td>I Don't Know</td><td>Blizzard of Ozz</td><td>Ozzy Osbourne</td><td>Rock</td><td>0.99</td><td>1</td></tr>
-  <tr><td>65</td><td>2021-10-08</td><td class="upprepad">51</td><td class="upprepad">Joakim Johansson</td><td class="upprepad">joakim.johansson@yahoo.se</td><td>2096</td><td>Flying High Again</td><td>Diary of a Madman (Remastered)</td><td>Ozzy Osbourne</td><td>Rock</td><td>0.99</td><td>1</td></tr>
-  <tr><td>65</td><td>2021-10-08</td><td class="upprepad">51</td><td class="upprepad">Joakim Johansson</td><td class="upprepad">joakim.johansson@yahoo.se</td><td>2098</td><td>No More Tears</td><td>No More Tears (Remastered)</td><td>Ozzy Osbourne</td><td>Rock</td><td>0.99</td><td>1</td></tr>
-  <tr><td>65</td><td>2021-10-08</td><td class="upprepad">51</td><td class="upprepad">Joakim Johansson</td><td class="upprepad">joakim.johansson@yahoo.se</td><td>2100</td><td>Crazy Train</td><td>Tribute</td><td>Ozzy Osbourne</td><td>Metal</td><td>0.99</td><td>1</td></tr>
-</table></div>
-<p>Datan är hämtad ur Chinook – fakturorna 42 och 65. Joakims namn och e-post står <b>sex gånger</b>, <i>Ozzy Osbourne</i> fyra gånger och varje fakturadatum flera gånger. Och det här är bara två fakturor av Joakims sju, och Joakim är en kund av 59.</p>
-
-<p><b>Normalisering</b> betyder att dela upp en tabell i flera mindre, så att varje uppgift sparas på <b>ett</b> ställe. Det är inte bara för att spara plats – upprepningen ställer till tre problem, så kallade <b>anomalier</b>:</p>
+<h2 id="del3">3. Varför normalisering?</h2>
+<p>Tänk om Chinook var byggd på ett annat sätt – med artistens namn direkt i tabellen <code>Album</code>:</p>
 <div class="scroll"><table>
-  <tr><th>Anomali</th><th>Vad händer i kvittotabellen?</th></tr>
-  <tr><td><b>Uppdateringsanomali</b> (<i>update anomaly</i>)</td><td>Joakim byter e-post. Då måste <b>sex rader</b> ändras – missar man en finns det två olika e-postadresser, och ingen vet vilken som är rätt.</td></tr>
-  <tr><td><b>Insättningsanomali</b> (<i>insert anomaly</i>)</td><td>En ny kund registrerar sig men har inte köpt något än. Var sparas hen? Det går inte utan en faktura och en låt. Samma sak med en ny låt som ingen har köpt.</td></tr>
-  <tr><td><b>Borttagningsanomali</b> (<i>delete anomaly</i>)</td><td>Faktura 42 makuleras och raderna tas bort. Då försvinner också uppgiften att <i>Invaders</i> och <i>Run to the Hills</i> finns, att de ligger på <i>The Number of The Beast</i> och att Iron Maiden spelar Metal.</td></tr>
+  <tr><th>AlbumId</th><th>Title</th><th>Artist</th></tr>
+  <tr><td>1</td><td>For Those About To Rock We Salute You</td><td class="upprepad">AC/DC</td></tr>
+  <tr><td>4</td><td>Let There Be Rock</td><td class="upprepad">AC/DC</td></tr>
+  <tr><td>2</td><td>Balls to the Wall</td><td class="upprepad">Accept</td></tr>
+  <tr><td>3</td><td>Restless and Wild</td><td class="upprepad">Accept</td></tr>
+  <tr><td>5</td><td>Big Ones</td><td>Aerosmith</td></tr>
 </table></div>
-<p class="etikett">Uppdateringsanomali: någon missade en rad</p>
+<p>Det ser enkelt ut, men det ger tre problem:</p>
 <div class="scroll"><table>
-  <tr><th>InvoiceId</th><th>TrackId</th><th>Customer</th><th>Email</th></tr>
-  <tr><td>42</td><td>1391</td><td>Joakim Johansson</td><td>joakim@nymail.se</td></tr>
-  <tr><td>42</td><td>1392</td><td>Joakim Johansson</td><td>joakim@nymail.se</td></tr>
-  <tr><td>65</td><td>2094</td><td>Joakim Johansson</td><td class="fel-varde">joakim.johansson@yahoo.se</td></tr>
-  <tr><td>65</td><td>2096</td><td>Joakim Johansson</td><td>joakim@nymail.se</td></tr>
+  <tr><th>Problem</th><th>Exempel</th></tr>
+  <tr><td><b>Ändra</b></td><td>AC/DC ska stavas om. Då måste alla deras album ändras. Missar man ett finns två olika namn – vilket är rätt? Iron Maiden har 21 album, alltså 21 rader.</td></tr>
+  <tr><td><b>Lägga till</b></td><td>En ny artist utan album kan inte sparas – det finns ingen albumrad att skriva namnet på. I riktiga Chinook finns 71 artister utan album.</td></tr>
+  <tr><td><b>Ta bort</b></td><td>Tar vi bort <i>Big Ones</i> försvinner Aerosmith helt, eftersom det var deras enda album.</td></tr>
 </table></div>
-<p class="box">Grundregeln: <b>varje uppgift ska finnas på ett ställe.</b> Då kan den inte bli motsägelsefull, den kan sparas när den uppstår och den försvinner inte av misstag.</p>
-
-<h2 id="del4">4. Samma problem i C#: kopior i stället för referenser</h2>
-<p>På torsdagen såg vi att en rad är ett objekt och att en främmande nyckel är en referens. Kvittotabellen motsvarar en klass där varje objekt har en egen <b>kopia</b> av kunden:</p>
-<pre><code>class Kvittorad
-{
-    public int InvoiceId { get; set; }
-    public DateTime InvoiceDate { get; set; }
-    public string CustomerName { get; set; }
-    public string CustomerEmail { get; set; }
-    public string TrackName { get; set; }
-    public string ArtistName { get; set; }
-    public decimal UnitPrice { get; set; }
-}
-
-// Sex objekt – sex kopior av Joakims e-post.
-// Byter han adress måste du hitta och ändra alla sex.
-foreach (var rad in rader.Where(r =&gt; r.CustomerName == "Joakim Johansson"))
-    rad.CustomerEmail = "joakim@nymail.se";</code></pre>
-<p>Så skulle du aldrig skriva det i C#. Du skulle ha <b>ett</b> kundobjekt och låta fakturorna <b>referera</b> till det:</p>
-<pre><code>var joakim = new Customer { CustomerId = 51, Email = "joakim.johansson@yahoo.se" };
-
-var faktura42 = new Invoice { InvoiceId = 42, Customer = joakim };
-var faktura65 = new Invoice { InvoiceId = 65, Customer = joakim };
-
-joakim.Email = "joakim@nymail.se";   // ändras på ett ställe – syns i båda fakturorna</code></pre>
+<p><b>Lösningen</b> är två tabeller. Namnet står på ett ställe, och albumen pekar på artisten med en främmande nyckel. Så ser riktiga Chinook ut:</p>
+<div class="tva-kol tabellpar">
 <div class="scroll"><table>
-  <tr><th>C#</th><th>Databas</th></tr>
-  <tr><td>En kopia av ett värde i varje objekt</td><td>En upprepad kolumn i varje rad</td></tr>
-  <tr><td>En referens till ett gemensamt objekt</td><td>En främmande nyckel till en rad i en annan tabell</td></tr>
-  <tr><td>En klass ska ha ett ansvar (<i>Single Responsibility</i>)</td><td>En tabell ska handla om en sak</td></tr>
-  <tr><td>Upprepa inte dig själv (<i>DRY – Don't Repeat Yourself</i>)</td><td>Spara varje uppgift på ett ställe</td></tr>
+  <tr><th colspan="2">Artist</th></tr>
+  <tr><th>ArtistId (<span class="pk">PK</span>)</th><th>Name</th></tr>
+  <tr><td>1</td><td>AC/DC</td></tr>
+  <tr><td>2</td><td>Accept</td></tr>
+  <tr><td>3</td><td>Aerosmith</td></tr>
 </table></div>
-<p class="box"><b>Normalisering = byt kopior mot referenser.</b> Du gör redan det i C# – idag lär vi oss reglerna för att göra det i en databas.</p>
-
-<h2 id="del5">5. Funktionellt beroende</h2>
-<p>För att veta <i>hur</i> en tabell ska delas upp behöver vi ett begrepp: <b>funktionellt beroende</b>.</p>
-<p class="box"><b>A → B</b> (läs: "A bestämmer B") betyder: <i>om du vet A, så vet du B</i>. Varje gång A har samma värde har B också samma värde.</p>
-<p>Exempel ur kvittotabellen:</p>
 <div class="scroll"><table>
-  <tr><th>Beroende</th><th>Betyder</th></tr>
-  <tr><td><code>CustomerId → Customer, Email</code></td><td>Kund 51 är alltid Joakim Johansson med samma e-post</td></tr>
-  <tr><td><code>InvoiceId → InvoiceDate, CustomerId</code></td><td>Faktura 65 har ett datum och en kund</td></tr>
-  <tr><td><code>TrackId → Track, Album, Genre</code></td><td>Låt 2100 är alltid <i>Crazy Train</i> på albumet <i>Tribute</i>, genre Metal</td></tr>
-  <tr><td><code>Album → Artist</code></td><td>Ett album har en artist</td></tr>
-  <tr><td><code>(InvoiceId, TrackId) → UnitPrice, Quantity</code></td><td>Priset och antalet gäller en viss låt på en viss faktura</td></tr>
+  <tr><th colspan="3">Album</th></tr>
+  <tr><th>AlbumId (<span class="pk">PK</span>)</th><th>Title</th><th>ArtistId (<span class="fk">FK</span>)</th></tr>
+  <tr><td>1</td><td>For Those About To Rock …</td><td>1</td></tr>
+  <tr><td>4</td><td>Let There Be Rock</td><td>1</td></tr>
+  <tr><td>2</td><td>Balls to the Wall</td><td>2</td></tr>
+  <tr><td>5</td><td>Big Ones</td><td>3</td></tr>
 </table></div>
-<p><b>Inte</b> beroende: <code>Artist → Track</code>. Om du vet att artisten är Ozzy Osbourne vet du inte vilken låt det är – han har många.</p>
+</div>
+<p class="box"><b>Normalisering</b> betyder att dela upp tabeller så att varje uppgift finns på <b>ett</b> ställe.</p>
+
+<h2 id="del4">4. Samma sak i C#</h2>
 <div class="tva-kol">
 <div>
-<p><b>I C#</b> är ett funktionellt beroende som en <code class="cs">Dictionary</code>: nyckeln ger dig värdet.</p>
-<p>Ibland behövs <b>två</b> värden för att hitta svaret – då är nyckeln sammansatt.</p>
+<p class="etikett">Kopia – namnet i varje album</p>
+<pre><code>album1.ArtistName = "AC/DC";
+album4.ArtistName = "AC/DC";</code></pre>
 </div>
-<pre><code>Dictionary&lt;int, Customer&gt; kunder = …;
-kunder[51].Email   // CustomerId → Email
-
-Dictionary&lt;(int, int), decimal&gt; priser = …;
-priser[(65, 2100)] // (InvoiceId, TrackId) → UnitPrice</code></pre>
+<div>
+<p class="etikett">Referens – ett gemensamt objekt</p>
+<pre><code>var acdc = new Artist { Name = "AC/DC" };
+album1.Artist = acdc;
+album4.Artist = acdc;</code></pre>
 </div>
-<p class="box"><b>Så hittar du beroendena:</b> fråga dig <i>"Om jag vet X – kan det finnas två olika Y?"</i> Är svaret nej gäller X → Y. Utgå från vad datan <b>betyder</b>, inte bara från exempelraderna: alla låtar ovan kostar 0.99, men genren bestämmer inte priset.</p>
+</div>
+<p class="box">I C# använder du redan referenser: ändrar du <code class="cs">acdc.Name</code> syns det i båda albumen. I databasen är referensen en <b>främmande nyckel</b>.</p>
 
-<h2 id="del6">6. Normalformerna 1NF, 2NF och 3NF</h2>
-<p>En <b>normalform</b> är en nivå av "ordning" i en tabell. Varje nivå bygger på den förra – en tabell i 3NF är också i 2NF och 1NF.</p>
+<h2 id="del5">5. Funktionellt beroende</h2>
+<p class="box"><b>A → B</b> betyder: om du vet A, så vet du B.</p>
+<div class="scroll"><table>
+  <tr><th>I Chinook</th><th>Betyder</th></tr>
+  <tr><td><code>ArtistId → Name</code></td><td>Artist 1 heter alltid AC/DC</td></tr>
+  <tr><td><code>GenreId → Name</code></td><td>Genre 3 heter alltid Metal</td></tr>
+  <tr><td><code>TrackId → Name</code></td><td>Låt 2100 heter alltid <i>Crazy Train</i></td></tr>
+</table></div>
+<p>Med funktionella beroenden kan man avgöra var en kolumn hör hemma: i den tabell vars nyckel bestämmer den.</p>
+
+<h2 id="del6">6. Tre regler: 1NF, 2NF och 3NF</h2>
 <div class="nf">
-  <div><h3>1NF</h3><p><b>Ett värde per cell.</b> Inga listor i en kolumn och inga upprepade kolumner som <code>Telefon1</code>, <code>Telefon2</code>. Varje rad är unik – tabellen har en primärnyckel.</p></div>
-  <div><h3>2NF</h3><p><b>1NF + hela nyckeln.</b> Varje kolumn beror på <i>hela</i> primärnyckeln, inte bara på en del av den. Gäller bara när nyckeln består av flera kolumner.</p></div>
-  <div><h3>3NF</h3><p><b>2NF + inget annat än nyckeln.</b> Ingen kolumn beror på en annan kolumn som inte är nyckel. Inga beroenden "i två steg".</p></div>
+  <div><h3>1NF</h3><p>Ett värde per cell.</p></div>
+  <div><h3>2NF</h3><p>Allt beror på <b>hela</b> nyckeln.</p></div>
+  <div><h3>3NF</h3><p>Allt beror <b>bara</b> på nyckeln.</p></div>
 </div>
-<p class="citat">"The key, the whole key, and nothing but the key."</p>
-<p>Ett klassiskt sätt att minnas reglerna, som en ed i rätten: varje kolumn ska bero på <b>nyckeln</b> (1NF), på <b>hela nyckeln</b> (2NF) och på <b>inget annat än nyckeln</b> (3NF).</p>
-<p class="box">Normalformerna beskrevs av <b>Edgar F. Codd</b> på IBM, samme person som uppfann relationsmodellen 1970. Det finns fler normalformer (BCNF, 4NF, 5NF), men i praktiken räcker 3NF för nästan alla system – och det är 3NF som kursen kräver.</p>
+<p>Varje regel bygger på den förra. Målet i kursen är 3NF.</p>
 
 <h2 id="del7">7. 1NF – ett värde per cell</h2>
-<p>Före 1NF kallas en tabell ibland för <b>onormaliserad</b> (0NF). Så här kunde Joakims faktura 65 se ut om man sparade den som en rad:</p>
+<p class="etikett">Fel – en lista i en cell</p>
 <div class="scroll"><table>
-  <tr><th>InvoiceId</th><th>InvoiceDate</th><th>Customer</th><th>Tracks</th></tr>
-  <tr><td>65</td><td>2021-10-08</td><td>Joakim Johansson</td><td class="fel-varde">I Don't Know, Flying High Again, No More Tears, Crazy Train</td></tr>
+  <tr><th>PlaylistId</th><th>Name</th><th>Tracks</th></tr>
+  <tr><td>16</td><td>Grunge</td><td class="fel-varde">Man In The Box, Smells Like Teen Spirit, In Bloom, …</td></tr>
 </table></div>
-<ul>
-  <li>Hur hittar man alla fakturor med <i>Crazy Train</i>? Med <code>LIKE '%Crazy Train%'</code> – och hoppas att ingen har stavat fel.</li>
-  <li>Hur räknar man antalet låtar, eller sätter ett pris per låt?</li>
-  <li>En lista kan inte innehålla främmande nycklar – det finns inget <code>TrackId</code> att peka med.</li>
-</ul>
-<p>Lika dåligt är att lösa det med kolumnerna <code>Track1</code>, <code>Track2</code>, <code>Track3</code> och <code>Track4</code>. Joakims faktura 271 har 14 låtar – ska tabellen ha 14 kolumner? Och hur söker man i alla på en gång?</p>
-<p><b>Lösningen i 1NF:</b> en rad per låt på fakturan – precis som kvittotabellen i avsnitt 3. Varje cell har ett värde.</p>
-<p>Varje rad måste också gå att skilja från de andra med en <b>primärnyckel</b>. Varken <code>InvoiceId</code> eller <code>TrackId</code> räcker ensam: faktura 65 har fyra rader, och samma låt kan finnas på många fakturor. Men <b>tillsammans</b> är de unika:</p>
-<p class="box">Kvittotabellens primärnyckel: <b>(InvoiceId, TrackId)</b> – en <b>sammansatt nyckel</b> (<i>composite key</i>). Kvittotabellen är nu i 1NF – men fortfarande full av upprepningar.</p>
-<div class="tva-kol">
-<p><b>I C#</b> skulle du aldrig spara låtarna som en sträng med kommatecken – du skulle använda en lista. I en databas blir en lista <b>fler rader</b>.</p>
-<pre><code>// 0NF
-public string Tracks { get; set; }   // "I Don't Know, Flying High Again, …"
+<p>Hur hittar man alla spellistor med <i>In Bloom</i>? Hur räknar man låtarna?</p>
+<p class="etikett">Rätt – en rad per låt, som tabellen <code>PlaylistTrack</code> i Chinook</p>
+<div class="scroll"><table>
+  <tr><th>PlaylistId (<span class="fk">FK</span>)</th><th>TrackId (<span class="fk">FK</span>)</th></tr>
+  <tr><td>16</td><td>52</td></tr>
+  <tr><td>16</td><td>2003</td></tr>
+  <tr><td>16</td><td>2004</td></tr>
+  <tr><td>…</td><td>…</td></tr>
+</table></div>
+<p class="box">Grunge-listan har 15 låtar – alltså 15 rader. I C# hade du använt en <code class="cs">List&lt;Track&gt;</code>. I en databas blir en lista fler rader.</p>
 
-// 1NF-tänk
-public List&lt;Track&gt; Tracks { get; set; } = new();</code></pre>
-</div>
-
-<h2 id="del8">8. 1NF i Chinook: kolumnen Composer</h2>
-<p>Chinook är en välgjord databas – men den har ett ställe som bryter mot 1NF. Titta på kolumnen <code>Composer</code> i <code>Track</code>:</p>
-<pre><code class="sql nohighlight">SELECT TrackId, Name, Composer
-FROM Track
-WHERE TrackId IN (1, 2, 3);</code></pre>
+<h2 id="del8">8. Chinook bryter mot 1NF: Composer</h2>
 <div class="scroll"><table>
   <tr><th>TrackId</th><th>Name</th><th>Composer</th></tr>
-  <tr><td>1</td><td>For Those About To Rock (We Salute You)</td><td>Angus Young, Malcolm Young, Brian Johnson</td></tr>
-  <tr><td>2</td><td>Balls to the Wall</td><td>U. <b>Dirkschneider</b>, W. <b>Hoffmann</b>, H. Frank, P. Baltes, S. <b>Kaufmann</b>, G. Hoffmann</td></tr>
-  <tr><td>3</td><td>Fast As a Shark</td><td>F. Baltes, S. <b>Kaufman</b>, U. <b>Dirkscneider</b> &amp; W. <b>Hoffman</b></td></tr>
+  <tr><td>1</td><td>For Those About To Rock (We Salute You)</td><td class="fel-varde">Angus Young, Malcolm Young, Brian Johnson</td></tr>
 </table></div>
-<p>En cell innehåller en <b>lista</b> med upphovspersoner – över 1 200 låtar i Chinook har flera namn i samma cell. Och se på låt 2 och 3: samma personer är stavade på olika sätt, och listan är ibland separerad med komma och ibland med <code>&amp;</code>.</p>
-<pre><code class="sql nohighlight">SELECT Name
-FROM Track
-WHERE Composer LIKE '%Dirkschneider%';
--- 1 rad: bara Balls to the Wall. Låt 3 och 4 missas på grund av stavfelet.</code></pre>
-<p class="box">Det här är uppdateringsanomalin i verkligheten: samma uppgift har skrivits in på många ställen, för hand, och har glidit isär. Hade varje person funnits på <b>en</b> rad i en egen tabell hade stavfelet inte kunnat uppstå.</p>
-<p><b>Lösningen:</b> en låt kan ha många upphovspersoner och en person kan ha skrivit många låtar – en <b>många till många</b>-relation. Den löses med en kopplingstabell, precis som <code>PlaylistTrack</code>:</p>
-<pre class="mermaid utan-en exempel-er stor">
+<p>Tre personer i en cell. Dessutom stavas samma person olika på olika låtar – <i>Dirkschneider</i> på låt 2 och <i>Dirkscneider</i> på låt 3 – så en sökning med <code>LIKE '%Dirkschneider%'</code> missar låtar.</p>
+<p><b>Lösningen:</b> en egen tabell för upphovspersonerna och en kopplingstabell, precis som <code>PlaylistTrack</code>:</p>
+<pre class="mermaid utan-en exempel-er">
 %%{init: {"er": {"layoutDirection": "LR"}}}%%
 erDiagram
     TRACK ||--o{ TRACKCOMPOSER : "skrivs av"
@@ -385,90 +338,88 @@ erDiagram
         string Name
     }
 </pre>
-<pre><code>class Track
-{
-    public int TrackId { get; set; }
-    public string Name { get; set; }
-    public List&lt;Composer&gt; Composers { get; set; } = new();   // i stället för string Composer
-}</code></pre>
-<p>Vi skriver <code>CREATE TABLE</code> för de två nya tabellerna i <a href="#del15">avsnitt 15</a>, när vi har gått igenom constraints.</p>
+<p>Vi skriver <code>CREATE TABLE</code> för tabellerna i <a href="#del15">avsnitt 15</a>.</p>
 
 <h2 id="del9">9. 2NF – hela nyckeln</h2>
-<p>Kvittotabellen är i 1NF med nyckeln <b>(InvoiceId, TrackId)</b>. 2NF kräver att varje kolumn beror på <b>hela</b> nyckeln. Gå igenom kolumnerna:</p>
+<p>2NF gäller när primärnyckeln består av <b>två</b> kolumner. I <code>PlaylistTrack</code> är nyckeln <b>(PlaylistId, TrackId)</b>. Varje kolumn måste bero på båda.</p>
+<p class="etikett">Fel</p>
 <div class="scroll"><table>
-  <tr><th>Kolumner</th><th>Beror på</th><th>Hela nyckeln?</th></tr>
-  <tr><td><code>InvoiceDate</code>, <code>CustomerId</code>, <code>Customer</code>, <code>Email</code></td><td>Bara <code>InvoiceId</code></td><td>Nej – <b>partiellt beroende</b></td></tr>
-  <tr><td><code>Track</code>, <code>Album</code>, <code>Artist</code>, <code>Genre</code></td><td>Bara <code>TrackId</code></td><td>Nej – <b>partiellt beroende</b></td></tr>
-  <tr><td><code>UnitPrice</code>, <code>Quantity</code></td><td><code>InvoiceId</code> <b>och</b> <code>TrackId</code></td><td>Ja</td></tr>
+  <tr><th>PlaylistId (<span class="pk">PK</span>)</th><th>TrackId (<span class="pk">PK</span>)</th><th>PlaylistName</th></tr>
+  <tr><td>16</td><td>52</td><td class="upprepad">Grunge</td></tr>
+  <tr><td>16</td><td>2003</td><td class="upprepad">Grunge</td></tr>
+  <tr><td>16</td><td>2004</td><td class="upprepad">Grunge</td></tr>
 </table></div>
-<p>Datumet för faktura 65 har ingenting med <i>Crazy Train</i> att göra – därför upprepas det på varje rad. <b>Lösningen:</b> flytta varje grupp till en egen tabell med den del av nyckeln som den beror på.</p>
+<p><code>PlaylistName</code> beror bara på <code>PlaylistId</code> – inte på låten. Därför upprepas det.</p>
+<p class="etikett">Rätt – som i Chinook</p>
 <div class="tva-kol tabellpar">
 <div class="scroll"><table>
-  <tr><th colspan="5">Invoice</th></tr>
-  <tr><th>InvoiceId (<span class="pk">PK</span>)</th><th>InvoiceDate</th><th>CustomerId</th><th>Customer</th><th>Email</th></tr>
-  <tr><td>42</td><td>2021-07-06</td><td>51</td><td>Joakim Johansson</td><td>joakim.johansson@yahoo.se</td></tr>
-  <tr><td>65</td><td>2021-10-08</td><td>51</td><td>Joakim Johansson</td><td>joakim.johansson@yahoo.se</td></tr>
+  <tr><th colspan="2">Playlist</th></tr>
+  <tr><th>PlaylistId (<span class="pk">PK</span>)</th><th>Name</th></tr>
+  <tr><td>16</td><td>Grunge</td></tr>
 </table></div>
 <div class="scroll"><table>
-  <tr><th colspan="4">InvoiceLine</th></tr>
-  <tr><th>InvoiceId (<span class="pk">PK</span>, <span class="fk">FK</span>)</th><th>TrackId (<span class="pk">PK</span>, <span class="fk">FK</span>)</th><th>UnitPrice</th><th>Quantity</th></tr>
-  <tr><td>42</td><td>1391</td><td>0.99</td><td>1</td></tr>
-  <tr><td>42</td><td>1392</td><td>0.99</td><td>1</td></tr>
-  <tr><td>65</td><td>2094</td><td>0.99</td><td>1</td></tr>
-  <tr><td>…</td><td>…</td><td>…</td><td>…</td></tr>
+  <tr><th colspan="2">PlaylistTrack</th></tr>
+  <tr><th>PlaylistId (<span class="pk">PK</span>)</th><th>TrackId (<span class="pk">PK</span>)</th></tr>
+  <tr><td>16</td><td>52</td></tr>
+  <tr><td>16</td><td>2003</td></tr>
+  <tr><td>16</td><td>2004</td></tr>
 </table></div>
 </div>
-<div class="scroll bred"><table>
-  <tr><th colspan="5">Track</th></tr>
-  <tr><th>TrackId (<span class="pk">PK</span>)</th><th>Name</th><th>Album</th><th>Artist</th><th>Genre</th></tr>
-  <tr><td>1391</td><td>Invaders</td><td>The Number of The Beast</td><td>Iron Maiden</td><td>Metal</td></tr>
-  <tr><td>1392</td><td>Run to the Hills</td><td>The Number of The Beast</td><td>Iron Maiden</td><td>Metal</td></tr>
-  <tr><td>2094</td><td>I Don't Know</td><td>Blizzard of Ozz</td><td>Ozzy Osbourne</td><td>Rock</td></tr>
-  <tr><td>2096</td><td>Flying High Again</td><td>Diary of a Madman (Remastered)</td><td>Ozzy Osbourne</td><td>Rock</td></tr>
-  <tr><td>…</td><td>…</td><td>…</td><td>…</td><td>…</td></tr>
-</table></div>
-<p class="box"><b>Varför ligger <code>UnitPrice</code> kvar i <code>InvoiceLine</code>?</b> Det är priset <i>när köpet gjordes</i> – det beror på både fakturan och låten. Ändras låtens pris imorgon ska Joakims gamla kvitto inte ändras. Chinook har dessutom ett eget id för varje fakturarad, <code>InvoiceLineId</code>, i stället för den sammansatta nyckeln – tanken är densamma.</p>
-<p>Nu står Joakims e-post två gånger i stället för sex. Bättre – men inte bra. Det leder oss till 3NF.</p>
 
-<h2 id="del10">10. 3NF – inget annat än nyckeln</h2>
-<p>3NF kräver att ingen kolumn beror på en annan kolumn som <b>inte</b> är nyckel. Ett sådant beroende "i två steg" kallas <b>transitivt beroende</b>:</p>
+<h2 id="del10">10. 3NF – bara nyckeln</h2>
+<p>En kolumn får inte bero på en annan kolumn som inte är nyckeln.</p>
+<p class="etikett">Fel</p>
 <div class="scroll"><table>
-  <tr><th>Tabell</th><th>Transitivt beroende</th><th>Problem</th></tr>
-  <tr><td><code>Invoice</code></td><td><code>InvoiceId → CustomerId → Customer, Email</code></td><td>Kunduppgifterna upprepas på varje faktura</td></tr>
-  <tr><td><code>Track</code></td><td><code>TrackId → Album → Artist</code></td><td>Artisten upprepas på varje låt på albumet</td></tr>
+  <tr><th>TrackId (<span class="pk">PK</span>)</th><th>Name</th><th>GenreId</th><th>GenreName</th></tr>
+  <tr><td>1</td><td>For Those About To Rock</td><td>1</td><td class="upprepad">Rock</td></tr>
+  <tr><td>2</td><td>Balls to the Wall</td><td>1</td><td class="upprepad">Rock</td></tr>
+  <tr><td>1391</td><td>Invaders</td><td>3</td><td>Metal</td></tr>
 </table></div>
-<p>E-posten handlar om <b>kunden</b>, inte om fakturan. Artisten handlar om <b>albumet</b>, inte om låten. <b>Lösningen:</b> flytta ut dem till egna tabeller och lämna kvar en främmande nyckel.</p>
-<ul>
-  <li><code>Customer</code> och <code>Email</code> flyttar till tabellen <code>Customer</code>. Kvar i <code>Invoice</code> blir <code>CustomerId</code> (<span class="fk">FK</span>).</li>
-  <li><code>Album</code> och <code>Artist</code> blir tabellerna <code>Album</code> och <code>Artist</code>. Kvar i <code>Track</code> blir <code>AlbumId</code> (<span class="fk">FK</span>), och i <code>Album</code> ligger <code>ArtistId</code> (<span class="fk">FK</span>).</li>
-  <li><code>Genre</code> får också en egen tabell. Strikt taget beror genrenamnet direkt på låten, så 3NF kräver det inte – men med en egen tabell kan ingen skriva <i>Metal</i> på ett ställe och <i>metal</i> på ett annat, och en ny genre kan finnas innan någon låt har den.</li>
-</ul>
-<pre class="mermaid utan-en stor">
+<p><code>GenreName</code> beror på <code>GenreId</code> – inte på låten: <code>TrackId → GenreId → GenreName</code>. Ett sådant beroende i två steg kallas <b>transitivt</b>.</p>
+<p class="etikett">Rätt – som i Chinook</p>
+<div class="tva-kol tabellpar">
+<div class="scroll"><table>
+  <tr><th colspan="2">Genre</th></tr>
+  <tr><th>GenreId (<span class="pk">PK</span>)</th><th>Name</th></tr>
+  <tr><td>1</td><td>Rock</td></tr>
+  <tr><td>3</td><td>Metal</td></tr>
+</table></div>
+<div class="scroll"><table>
+  <tr><th colspan="3">Track</th></tr>
+  <tr><th>TrackId (<span class="pk">PK</span>)</th><th>Name</th><th>GenreId (<span class="fk">FK</span>)</th></tr>
+  <tr><td>1</td><td>For Those About To Rock</td><td>1</td></tr>
+  <tr><td>2</td><td>Balls to the Wall</td><td>1</td></tr>
+  <tr><td>1391</td><td>Invaders</td><td>3</td></tr>
+</table></div>
+</div>
+
+<h2 id="del11">11. Resultatet: därför ser Chinook ut så här</h2>
+<div class="scroll"><table>
+  <tr><th>Regel</th><th>Fel</th><th>Lösning i Chinook</th></tr>
+  <tr><td><b>1NF</b></td><td>Alla låtar i en cell</td><td>En rad per låt i <code>PlaylistTrack</code></td></tr>
+  <tr><td><b>2NF</b></td><td><code>PlaylistName</code> i <code>PlaylistTrack</code></td><td>Namnet i <code>Playlist</code></td></tr>
+  <tr><td><b>3NF</b></td><td><code>GenreName</code> i <code>Track</code></td><td>Namnet i <code>Genre</code></td></tr>
+</table></div>
+<pre class="mermaid utan-en exempel-er stor">
 %%{init: {"er": {"layoutDirection": "LR"}}}%%
 erDiagram
-    CUSTOMER ||--o{ INVOICE : "har"
-    INVOICE ||--o{ INVOICELINE : "har"
-    TRACK ||--o{ INVOICELINE : "säljs i"
-    ALBUM ||--o{ TRACK : "innehåller"
     ARTIST ||--o{ ALBUM : "har"
+    ALBUM ||--o{ TRACK : "innehåller"
     GENRE ||--o{ TRACK : "har"
-    CUSTOMER {
-        int CustomerId PK
-        string FirstName
-        string LastName
-        string Email
+    TRACK ||--o{ PLAYLISTTRACK : "finns i"
+    PLAYLIST ||--o{ PLAYLISTTRACK : "innehåller"
+    ARTIST {
+        int ArtistId PK
+        string Name
     }
-    INVOICE {
-        int InvoiceId PK
-        datetime InvoiceDate
-        int CustomerId FK
+    ALBUM {
+        int AlbumId PK
+        string Title
+        int ArtistId FK
     }
-    INVOICELINE {
-        int InvoiceLineId PK
-        int InvoiceId FK
-        int TrackId FK
-        decimal UnitPrice
-        int Quantity
+    GENRE {
+        int GenreId PK
+        string Name
     }
     TRACK {
         int TrackId PK
@@ -476,60 +427,35 @@ erDiagram
         int AlbumId FK
         int GenreId FK
     }
-    ALBUM {
-        int AlbumId PK
-        string Title
-        int ArtistId FK
+    PLAYLISTTRACK {
+        int PlaylistId PK, FK
+        int TrackId PK, FK
     }
-    ARTIST {
-        int ArtistId PK
-        string Name
-    }
-    GENRE {
-        int GenreId PK
+    PLAYLIST {
+        int PlaylistId PK
         string Name
     }
 </pre>
-<p class="box">Känner du igen det? Det är <b>Chinook</b>. Vi har normaliserat kvittotabellen och kommit fram till samma tabeller som finns i databasen ni installerade i torsdags.</p>
-
-<h2 id="del11">11. Resultatet: från en tabell till Chinook</h2>
-<div class="scroll"><table>
-  <tr><th>Problem i kvittotabellen</th><th>Efter normalisering till 3NF</th></tr>
-  <tr><td>Joakims e-post på sex rader</td><td>På <b>en</b> rad i <code>Customer</code></td></tr>
-  <tr><td>En ny kund kan inte sparas utan ett köp</td><td>Lägg till en rad i <code>Customer</code> – ingen faktura behövs</td></tr>
-  <tr><td>Makulerad faktura tar med sig låtarna</td><td>Ta bort raderna i <code>InvoiceLine</code> och <code>Invoice</code> – låtarna finns kvar i <code>Track</code></td></tr>
-  <tr><td>Iron Maiden upprepas på varje låt</td><td>En rad i <code>Artist</code>, refererad från <code>Album</code></td></tr>
-</table></div>
-<p><b>Priset</b> för en normaliserad databas: datan ligger i flera tabeller, så för att visa ett kvitto måste man sätta ihop dem igen. Det gör man med <code>JOIN</code> – längre fram idag.</p>
-<p><b>Arbetsgång – använd den i parövningen:</b></p>
+<p><b>Så normaliserar du – använd det i parövningen:</b></p>
 <ol>
-  <li>Lista alla kolumner och hitta något som gör varje rad unik – det är primärnyckeln.</li>
-  <li><b>1NF:</b> dela upp listor och upprepade kolumner till fler rader.</li>
-  <li>Skriv ner alla funktionella beroenden: <i>vad bestämmer vad?</i></li>
-  <li><b>2NF:</b> flytta kolumner som bara beror på en del av nyckeln till en egen tabell.</li>
-  <li><b>3NF:</b> flytta kolumner som beror på något annat än nyckeln till en egen tabell.</li>
-  <li>Ge varje ny tabell en primärnyckel, koppla ihop dem med främmande nycklar och rita ER-diagrammet.</li>
+  <li>Hitta det som gör varje rad unik – <b>primärnyckeln</b>.</li>
+  <li><b>1NF:</b> en lista i en cell → flera rader.</li>
+  <li><b>2NF och 3NF:</b> fråga för varje kolumn: <i>handlar den om nyckeln?</i></li>
+  <li>Nej? Flytta den till en egen tabell och lämna en <b>främmande nyckel</b>.</li>
 </ol>
 
-<h2 id="del12">12. Medveten denormalisering</h2>
-<p>Chinook är normaliserad – men inte överallt. Ibland är det ett medvetet val att spara samma sak på två ställen:</p>
-<div class="scroll"><table>
-  <tr><th>I Chinook</th><th>Varför?</th></tr>
-  <tr><td><code>Invoice</code> har egna adresskolumner: <code>BillingAddress</code>, <code>BillingCity</code> …</td><td>Fakturan ska visa adressen <i>när köpet gjordes</i>, även om kunden flyttar. Det är en annan uppgift än "kundens adress nu".</td></tr>
-  <tr><td><code>InvoiceLine.UnitPrice</code> och <code>Track.UnitPrice</code></td><td>Priset vid köpet respektive dagens pris. Också två olika uppgifter.</td></tr>
-  <tr><td><code>Customer</code> har både <code>PostalCode</code> och <code>City</code></td><td>Postnumret bestämmer egentligen orten – ett transitivt beroende. Men en egen tabell med alla världens postnummer vore mer jobb än nytta.</td></tr>
-</table></div>
-<p class="box"><b>Normalisera först – denormalisera medvetet.</b> Det är okej att avvika från 3NF om du kan förklara varför. Det är precis det kursmålet menar med att <i>motivera valen</i>.</p>
+<h2 id="del12">12. Ibland sparar man dubbelt med flit</h2>
+<p>Priset finns på två ställen i Chinook: <code>Track.UnitPrice</code> är <b>dagens</b> pris och <code>InvoiceLine.UnitPrice</code> är priset <b>när låten köptes</b>. Höjs priset ska gamla kvitton inte ändras. På samma sätt sparar <code>Invoice</code> kundens adress vid köpet.</p>
+<p class="box">Det är två olika uppgifter, så det bryter inte mot reglerna. Normalisera först – och spara dubbelt bara när du kan förklara varför.</p>
 
-<h2 id="del13">13. Snabbquiz: vilken normalform bryts?</h2>
+<h2 id="del13">13. Quiz: vilken regel bryts?</h2>
 <p>Primärnyckeln är <u>understruken</u>. Klicka för att se svaret.</p>
-<details><summary>1. <code>Student(<u>StudentId</u>, Namn, Telefon)</code> där Telefon kan vara <i>"070-123 45 67, 073-765 43 21"</i></summary><p><b>1NF</b> – två värden i samma cell. Lösning: en tabell <code>Telefon(StudentId, Nummer)</code>.</p></details>
-<details><summary>2. <code>Betyg(<u>ElevId</u>, <u>KursId</u>, Betyg, Kursnamn)</code></summary><p><b>2NF</b> – <code>Kursnamn</code> beror bara på <code>KursId</code>, en del av nyckeln. Flytta det till <code>Kurs</code>.</p></details>
-<details><summary>3. <code>Elev(<u>ElevId</u>, Namn, KlassId, Klassnamn)</code></summary><p><b>3NF</b> – <code>ElevId → KlassId → Klassnamn</code>. Flytta <code>Klassnamn</code> till <code>Klass</code>.</p></details>
-<details><summary>4. <code>Album(<u>AlbumId</u>, Title, ArtistId)</code></summary><p><b>Ingen</b> – tabellen är i 3NF. <code>ArtistId</code> är en främmande nyckel, inte en kopia av artistens uppgifter.</p></details>
-<details><summary>5. <code>PlaylistTrack(<u>PlaylistId</u>, <u>TrackId</u>, PlaylistName)</code></summary><p><b>2NF</b> – <code>PlaylistName</code> beror bara på <code>PlaylistId</code>. Det ska ligga i <code>Playlist</code>, där det också ligger i Chinook.</p></details>
-<details><summary>6. <code>Invoice(<u>InvoiceId</u>, InvoiceDate, CustomerId, CustomerEmail)</code></summary><p><b>3NF</b> – <code>InvoiceId → CustomerId → CustomerEmail</code>. E-posten hör hemma i <code>Customer</code>.</p></details>
-<details><summary>7. <code>Anstalld(<u>Id</u>, Namn, Barn1, Barn2, Barn3)</code></summary><p><b>1NF</b> – upprepade kolumner. Vad händer när någon får ett fjärde barn? Lösning: en tabell <code>Barn(AnstalldId, Namn)</code>.</p></details>
+<details><summary>1. <code>Album(<u>AlbumId</u>, Title, ArtistId, ArtistName)</code></summary><p><b>3NF</b> – <code>ArtistName</code> beror på <code>ArtistId</code>. Flytta det till <code>Artist</code>.</p></details>
+<details><summary>2. <code>Customer(<u>CustomerId</u>, Name, Phone1, Phone2)</code></summary><p><b>1NF</b> – upprepade kolumner. Vad händer med ett tredje nummer?</p></details>
+<details><summary>3. <code>Album(<u>AlbumId</u>, Title, ArtistId)</code></summary><p><b>Ingen</b> – den är i 3NF. Så ser den ut i Chinook.</p></details>
+<details><summary>4. <code>InvoiceLine(<u>InvoiceId</u>, <u>TrackId</u>, Quantity, TrackName)</code></summary><p><b>2NF</b> – <code>TrackName</code> beror bara på <code>TrackId</code>.</p></details>
+<details><summary>5. <code>Invoice(<u>InvoiceId</u>, InvoiceDate, CustomerId, CustomerEmail)</code></summary><p><b>3NF</b> – e-posten handlar om kunden. Den hör hemma i <code>Customer</code>.</p></details>
+<details><summary>6. <code>Track(<u>TrackId</u>, Name, Composer)</code> där Composer är <i>"Angus Young, Malcolm Young"</i></summary><p><b>1NF</b> – två namn i en cell.</p></details>
 
 <h2 id="del14">14. Constraints</h2>
 <p>Normalisering bestämmer <b>var</b> datan ska ligga. <b>Constraints</b> bestämmer <b>vad</b> som får stå där. En constraint är en regel som databasen själv kontrollerar – oavsett om datan kommer från en webbsida, en app eller någon som skriver SQL för hand.</p>
@@ -685,7 +611,7 @@ WHERE villkor;</code></pre>
 SET Email = N'joakim@nymail.se'
 WHERE CustomerId = 51;
 -- (1 row affected)</code></pre>
-<p class="box">Här ser du vinsten med normaliseringen: <b>en</b> rad ändras. I kvittotabellen från avsnitt 3 hade samma ändring behövt träffa sex rader – och alla rader på hans andra fem fakturor. Och alla fakturor visar ändå rätt e-post, eftersom de bara pekar på kunden med <code>CustomerId</code>.</p>
+<p class="box">Här ser du vinsten med normaliseringen: kundens e-post står på <b>ett</b> ställe, så bara en rad ändras. Joakims sju fakturor pekar på honom med <code>CustomerId</code> och visar automatiskt den nya adressen.</p>
 <div class="tva-kol">
 <div>
 <p class="etikett">Flera kolumner på en gång</p>
@@ -818,8 +744,8 @@ JOIN Genre g ON t.GenreId = g.GenreId
 WHERE t.AlbumId = 1;</code></pre>
 <p class="box"><b>INNER JOIN</b> tar bara med rader som har en matchning. 71 av Chinooks 275 artister har inga album – de syns inte i en <code>INNER JOIN</code> mellan <code>Artist</code> och <code>Album</code>. För att få med dem behövs <code>LEFT JOIN</code>, som kommer senare i kursen.</p>
 
-<h3>Bygg ihop Joakims kvitto igen</h3>
-<p>Med en <code>JOIN</code> per främmande nyckel får vi tillbaka kvittotabellen från avsnitt 3 – fast datan nu ligger i sju tabeller:</p>
+<h3>Bygg ihop Joakims kvitto</h3>
+<p>Ett kvitto behöver data från sju tabeller. Med en <code>JOIN</code> per främmande nyckel får vi allt i en fråga:</p>
 <pre><code class="sql nohighlight">SELECT i.InvoiceId, i.InvoiceDate, c.FirstName, c.LastName, c.Email,
        t.Name AS Track, al.Title AS Album, ar.Name AS Artist, g.Name AS Genre,
        il.UnitPrice, il.Quantity
@@ -840,7 +766,7 @@ WHERE i.InvoiceId IN (42, 65);</code></pre>
   <tr><td>65</td><td>Joakim</td><td>No More Tears</td><td>Ozzy Osbourne</td><td>Rock</td><td>…</td></tr>
   <tr><td>65</td><td>Joakim</td><td>Crazy Train</td><td>Ozzy Osbourne</td><td>Metal</td><td>…</td></tr>
 </table></div>
-<p class="box"><b>Spara normaliserat – läs med JOIN.</b> Varje uppgift ligger på ett ställe och kan inte bli motsägelsefull, men du kan alltid få fram den "platta" tabellen när du behöver den. Tips: börja med <code>FROM</code> och lägg till en <code>JOIN</code> i taget. Följ kråkfötterna i ER-diagrammet – varje linje blir ett <code>ON</code>.</p>
+<p class="box"><b>Spara normaliserat – läs med JOIN.</b> Varje uppgift ligger på ett ställe och kan inte bli motsägelsefull, men du kan alltid sätta ihop den när du behöver den. Tips: börja med <code>FROM</code> och lägg till en <code>JOIN</code> i taget. Följ kråkfötterna i ER-diagrammet – varje linje blir ett <code>ON</code>.</p>
 
 <h2 id="del21">21. Parövning: normalisera konsertbokningar</h2>
 <p>En konsertarrangör har skött alla bokningar i ett Excel-ark. Nu ska det bli en databas. Arbeta i par i breakout rooms.</p>
