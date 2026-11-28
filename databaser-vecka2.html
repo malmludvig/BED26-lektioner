@@ -288,6 +288,43 @@ joakim.Email = "joakim@nymail.se";   // ändras på ett ställe – syns i båda
 </table></div>
 <p class="box"><b>Normalisering = byt kopior mot referenser.</b> Du gör redan det i C# – idag lär vi oss reglerna för att göra det i en databas.</p>
 
+<h2 id="del5">5. Funktionellt beroende</h2>
+<p>För att veta <i>hur</i> en tabell ska delas upp behöver vi ett begrepp: <b>funktionellt beroende</b>.</p>
+<p class="box"><b>A → B</b> (läs: "A bestämmer B") betyder: <i>om du vet A, så vet du B</i>. Varje gång A har samma värde har B också samma värde.</p>
+<p>Exempel ur kvittotabellen:</p>
+<div class="scroll"><table>
+  <tr><th>Beroende</th><th>Betyder</th></tr>
+  <tr><td><code>CustomerId → Customer, Email</code></td><td>Kund 51 är alltid Joakim Johansson med samma e-post</td></tr>
+  <tr><td><code>InvoiceId → InvoiceDate, CustomerId</code></td><td>Faktura 65 har ett datum och en kund</td></tr>
+  <tr><td><code>TrackId → Track, Album, Genre</code></td><td>Låt 2100 är alltid <i>Crazy Train</i> på albumet <i>Tribute</i>, genre Metal</td></tr>
+  <tr><td><code>Album → Artist</code></td><td>Ett album har en artist</td></tr>
+  <tr><td><code>(InvoiceId, TrackId) → UnitPrice, Quantity</code></td><td>Priset och antalet gäller en viss låt på en viss faktura</td></tr>
+</table></div>
+<p><b>Inte</b> beroende: <code>Artist → Track</code>. Om du vet att artisten är Ozzy Osbourne vet du inte vilken låt det är – han har många.</p>
+<div class="tva-kol">
+<div>
+<p><b>I C#</b> är ett funktionellt beroende som en <code>Dictionary</code>: nyckeln ger dig värdet.</p>
+<p>Ibland behövs <b>två</b> värden för att hitta svaret – då är nyckeln sammansatt.</p>
+</div>
+<pre><code>Dictionary&lt;int, Customer&gt; kunder = …;
+kunder[51].Email   // CustomerId → Email
+
+Dictionary&lt;(int, int), decimal&gt; priser = …;
+priser[(65, 2100)] // (InvoiceId, TrackId) → UnitPrice</code></pre>
+</div>
+<p class="box"><b>Så hittar du beroendena:</b> fråga dig <i>"Om jag vet X – kan det finnas två olika Y?"</i> Är svaret nej gäller X → Y. Utgå från vad datan <b>betyder</b>, inte bara från exempelraderna: alla låtar ovan kostar 0.99, men genren bestämmer inte priset.</p>
+
+<h2 id="del6">6. Normalformerna 1NF, 2NF och 3NF</h2>
+<p>En <b>normalform</b> är en nivå av "ordning" i en tabell. Varje nivå bygger på den förra – en tabell i 3NF är också i 2NF och 1NF.</p>
+<div class="nf">
+  <div><h3>1NF</h3><p><b>Ett värde per cell.</b> Inga listor i en kolumn och inga upprepade kolumner som <code>Telefon1</code>, <code>Telefon2</code>. Varje rad är unik – tabellen har en primärnyckel.</p></div>
+  <div><h3>2NF</h3><p><b>1NF + hela nyckeln.</b> Varje kolumn beror på <i>hela</i> primärnyckeln, inte bara på en del av den. Gäller bara när nyckeln består av flera kolumner.</p></div>
+  <div><h3>3NF</h3><p><b>2NF + inget annat än nyckeln.</b> Ingen kolumn beror på en annan kolumn som inte är nyckel. Inga beroenden "i två steg".</p></div>
+</div>
+<p class="citat">"The key, the whole key, and nothing but the key."</p>
+<p>Ett klassiskt sätt att minnas reglerna, som en ed i rätten: varje kolumn ska bero på <b>nyckeln</b> (1NF), på <b>hela nyckeln</b> (2NF) och på <b>inget annat än nyckeln</b> (3NF).</p>
+<p class="box">Normalformerna beskrevs av <b>Edgar F. Codd</b> på IBM, samme person som uppfann relationsmodellen 1970. Det finns fler normalformer (BCNF, 4NF, 5NF), men i praktiken räcker 3NF för nästan alla system – och det är 3NF som kursen kräver.</p>
+
 </main>
 <script type="module">
   import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.esm.min.mjs";
