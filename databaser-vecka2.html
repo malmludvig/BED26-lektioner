@@ -209,20 +209,20 @@ SELECT * FROM Genre WHERE GenreId = 26;</code></pre>
 </div>
 
 <h3>Facit i LINQ</h3>
-<p>Samma frågor mot listor i C#. Lägg märke till <code>ThenBy</code> i A5 – så skriver man <code>ORDER BY Country, LastName</code> i LINQ.</p>
+<p>Samma frågor mot listor i C#. Lägg märke till <code class="cs">ThenBy</code> i A5 – så skriver man <code>ORDER BY Country, LastName</code> i LINQ.</p>
 <div class="scroll"><table>
   <tr><th></th><th>SQL</th><th>LINQ</th></tr>
-  <tr><td>A3</td><td><code>WHERE Country = 'Sweden'</code></td><td><code>customers.Where(c =&gt; c.Country == "Sweden")</code></td></tr>
-  <tr><td>A4</td><td><code>WHERE Company IS NULL</code></td><td><code>customers.Where(c =&gt; c.Company == null)</code></td></tr>
-  <tr><td>A5</td><td><code>WHERE Country IN (…) ORDER BY Country, LastName</code></td><td><code>.Where(c =&gt; nordic.Contains(c.Country)).OrderBy(c =&gt; c.Country).ThenBy(c =&gt; c.LastName)</code></td></tr>
-  <tr><td>A6</td><td><code>SELECT Name, Milliseconds / 60000.0 AS Minuter</code></td><td><code>.Select(t =&gt; new { t.Name, Minuter = t.Milliseconds / 60000.0 })</code></td></tr>
-  <tr><td>A7</td><td><code>SELECT TOP 10 … ORDER BY Milliseconds DESC</code></td><td><code>tracks.OrderByDescending(t =&gt; t.Milliseconds).Take(10)</code></td></tr>
-  <tr><td>A8</td><td><code>WHERE Name LIKE 'Love %'</code></td><td><code>tracks.Where(t =&gt; t.Name.StartsWith("Love "))</code></td></tr>
-  <tr><td>A9</td><td><code>WHERE YEAR(InvoiceDate) = 2023</code></td><td><code>invoices.Where(i =&gt; i.InvoiceDate.Year == 2023)</code></td></tr>
-  <tr><td>A10</td><td><code>WHERE Total BETWEEN 10 AND 15</code></td><td><code>invoices.Where(i =&gt; i.Total &gt;= 10 &amp;&amp; i.Total &lt;= 15)</code></td></tr>
-  <tr><td>A11</td><td><code>SELECT DISTINCT Country … ORDER BY Country</code></td><td><code>customers.Select(c =&gt; c.Country).Distinct().OrderBy(c =&gt; c)</code></td></tr>
-  <tr><td>A12</td><td><code>WHERE ReportsTo IS NULL</code></td><td><code>employees.Where(e =&gt; e.ReportsTo == null)</code></td></tr>
-  <tr><td>A13</td><td><code>INSERT INTO Genre … VALUES (26, N'Svensk pop')</code></td><td><code>genres.Add(new Genre { GenreId = 26, Name = "Svensk pop" })</code></td></tr>
+  <tr><td>A3</td><td><code>WHERE Country = 'Sweden'</code></td><td><code class="cs">customers.Where(c =&gt; c.Country == "Sweden")</code></td></tr>
+  <tr><td>A4</td><td><code>WHERE Company IS NULL</code></td><td><code class="cs">customers.Where(c =&gt; c.Company == null)</code></td></tr>
+  <tr><td>A5</td><td><code>WHERE Country IN (…) ORDER BY Country, LastName</code></td><td><code class="cs">.Where(c =&gt; nordic.Contains(c.Country)).OrderBy(c =&gt; c.Country).ThenBy(c =&gt; c.LastName)</code></td></tr>
+  <tr><td>A6</td><td><code>SELECT Name, Milliseconds / 60000.0 AS Minuter</code></td><td><code class="cs">.Select(t =&gt; new { t.Name, Minuter = t.Milliseconds / 60000.0 })</code></td></tr>
+  <tr><td>A7</td><td><code>SELECT TOP 10 … ORDER BY Milliseconds DESC</code></td><td><code class="cs">tracks.OrderByDescending(t =&gt; t.Milliseconds).Take(10)</code></td></tr>
+  <tr><td>A8</td><td><code>WHERE Name LIKE 'Love %'</code></td><td><code class="cs">tracks.Where(t =&gt; t.Name.StartsWith("Love "))</code></td></tr>
+  <tr><td>A9</td><td><code>WHERE YEAR(InvoiceDate) = 2023</code></td><td><code class="cs">invoices.Where(i =&gt; i.InvoiceDate.Year == 2023)</code></td></tr>
+  <tr><td>A10</td><td><code>WHERE Total BETWEEN 10 AND 15</code></td><td><code class="cs">invoices.Where(i =&gt; i.Total &gt;= 10 &amp;&amp; i.Total &lt;= 15)</code></td></tr>
+  <tr><td>A11</td><td><code>SELECT DISTINCT Country … ORDER BY Country</code></td><td><code class="cs">customers.Select(c =&gt; c.Country).Distinct().OrderBy(c =&gt; c)</code></td></tr>
+  <tr><td>A12</td><td><code>WHERE ReportsTo IS NULL</code></td><td><code class="cs">employees.Where(e =&gt; e.ReportsTo == null)</code></td></tr>
+  <tr><td>A13</td><td><code>INSERT INTO Genre … VALUES (26, N'Svensk pop')</code></td><td><code class="cs">genres.Add(new Genre { GenreId = 26, Name = "Svensk pop" })</code></td></tr>
 </table></div>
 
 <h2 id="del3">3. Varför normalisering? Joakims kvitton</h2>
@@ -303,7 +303,7 @@ joakim.Email = "joakim@nymail.se";   // ändras på ett ställe – syns i båda
 <p><b>Inte</b> beroende: <code>Artist → Track</code>. Om du vet att artisten är Ozzy Osbourne vet du inte vilken låt det är – han har många.</p>
 <div class="tva-kol">
 <div>
-<p><b>I C#</b> är ett funktionellt beroende som en <code>Dictionary</code>: nyckeln ger dig värdet.</p>
+<p><b>I C#</b> är ett funktionellt beroende som en <code class="cs">Dictionary</code>: nyckeln ger dig värdet.</p>
 <p>Ibland behövs <b>två</b> värden för att hitta svaret – då är nyckeln sammansatt.</p>
 </div>
 <pre><code>Dictionary&lt;int, Customer&gt; kunder = …;
@@ -537,10 +537,10 @@ erDiagram
   <tr><th>Constraint</th><th>Betyder</th><th>Ungefär som i C#</th></tr>
   <tr><td><b><code>PRIMARY KEY</code></b></td><td>Unikt id för varje rad – aldrig <code>NULL</code></td><td>Objektets identitet</td></tr>
   <tr><td><b><code>FOREIGN KEY</code></b></td><td>Måste peka på en rad som finns</td><td>En referens som inte får peka på något som inte finns</td></tr>
-  <tr><td><b><code>NOT NULL</code></b></td><td>Måste ha ett värde</td><td><code>string</code> i stället för <code>string?</code></td></tr>
-  <tr><td><b><code>UNIQUE</code></b></td><td>Samma värde får inte finnas två gånger</td><td>Nycklarna i en <code>Dictionary</code></td></tr>
-  <tr><td><b><code>CHECK</code></b></td><td>Värdet måste uppfylla ett villkor</td><td><code>if (antal &lt;= 0) throw new ArgumentException();</code></td></tr>
-  <tr><td><b><code>DEFAULT</code></b></td><td>Värde som används om inget anges</td><td>Startvärde: <code>public int Quantity { get; set; } = 1;</code></td></tr>
+  <tr><td><b><code>NOT NULL</code></b></td><td>Måste ha ett värde</td><td><code class="cs">string</code> i stället för <code class="cs">string?</code></td></tr>
+  <tr><td><b><code>UNIQUE</code></b></td><td>Samma värde får inte finnas två gånger</td><td>Nycklarna i en <code class="cs">Dictionary</code></td></tr>
+  <tr><td><b><code>CHECK</code></b></td><td>Värdet måste uppfylla ett villkor</td><td><code class="cs">if (antal &lt;= 0) throw new ArgumentException();</code></td></tr>
+  <tr><td><b><code>DEFAULT</code></b></td><td>Värde som används om inget anges</td><td>Startvärde: <code class="cs">public int Quantity { get; set; } = 1;</code></td></tr>
 </table></div>
 <p>PK och FK kan ni sedan förra veckan. Nu tittar vi på de fyra andra – med Chinook.</p>
 
@@ -592,7 +592,7 @@ ADD CONSTRAINT DF_Invoice_InvoiceDate DEFAULT GETDATE() FOR InvoiceDate;
 -- Quantity utelämnas – och blir 1
 INSERT INTO InvoiceLine (InvoiceLineId, InvoiceId, TrackId, UnitPrice)
 VALUES (2241, 42, 1, 0.99);</code></pre>
-<p><code>GETDATE()</code> ger dagens datum och klockslag – ungefär som <code>DateTime.Now</code>. Ett <code>DEFAULT</code> används bara när kolumnen utelämnas. Skriver du uttryckligen <code>NULL</code> blir det <code>NULL</code>.</p>
+<p><code>GETDATE()</code> ger dagens datum och klockslag – ungefär som <code class="cs">DateTime.Now</code>. Ett <code>DEFAULT</code> används bara när kolumnen utelämnas. Skriver du uttryckligen <code>NULL</code> blir det <code>NULL</code>.</p>
 
 <h3>Ge dina constraints namn</h3>
 <div class="scroll"><table>
@@ -635,11 +635,11 @@ VALUES (1, 1), (1, 2), (1, 3),    -- For Those About To Rock
 <h2 id="del16">16. CRUD</h2>
 <p><b>CRUD</b> är de fyra saker man gör med data: <b>C</b>reate, <b>R</b>ead, <b>U</b>pdate och <b>D</b>elete. Nästan varje program du kommer att bygga är CRUD i grunden – en webbshop, ett bokningssystem, en att-göra-lista.</p>
 <div class="scroll"><table>
-  <tr><th></th><th>Betyder</th><th>SQL</th><th><code>List&lt;T&gt;</code> i C#</th><th>HTTP i ett API</th></tr>
-  <tr><td><b>C</b>reate</td><td>Skapa</td><td><code>INSERT</code></td><td><code>list.Add(x)</code></td><td><code>POST</code></td></tr>
-  <tr><td><b>R</b>ead</td><td>Läsa</td><td><code>SELECT</code></td><td><code>list.Where(…)</code></td><td><code>GET</code></td></tr>
-  <tr><td><b>U</b>pdate</td><td>Ändra</td><td><code>UPDATE</code></td><td><code>x.Name = "…"</code></td><td><code>PUT</code> / <code>PATCH</code></td></tr>
-  <tr><td><b>D</b>elete</td><td>Ta bort</td><td><code>DELETE</code></td><td><code>list.Remove(x)</code></td><td><code>DELETE</code></td></tr>
+  <tr><th></th><th>Betyder</th><th>SQL</th><th><code class="cs">List&lt;T&gt;</code> i C#</th><th>HTTP i ett API</th></tr>
+  <tr><td><b>C</b>reate</td><td>Skapa</td><td><code>INSERT</code></td><td><code class="cs">list.Add(x)</code></td><td><code>POST</code></td></tr>
+  <tr><td><b>R</b>ead</td><td>Läsa</td><td><code>SELECT</code></td><td><code class="cs">list.Where(…)</code></td><td><code>GET</code></td></tr>
+  <tr><td><b>U</b>pdate</td><td>Ändra</td><td><code>UPDATE</code></td><td><code class="cs">x.Name = "…"</code></td><td><code>PUT</code> / <code>PATCH</code></td></tr>
+  <tr><td><b>D</b>elete</td><td>Ta bort</td><td><code>DELETE</code></td><td><code class="cs">list.Remove(x)</code></td><td><code>DELETE</code></td></tr>
 </table></div>
 <p><code>INSERT</code> och <code>SELECT</code> kan ni redan. Idag lägger vi till <code>UPDATE</code> och <code>DELETE</code> – och på onsdag fördjupar Christoffer dem. Vecka 4 gör vi samma sak från C# med EF Core.</p>
 <p><b>Hela CRUD för genren från övning A13:</b></p>
@@ -723,7 +723,7 @@ The statement has been terminated.</pre>
 <p>AC/DC har två album som pekar på artisten. Om artisten försvann skulle albumen peka på något som inte finns. Databasen vägrar – det kallas <b>referensintegritet</b>.</p>
 <div class="scroll"><table>
   <tr><th>C#</th><th>Databas</th></tr>
-  <tr><td><code>artists.Remove(acdc)</code> går bra – albumen har kvar sin referens och ingen varnar dig</td><td><code>DELETE</code> stoppas av främmande nyckeln</td></tr>
+  <tr><td><code class="cs">artists.Remove(acdc)</code> går bra – albumen har kvar sin referens och ingen varnar dig</td><td><code>DELETE</code> stoppas av främmande nyckeln</td></tr>
   <tr><td>Ordningen spelar ingen roll</td><td>Ta bort på <b>många</b>-sidan först – omvänd ordning mot <code>INSERT</code></td></tr>
 </table></div>
 <p>Artisten <i>Kent</i> som vi lade till i torsdags (ArtistId 276) har inga album och kan tas bort direkt: <code>DELETE FROM Artist WHERE ArtistId = 276;</code></p>
@@ -793,7 +793,7 @@ ORDER BY Album.Title;
 <p>Sedan körs <code>WHERE</code>, <code>SELECT</code> och <code>ORDER BY</code> på den hopsatta tabellen – precis som vanligt.</p>
 <div class="tva-kol">
 <div>
-<p><b>I C#</b> följer du referensen direkt: <code>album.Artist.Name</code>. Har du bara id:n, som i databasen, finns <code>Join</code> i LINQ:</p>
+<p><b>I C#</b> följer du referensen direkt: <code class="cs">album.Artist.Name</code>. Har du bara id:n, som i databasen, finns <code>Join</code> i LINQ:</p>
 </div>
 <pre><code>var svar = albums
     .Join(artists,
