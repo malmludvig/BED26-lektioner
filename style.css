@@ -117,3 +117,6 @@ pre:has(code.sql) { background: #ffffff; color: #000000; border: 1px solid var(-
 /* Felmeddelanden från SSMS */
 pre.fel { background: #ffffff; color: #ff0000; border: 1px solid var(--line); white-space: pre-wrap; }
 .null { color: var(--muted); font-style: italic; }
+
+/* C#/LINQ i löptext och tabeller: samma mörka Visual Studio-tema som kodblocken (färgas av vs.js) */
+code.cs { background: #1e1e1e; color: #dcdcdc; padding: 1px 6px; border-radius: 4px; font-size: .92em; box-decoration-break: clone; -webkit-box-decoration-break: clone; }
