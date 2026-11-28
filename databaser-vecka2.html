@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="claude:viewport-fit-sides" content="cover">
+<title>Normalisering och CRUD</title>
+<link rel="stylesheet" href="style.css">
+<style>
+  /* Breda tabeller, t.ex. kvittotabellen med tolv kolumner */
+  .bred table { font-size: .82rem; }
+  .bred th, .bred td { padding: 4px 6px; white-space: nowrap; }
+  .upprepad { background: #fde68a; color: #1c2433; }
+  .fel-varde { background: #fecaca; color: #1c2433; font-weight: 700; }
+  .etikett { color: var(--muted); font-size: .95rem; margin: 12px 0 4px; font-weight: 600; }
+  pre.fel { font-size: 14px; }
+  .facit h3 { margin-bottom: 4px; }
+  .facit .uppgift { color: var(--muted); margin-top: 0; }
+  .nf { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin: 16px 0; }
+  .nf > div { background: var(--card); border: 1px solid var(--line); border-top: 4px solid var(--accent); border-radius: 8px; padding: 14px 16px; }
+  .nf h3 { margin: 0 0 6px; }
+  .nf p { margin: 6px 0 0; }
+  @media (max-width: 760px) { .nf { grid-template-columns: 1fr; } }
+  .citat { text-align: center; font-size: 1.2rem; font-style: italic; }
+</style>
+</head>
+<body>
+<header class="sidhuvud">BED26 Lektionsmaterial</header>
+<nav class="kurser"><a href="databaser-vecka1.html" aria-current="true">Databaser</a><span aria-hidden="true">|</span><a href="vecka43.html">Objektorienterad programmering med C#</a></nav>
+<nav class="veckor"><a href="databaser-vecka1.html">Lektioner vecka 1</a><a href="databaser-vecka2.html" aria-current="true">Lektioner vecka 2</a></nav>
+<nav class="undermeny"><a href="databaser-normalisering-presentation.html">Måndag: Presentation</a><a href="databaser-vecka2.html" aria-current="page">Normalisering och CRUD</a></nav>
+<main>
+
+<h1>Normalisering och CRUD</h1>
+<p class="lead">Måndag vecka 2 · digitalt. Vi fortsätter där torsdagen slutade: rader är objekt och främmande nycklar är referenser. Idag ser vi varför data ska delas upp i flera tabeller, hur man gör det steg för steg – och hur man ändrar, tar bort och sätter ihop datan igen med SQL. Allt med Chinook.</p>
+
+<div class="box">
+<p><b>Dagens plan</b></p>
+<ol>
+  <li><a href="#del1">Dagens upplägg och veckans mål</a></li>
+  <li><a href="#del2">Facit: övningarna från vecka 1</a></li>
+  <li><a href="#del3">Varför normalisering? Joakims kvitton</a></li>
+  <li><a href="#del4">Samma problem i C#: kopior i stället för referenser</a></li>
+  <li><a href="#del5">Funktionellt beroende</a></li>
+  <li><a href="#del6">Normalformerna 1NF, 2NF och 3NF</a></li>
+  <li><a href="#del7">1NF – ett värde per cell</a></li>
+  <li><a href="#del8">1NF i Chinook: kolumnen Composer</a></li>
+  <li><a href="#del9">2NF – hela nyckeln</a></li>
+  <li><a href="#del10">3NF – inget annat än nyckeln</a></li>
+  <li><a href="#del11">Resultatet: från en tabell till Chinook</a></li>
+  <li><a href="#del12">Medveten denormalisering</a></li>
+  <li><a href="#del13">Snabbquiz: vilken normalform bryts?</a></li>
+  <li><a href="#del14">Constraints</a></li>
+  <li><a href="#del15">Allt ihop: tabellerna för Composer</a></li>
+  <li><a href="#del16">CRUD</a></li>
+  <li><a href="#del17">UPDATE</a></li>
+  <li><a href="#del18">DELETE</a></li>
+  <li><a href="#del19">Säker rutin för UPDATE och DELETE</a></li>
+  <li><a href="#del20">JOIN – normaliseringen baklänges</a></li>
+  <li><a href="#del21">Parövning: normalisera konsertbokningar</a></li>
+  <li><a href="#del22">Övningar i Chinook: CRUD och JOIN</a></li>
+  <li><a href="#del23">Sammanfattning och inför onsdag</a></li>
+</ol>
+<p><a href="databaser-normalisering-presentation.html">Presentationen</a> har samma innehåll som den här sidan.</p>
+</div>
+
+<h2 id="del1">1. Dagens upplägg och veckans mål</h2>
+<div class="scroll"><table>
+  <tr><th>Vad</th><th>Hur</th></tr>
+  <tr><td>Facit till förra veckans övningar A1–A13</td><td>Genomgång och frågor</td></tr>
+  <tr><td>Varför normalisera? Joakims kvitton i en enda tabell</td><td>Genomgång och dialog</td></tr>
+  <tr><td>Funktionellt beroende, 1NF, 2NF och 3NF</td><td>Genomgång, quiz i chatten</td></tr>
+  <tr><td>Constraints: <code>NOT NULL</code>, <code>UNIQUE</code>, <code>CHECK</code>, <code>DEFAULT</code></td><td>Gemensam kodning</td></tr>
+  <tr><td>CRUD: <code>UPDATE</code> och <code>DELETE</code> – på ett säkert sätt</td><td>Gemensam kodning</td></tr>
+  <tr><td><code>JOIN</code> – normaliseringen baklänges</td><td>Gemensam kodning</td></tr>
+  <tr><td>Parövning: normalisera konsertbokningar</td><td>Breakout rooms i par</td></tr>
+  <tr><td>Reflektion och frågor inför onsdag</td><td>Alla</td></tr>
+</table></div>
+<p>Efter den här veckan ska du kunna:</p>
+<ol>
+  <li><b>Normalisera</b> en datamodell till 3NF och <b>motivera</b> valen.</li>
+  <li><b>Skriva</b> SQL för hela CRUD: skapa, läsa, ändra och ta bort.</li>
+  <li><b>Hämta</b> data från flera tabeller med <code>JOIN</code>.</li>
+</ol>
+<p class="box">Idag går vi igenom mål 1 ordentligt och lägger grunden för mål 2 och 3. På onsdag fördjupar Christoffer <code>UPDATE</code>, <code>DELETE</code>, <code>ORDER BY</code>, <code>GROUP BY</code> och <code>HAVING</code>.</p>
+
+</main>
+<script type="module">
+  import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.esm.min.mjs";
+  mermaid.initialize({ startOnLoad: false, theme: "neutral" });
+  try { await mermaid.run(); } catch (e) { }
+  // Mermaid ger markörerna samma id i alla diagram – gör dem unika per diagram
+  // och byt till förenklad kråkfot: ett streck = en, kråkfot = många (min anges inte)
+  const ENKEL = {
+    EN_START:     { w: 18, refX: 0,  d: "M9,0 L9,18" },
+    EN_END:       { w: 18, refX: 18, d: "M9,0 L9,18" },
+    MANGA_START:  { w: 20, refX: 0,  d: "M0,1 L16,9 M0,17 L16,9 M0,9 L16,9" },
+    MANGA_END:    { w: 20, refX: 20, d: "M20,1 L4,9 M20,17 L4,9 M20,9 L4,9" },
+  };
+  document.querySelectorAll(".mermaid svg").forEach((svg, n) => {
+    svg.querySelectorAll("marker[id]").forEach(m => {
+      const old = m.id, nu = old + "_" + n;
+      m.id = nu;
+      svg.querySelectorAll(`[marker-start="url(#${old})"]`).forEach(e => e.setAttribute("marker-start", `url(#${nu})`));
+      svg.querySelectorAll(`[marker-end="url(#${old})"]`).forEach(e => e.setAttribute("marker-end", `url(#${nu})`));
+      const typ = /^(ONLY_ONE|ZERO_OR_ONE)_(START|END)/.exec(old) ? "EN_" + RegExp.$2
+                : /^(ONE_OR_MORE|ZERO_OR_MORE)_(START|END)/.exec(old) ? "MANGA_" + RegExp.$2 : null;
+      if (!typ) return;
+      if (typ.startsWith("EN_") && svg.closest(".utan-en")) { m.innerHTML = ""; return; }   // bara kråkfoten: -----<
+      const k = ENKEL[typ];
+      m.setAttribute("markerWidth", k.w); m.setAttribute("markerHeight", 18);
+      m.setAttribute("refX", k.refX); m.setAttribute("refY", 9);
+      m.innerHTML = `<path d="${k.d}" fill="none" stroke="gray"></path>`;
+    });
+  });
+</script>
+<script src="vs.js"></script>
+<script src="sql.js"></script>
+</body>
+</html>
