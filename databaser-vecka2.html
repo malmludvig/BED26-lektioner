@@ -84,6 +84,147 @@
 </ol>
 <p class="box">Idag går vi igenom mål 1 ordentligt och lägger grunden för mål 2 och 3. På onsdag fördjupar Christoffer <code>UPDATE</code>, <code>DELETE</code>, <code>ORDER BY</code>, <code>GROUP BY</code> och <code>HAVING</code>.</p>
 
+<h2 id="del2">2. Facit: övningarna från vecka 1</h2>
+<p>Här är ett förslag på svar till övningarna A1–A13 från torsdagen. Det finns ofta flera sätt som ger samma resultat – jämför med din egen lösning. Antalet rader är räknat på Chinook-databasen från den senaste releasen (fakturor 2021–2025).</p>
+
+<div class="facit">
+<h3>A1. Visa alla genrer</h3>
+<pre><code class="sql nohighlight">SELECT * FROM Genre;</code></pre>
+<p><b>25 rader</b>, från <i>Rock</i> (GenreId 1) till <i>Opera</i> (GenreId 25). <code>*</code> betyder alla kolumner, och utan <code>WHERE</code> får man alla rader.</p>
+
+<h3>A2. Förnamn, efternamn och land för alla kunder</h3>
+<pre><code class="sql nohighlight">SELECT FirstName, LastName, Country
+FROM Customer;</code></pre>
+<p><b>59 rader.</b> Kolumnerna kommer i den ordning du skriver dem efter <code>SELECT</code>.</p>
+
+<h3>A3. Kunder som bor i Sverige</h3>
+<pre><code class="sql nohighlight">SELECT *
+FROM Customer
+WHERE Country = 'Sweden';</code></pre>
+<p><b>1 rad:</b> Joakim Johansson i Stockholm – honom kommer vi att se mycket av idag. Text skrivs inom <b>enkla</b> citattecken.</p>
+
+<h3>A4. Kunder som inte har angett något företag</h3>
+<pre><code class="sql nohighlight">SELECT FirstName, LastName
+FROM Customer
+WHERE Company IS NULL;</code></pre>
+<p><b>49 rader.</b> <code>WHERE Company = NULL</code> ger noll rader utan felmeddelande – <code>NULL</code> betyder "vet inte", och man kan inte veta om något är lika med "vet inte".</p>
+
+<h3>A5. Nordiska kunder, sorterade på land och efternamn</h3>
+<pre><code class="sql nohighlight">SELECT FirstName, LastName, Country
+FROM Customer
+WHERE Country IN ('Sweden', 'Norway', 'Denmark', 'Finland')
+ORDER BY Country, LastName;</code></pre>
+<div class="scroll"><table>
+  <tr><th>FirstName</th><th>LastName</th><th>Country</th></tr>
+  <tr><td>Kara</td><td>Nielsen</td><td>Denmark</td></tr>
+  <tr><td>Terhi</td><td>Hämäläinen</td><td>Finland</td></tr>
+  <tr><td>Bjørn</td><td>Hansen</td><td>Norway</td></tr>
+  <tr><td>Joakim</td><td>Johansson</td><td>Sweden</td></tr>
+</table></div>
+<p><code>IN</code> är ett kortare sätt att skriva fyra villkor med <code>OR</code>. <code>ORDER BY Country, LastName</code> sorterar först på land och sedan på efternamn <i>inom samma land</i>. Här finns bara en kund per land, så den andra sorteringen syns inte – men den hör till uppgiften.</p>
+
+<h3>A6. Låtar som är längre än tio minuter, med längden i minuter</h3>
+<pre><code class="sql nohighlight">SELECT Name, Milliseconds / 60000.0 AS Minuter
+FROM Track
+WHERE Milliseconds &gt; 600000;   -- 10 minuter = 600 000 ms</code></pre>
+<p><b>260 rader.</b> En minut är 60 000 millisekunder. Skriver du <code>/ 60000</code> blir det heltalsdivision och decimalerna kapas – samma heltalsfälla som i C#. Med <code>60000.0</code> får du decimaler, t.ex. <code>88.1158833</code>. Vill du ha en decimal: <code>CAST(Milliseconds / 60000.0 AS DECIMAL(5,1))</code> ger <code>88.1</code>.</p>
+<p class="box">Jämför gärna kolumnen direkt i <code>WHERE</code> (<code>Milliseconds &gt; 600000</code>) i stället för att räkna om varje rad (<code>Milliseconds / 60000.0 &gt; 10</code>). Båda ger rätt svar, men det första är enklare för databasen.</p>
+
+<h3>A7. De tio längsta låtarna</h3>
+<pre><code class="sql nohighlight">SELECT TOP 10 Name, Milliseconds
+FROM Track
+ORDER BY Milliseconds DESC;</code></pre>
+<div class="scroll"><table>
+  <tr><th>Name</th><th>Milliseconds</th></tr>
+  <tr><td>Occupation / Precipice</td><td>5286953</td></tr>
+  <tr><td>Through a Looking Glass</td><td>5088838</td></tr>
+  <tr><td>Greetings from Earth, Pt. 1</td><td>2960293</td></tr>
+  <tr><td>…</td><td>…</td></tr>
+  <tr><td>Fire In Space</td><td>2926593</td></tr>
+</table></div>
+<p>Förvånad? De längsta "låtarna" är TV-avsnitt från <i>Battlestar Galactica</i> och <i>Lost</i> – Chinook säljer även video. <code>TOP</code> utan <code>ORDER BY</code> hade gett tio slumpmässiga rader.</p>
+
+<h3>A8. Låtar vars namn börjar med ordet Love</h3>
+<pre><code class="sql nohighlight">SELECT Name
+FROM Track
+WHERE Name LIKE 'Love %';</code></pre>
+<p><b>23 rader.</b> Mellanslaget efter <i>Love</i> är poängen med uppgiften: det betyder att <i>Love</i> är ett eget ord.</p>
+<div class="scroll"><table>
+  <tr><th>Villkor</th><th>Rader</th><th>Kommentar</th></tr>
+  <tr><td><code>LIKE 'Love%'</code></td><td>27</td><td>Får med <i>Loverman</i> och <i>Loves Been Good To Me</i> – fel ord</td></tr>
+  <tr><td><code>LIKE 'Love %'</code></td><td>23</td><td>Missar låten som bara heter <i>Love</i> och <i>Love, Hate, Love</i></td></tr>
+  <tr><td><code>LIKE 'Love %' OR Name = 'Love'</code></td><td>24</td><td>Får med låten som bara heter <i>Love</i></td></tr>
+</table></div>
+<p class="box">Alla tre svaren är rimliga om du kan förklara vad du har valt. Det viktiga är att förstå skillnaden: <code>%</code> matchar vad som helst – även ingenting och andra bokstäver.</p>
+
+<h3>A9. Fakturor från 2023</h3>
+<div class="tva-kol">
+<pre><code class="sql nohighlight">SELECT *
+FROM Invoice
+WHERE YEAR(InvoiceDate) = 2023;</code></pre>
+<pre><code class="sql nohighlight">SELECT *
+FROM Invoice
+WHERE InvoiceDate &gt;= '2023-01-01'
+  AND InvoiceDate &lt;  '2024-01-01';</code></pre>
+</div>
+<p>Båda ger <b>83 rader</b>. Intervallet med <code>&lt; '2024-01-01'</code> tar med fakturor som har ett klockslag sent på nyårsafton.</p>
+
+<h3>A10. Fakturor med totalsumma mellan 10 och 15, dyraste först</h3>
+<pre><code class="sql nohighlight">SELECT *
+FROM Invoice
+WHERE Total BETWEEN 10 AND 15
+ORDER BY Total DESC;</code></pre>
+<p><b>53 rader.</b> Dyrast är faktura 193 på 14.91, sedan kommer många på 13.86 och sist 10.91. <code>BETWEEN</code> tar med gränserna: det är samma sak som <code>Total &gt;= 10 AND Total &lt;= 15</code>.</p>
+
+<h3>A11. Vilka länder har kunder?</h3>
+<pre><code class="sql nohighlight">SELECT DISTINCT Country
+FROM Customer
+ORDER BY Country;</code></pre>
+<p><b>24 länder</b>, från Argentina till USA. <code>DISTINCT</code> tar bort dubbletterna – USA har 13 kunder men syns en gång. Lägg märke till att <i>United Kingdom</i> kommer före <i>USA</i>: SQL Server bryr sig inte om stora och små bokstäver när den sorterar, och <i>n</i> kommer före <i>s</i>.</p>
+
+<h3>A12. Vilken anställd rapporterar inte till någon?</h3>
+<pre><code class="sql nohighlight">SELECT FirstName, LastName, Title
+FROM Employee
+WHERE ReportsTo IS NULL;</code></pre>
+<p><b>1 rad:</b> Andrew Adams, General Manager – högsta chefen har ingen chef. <code>ReportsTo</code> är den rekursiva relationen som pekar på <code>Employee</code> själv.</p>
+
+<h3>A13. Lägg till en ny genre som heter Svensk pop</h3>
+<div class="tva-kol">
+<div>
+<p class="etikett">1. Hitta högsta id</p>
+<pre><code class="sql nohighlight">SELECT TOP 1 GenreId
+FROM Genre
+ORDER BY GenreId DESC;
+-- 25</code></pre>
+</div>
+<div>
+<p class="etikett">2. Lägg till och kontrollera</p>
+<pre><code class="sql nohighlight">INSERT INTO Genre (GenreId, Name)
+VALUES (26, N'Svensk pop');
+
+SELECT * FROM Genre WHERE GenreId = 26;</code></pre>
+</div>
+</div>
+<p>Chinooks id-kolumner räknas inte upp automatiskt, så du måste ange id själv. Spara genren – vi ändrar och tar bort den senare idag.</p>
+</div>
+
+<h3>Facit i LINQ</h3>
+<p>Samma frågor mot listor i C#. Lägg märke till <code>ThenBy</code> i A5 – så skriver man <code>ORDER BY Country, LastName</code> i LINQ.</p>
+<div class="scroll"><table>
+  <tr><th></th><th>SQL</th><th>LINQ</th></tr>
+  <tr><td>A3</td><td><code>WHERE Country = 'Sweden'</code></td><td><code>customers.Where(c =&gt; c.Country == "Sweden")</code></td></tr>
+  <tr><td>A4</td><td><code>WHERE Company IS NULL</code></td><td><code>customers.Where(c =&gt; c.Company == null)</code></td></tr>
+  <tr><td>A5</td><td><code>WHERE Country IN (…) ORDER BY Country, LastName</code></td><td><code>.Where(c =&gt; nordic.Contains(c.Country)).OrderBy(c =&gt; c.Country).ThenBy(c =&gt; c.LastName)</code></td></tr>
+  <tr><td>A6</td><td><code>SELECT Name, Milliseconds / 60000.0 AS Minuter</code></td><td><code>.Select(t =&gt; new { t.Name, Minuter = t.Milliseconds / 60000.0 })</code></td></tr>
+  <tr><td>A7</td><td><code>SELECT TOP 10 … ORDER BY Milliseconds DESC</code></td><td><code>tracks.OrderByDescending(t =&gt; t.Milliseconds).Take(10)</code></td></tr>
+  <tr><td>A8</td><td><code>WHERE Name LIKE 'Love %'</code></td><td><code>tracks.Where(t =&gt; t.Name.StartsWith("Love "))</code></td></tr>
+  <tr><td>A9</td><td><code>WHERE YEAR(InvoiceDate) = 2023</code></td><td><code>invoices.Where(i =&gt; i.InvoiceDate.Year == 2023)</code></td></tr>
+  <tr><td>A10</td><td><code>WHERE Total BETWEEN 10 AND 15</code></td><td><code>invoices.Where(i =&gt; i.Total &gt;= 10 &amp;&amp; i.Total &lt;= 15)</code></td></tr>
+  <tr><td>A11</td><td><code>SELECT DISTINCT Country … ORDER BY Country</code></td><td><code>customers.Select(c =&gt; c.Country).Distinct().OrderBy(c =&gt; c)</code></td></tr>
+  <tr><td>A12</td><td><code>WHERE ReportsTo IS NULL</code></td><td><code>employees.Where(e =&gt; e.ReportsTo == null)</code></td></tr>
+  <tr><td>A13</td><td><code>INSERT INTO Genre … VALUES (26, N'Svensk pop')</code></td><td><code>genres.Add(new Genre { GenreId = 26, Name = "Svensk pop" })</code></td></tr>
+</table></div>
+
 </main>
 <script type="module">
   import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.esm.min.mjs";
