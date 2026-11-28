@@ -2,7 +2,7 @@
 const kontroll = "if|else|return|for|foreach|while|break|continue|switch|in";
 const nyckelord = "class|interface|enum|public|private|protected|static|virtual|override|abstract|void|string|int|decimal|bool|double|new|this|base|true|false|null|get|set|where|var|out|is|object|using|from|select|orderby|descending|group|by|into";
 const typer = new Set(["List", "Console", "DateOnly", "DateTime", "Math", "T", "IEnumerable", "Dictionary", "Queue", "Stack", "ArrayList", "Enumerable"]);
-const block = [...document.querySelectorAll("pre > code:not(.nohighlight)")];
+const block = [...document.querySelectorAll("pre > code:not(.nohighlight), code.cs")];   // code.cs = C# i löptext och tabeller
 
 // Alla egna klasser, interface och enums blir också typer
 block.forEach(b => b.textContent.replace(/(?:class|interface|enum)\s+([\p{L}\d_]+)/gu, (_, namn) => typer.add(namn)));
