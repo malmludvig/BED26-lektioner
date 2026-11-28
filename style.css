@@ -110,3 +110,10 @@ th .fk { color: #5eead4; }
 .tabellpar.tre { grid-template-columns: 1fr 1fr 1fr; }
 @media (max-width: 760px) { .tabellpar.tre { grid-template-columns: 1fr; } }
 .exempel-er.stor svg { max-height: 420px; }
+
+/* SQL i ljust tema som i SSMS – C# är mörkt, så de går lätt att skilja åt (används med sql.js) */
+pre:has(code.sql) { background: #ffffff; color: #000000; border: 1px solid var(--line); }
+.sq-k { color: #0000ff; } .sq-o { color: #808080; } .sq-s { color: #ff0000; } .sq-c { color: #008000; } .sq-n { color: #000000; } .sq-f { color: #ff00ff; }
+/* Felmeddelanden från SSMS */
+pre.fel { background: #ffffff; color: #ff0000; border: 1px solid var(--line); white-space: pre-wrap; }
+.null { color: var(--muted); font-style: italic; }
