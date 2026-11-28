@@ -589,8 +589,9 @@ public List&lt;Track&gt; Tracks { get; set; } = new();       // så gör du i C#
 <section class="slide">
   <h2>Lösningen: en kopplingstabell</h2>
 <p>En låt har många upphovspersoner, en person har skrivit många låtar – <b>många till många</b>, precis som <code>PlaylistTrack</code>.</p>
-<div class="tva-kol modell">
+<div class="tva-kol">
 <pre class="mermaid utan-en">
+%%{init: {"er": {"layoutDirection": "LR"}}}%%
 erDiagram
     TRACK ||--o{ TRACKCOMPOSER : "skrivs av"
     COMPOSER ||--o{ TRACKCOMPOSER : "har skrivit"
@@ -612,8 +613,9 @@ erDiagram
     public int TrackId { get; set; }
     public string Name { get; set; }
 
-    // i stället för string Composer
-    public List&lt;Composer&gt; Composers { get; set; } = new();
+    // förut: string Composer
+    public List&lt;Composer&gt; Composers
+        { get; set; } = new();
 }</code></pre>
 </div>
 <p class="box">Varje person finns på <b>en</b> rad. Då kan stavningen inte glida isär. <code>CREATE TABLE</code> kommer efter constraints.</p>
