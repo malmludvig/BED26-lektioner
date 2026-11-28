@@ -841,7 +841,7 @@ WHERE villkor;</code></pre>
 SET Email = N'joakim@nymail.se'
 WHERE CustomerId = 51;
 -- (1 row affected)</code></pre>
-<p class="box">Vinsten med normaliseringen: <b>en</b> rad ändras. I kvittotabellen hade det varit sex rader – plus alla rader på hans fem andra fakturor. Alla fakturor visar ändå rätt e-post, eftersom de bara pekar på kunden.</p>
+<p class="box">Kundens e-post står på <b>ett</b> ställe – därför ändras bara en rad. Joakims sju fakturor pekar på honom med <code>CustomerId</code> och visar automatiskt den nya adressen.</p>
 </section>
 
 <section class="slide">
@@ -1029,7 +1029,7 @@ WHERE t.AlbumId = 1;</code></pre>
 </section>
 
 <section class="slide liten-kod">
-  <h2>Bygg ihop Joakims kvitto igen</h2>
+  <h2>Bygg ihop Joakims kvitto</h2>
 <pre><code class="sql nohighlight">SELECT i.InvoiceId, i.InvoiceDate, c.FirstName, c.LastName, c.Email,
        t.Name AS Track, al.Title AS Album, ar.Name AS Artist, g.Name AS Genre,
        il.UnitPrice, il.Quantity
