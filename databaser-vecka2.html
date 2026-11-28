@@ -632,6 +632,128 @@ VALUES (1, 1), (1, 2), (1, 3),    -- For Those About To Rock
   <tr><td><code>REFERENCES</code></td><td>En koppling kan bara peka på en låt och en person som finns.</td></tr>
 </table></div>
 
+<h2 id="del16">16. CRUD</h2>
+<p><b>CRUD</b> är de fyra saker man gör med data: <b>C</b>reate, <b>R</b>ead, <b>U</b>pdate och <b>D</b>elete. Nästan varje program du kommer att bygga är CRUD i grunden – en webbshop, ett bokningssystem, en att-göra-lista.</p>
+<div class="scroll"><table>
+  <tr><th></th><th>Betyder</th><th>SQL</th><th><code>List&lt;T&gt;</code> i C#</th><th>HTTP i ett API</th></tr>
+  <tr><td><b>C</b>reate</td><td>Skapa</td><td><code>INSERT</code></td><td><code>list.Add(x)</code></td><td><code>POST</code></td></tr>
+  <tr><td><b>R</b>ead</td><td>Läsa</td><td><code>SELECT</code></td><td><code>list.Where(…)</code></td><td><code>GET</code></td></tr>
+  <tr><td><b>U</b>pdate</td><td>Ändra</td><td><code>UPDATE</code></td><td><code>x.Name = "…"</code></td><td><code>PUT</code> / <code>PATCH</code></td></tr>
+  <tr><td><b>D</b>elete</td><td>Ta bort</td><td><code>DELETE</code></td><td><code>list.Remove(x)</code></td><td><code>DELETE</code></td></tr>
+</table></div>
+<p><code>INSERT</code> och <code>SELECT</code> kan ni redan. Idag lägger vi till <code>UPDATE</code> och <code>DELETE</code> – och på onsdag fördjupar Christoffer dem. Vecka 4 gör vi samma sak från C# med EF Core.</p>
+<p><b>Hela CRUD för genren från övning A13:</b></p>
+<div class="tva-kol">
+<pre><code class="sql nohighlight">-- C
+INSERT INTO Genre (GenreId, Name)
+VALUES (26, N'Svensk pop');
+
+-- R
+SELECT * FROM Genre WHERE GenreId = 26;
+
+-- U
+UPDATE Genre
+SET Name = N'Svenskpop'
+WHERE GenreId = 26;
+
+-- D
+DELETE FROM Genre
+WHERE GenreId = 26;</code></pre>
+<pre><code>// C
+var svenskPop = new Genre { GenreId = 26, Name = "Svensk pop" };
+genres.Add(svenskPop);
+
+// R
+var g = genres.Where(g =&gt; g.GenreId == 26);
+
+// U
+svenskPop.Name = "Svenskpop";
+
+
+
+// D
+genres.Remove(svenskPop);
+</code></pre>
+</div>
+
+<h2 id="del17">17. UPDATE</h2>
+<pre><code class="sql nohighlight">UPDATE tabell
+SET kolumn = nyttVärde, annanKolumn = annatVärde
+WHERE villkor;</code></pre>
+<p><b>Joakim byter e-post:</b></p>
+<pre><code class="sql nohighlight">UPDATE Customer
+SET Email = N'joakim@nymail.se'
+WHERE CustomerId = 51;
+-- (1 row affected)</code></pre>
+<p class="box">Här ser du vinsten med normaliseringen: <b>en</b> rad ändras. I kvittotabellen från avsnitt 3 hade samma ändring behövt träffa sex rader – och alla rader på hans andra fem fakturor. Och alla fakturor visar ändå rätt e-post, eftersom de bara pekar på kunden med <code>CustomerId</code>.</p>
+<div class="tva-kol">
+<div>
+<p class="etikett">Flera kolumner på en gång</p>
+<pre><code class="sql nohighlight">UPDATE Customer
+SET City = N'Göteborg',
+    PostalCode = N'411 01'
+WHERE CustomerId = 51;</code></pre>
+</div>
+<div>
+<p class="etikett">Räkna med det gamla värdet</p>
+<pre><code class="sql nohighlight">-- Höj priset med 10 % på all Metal
+UPDATE Track
+SET UnitPrice = UnitPrice * 1.10
+WHERE GenreId = 3;
+-- (374 rows affected)</code></pre>
+</div>
+</div>
+<pre><code>// Samma sak i C#
+joakim.Email = "joakim@nymail.se";
+
+foreach (var t in tracks.Where(t =&gt; t.GenreId == 3))
+    t.UnitPrice = t.UnitPrice * 1.10m;</code></pre>
+<p class="box"><code>WHERE</code> avgör <b>vilka rader</b> som ändras. Vill du ändra en rad – använd primärnyckeln. <code>WHERE FirstName = 'Joakim'</code> fungerar idag, men inte den dagen det finns två Joakim.</p>
+
+<h2 id="del18">18. DELETE</h2>
+<pre><code class="sql nohighlight">DELETE FROM Genre
+WHERE GenreId = 26;
+-- (1 row affected)</code></pre>
+<p><b>Främmande nycklar skyddar datan även här.</b> Försök ta bort AC/DC:</p>
+<pre><code class="sql nohighlight">DELETE FROM Artist
+WHERE ArtistId = 1;</code></pre>
+<pre class="fel">Msg 547, Level 16, State 0, Line 1
+The DELETE statement conflicted with the REFERENCE constraint "FK_AlbumArtistId". The conflict occurred in database "Chinook", table "dbo.Album", column 'ArtistId'.
+The statement has been terminated.</pre>
+<p>AC/DC har två album som pekar på artisten. Om artisten försvann skulle albumen peka på något som inte finns. Databasen vägrar – det kallas <b>referensintegritet</b>.</p>
+<div class="scroll"><table>
+  <tr><th>C#</th><th>Databas</th></tr>
+  <tr><td><code>artists.Remove(acdc)</code> går bra – albumen har kvar sin referens och ingen varnar dig</td><td><code>DELETE</code> stoppas av främmande nyckeln</td></tr>
+  <tr><td>Ordningen spelar ingen roll</td><td>Ta bort på <b>många</b>-sidan först – omvänd ordning mot <code>INSERT</code></td></tr>
+</table></div>
+<p>Artisten <i>Kent</i> som vi lade till i torsdags (ArtistId 276) har inga album och kan tas bort direkt: <code>DELETE FROM Artist WHERE ArtistId = 276;</code></p>
+<p class="box">I riktiga system tar man sällan bort data som hänger ihop med annat, t.ex. sålda låtar. Ofta används i stället en kolumn som <code>Aktiv BIT NOT NULL DEFAULT 1</code> och ett <code>UPDATE</code> som sätter den till <code>0</code> – det kallas <i>soft delete</i>. Det går också att låta databasen ta bort barnen automatiskt med <code>ON DELETE CASCADE</code>, men det är kraftfullt och farligt.</p>
+
+<h2 id="del19">19. Säker rutin för UPDATE och DELETE</h2>
+<figure class="shot"><img src="db-meme-update-utan-where.webp" alt="Meme: You use SQL UPDATE, you forget SQL WHERE – 37 052 rows affected" loading="lazy" style="max-width:460px;margin:0 auto"></figure>
+<p><code>UPDATE</code> och <code>DELETE</code> utan <code>WHERE</code> ändrar <b>alla</b> rader. Det finns ingen ångra-knapp. Gör så här varje gång:</p>
+<ol>
+  <li><b>Skriv villkoret som en <code>SELECT</code> först</b> – och kontrollera att det är rätt rader.</li>
+  <li><b>Byt</b> <code>SELECT *</code> mot <code>UPDATE … SET …</code> eller <code>DELETE</code>. Behåll <code>WHERE</code> exakt som det var.</li>
+  <li><b>Kör i en transaktion</b> och titta på resultatet innan du sparar.</li>
+  <li><b>Läs meddelandet</b> <i>(1 row affected)</i>. Väntade du dig 1 och det står 59 – kör <code>ROLLBACK</code>.</li>
+</ol>
+<pre><code class="sql nohighlight">-- 1. Vilka rader gäller det?
+SELECT * FROM Customer WHERE CustomerId = 51;
+
+-- 2–3. Ändra i en transaktion
+BEGIN TRANSACTION;
+
+UPDATE Customer
+SET Email = N'joakim@nymail.se'
+WHERE CustomerId = 51;
+
+SELECT * FROM Customer WHERE CustomerId = 51;   -- ser det rätt ut?
+
+ROLLBACK;   -- ångra allt sedan BEGIN TRANSACTION …
+-- COMMIT;  -- … eller spara ändringen</code></pre>
+<p class="box">En transaktion är som ett utkast: inget sparas på riktigt förrän du skriver <code>COMMIT</code>. Glöm inte att avsluta med <code>COMMIT</code> eller <code>ROLLBACK</code> – annars låser din öppna transaktion raderna för andra.</p>
+
 </main>
 <script type="module">
   import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.esm.min.mjs";
