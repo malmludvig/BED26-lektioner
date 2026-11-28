@@ -842,6 +842,89 @@ WHERE i.InvoiceId IN (42, 65);</code></pre>
 </table></div>
 <p class="box"><b>Spara normaliserat – läs med JOIN.</b> Varje uppgift ligger på ett ställe och kan inte bli motsägelsefull, men du kan alltid få fram den "platta" tabellen när du behöver den. Tips: börja med <code>FROM</code> och lägg till en <code>JOIN</code> i taget. Följ kråkfötterna i ER-diagrammet – varje linje blir ett <code>ON</code>.</p>
 
+<h2 id="del21">21. Parövning: normalisera konsertbokningar</h2>
+<p>En konsertarrangör har skött alla bokningar i ett Excel-ark. Nu ska det bli en databas. Arbeta i par i breakout rooms.</p>
+<div class="scroll bred"><table>
+  <tr><th>BokningNr</th><th>Bokningsdatum</th><th>Kund</th><th>Kontakt</th><th>Artist</th><th>Konsertdatum</th><th>Arena</th><th>Stad</th><th>Biljettyp</th><th>Pris</th><th>Antal</th></tr>
+  <tr><td>1001</td><td>2026-10-02</td><td>Anna Berg</td><td>anna.berg@mail.se, 070-111 22 33</td><td>Håkan Hellström</td><td>2027-06-12</td><td>Ullevi</td><td>Göteborg</td><td>Ståplats</td><td>895</td><td>2</td></tr>
+  <tr><td>1001</td><td>2026-10-02</td><td>Anna Berg</td><td>anna.berg@mail.se, 070-111 22 33</td><td>Håkan Hellström</td><td>2027-06-12</td><td>Ullevi</td><td>Göteborg</td><td>Sittplats</td><td>1095</td><td>1</td></tr>
+  <tr><td>1002</td><td>2026-10-03</td><td>Omar Ali</td><td>omar.ali@mail.se, 073-444 55 66</td><td>Håkan Hellström</td><td>2027-06-12</td><td>Ullevi</td><td>Göteborg</td><td>Ståplats</td><td>895</td><td>4</td></tr>
+  <tr><td>1003</td><td>2026-10-05</td><td>Anna Berg</td><td>anna@jobbet.se, 070-111 22 33</td><td>Ghost</td><td>2027-03-20</td><td>Scandinavium</td><td>Göteborg</td><td>Sittplats</td><td>990</td><td>2</td></tr>
+  <tr><td>1004</td><td>2026-10-07</td><td>Lisa Ek</td><td>lisa.ek@mail.se</td><td>Ghost</td><td>2027-03-22</td><td>Avicii Arena</td><td>Stockholm</td><td>Ståplats</td><td>790</td><td>1</td></tr>
+  <tr><td>1005</td><td>2026-10-09</td><td>Omar Ali</td><td>omar.ali@mail.se, 073-444 55 66</td><td>First Aid Kit</td><td>2027-05-08</td><td>Avicii Arena</td><td>Stockholm</td><td>Sittplats</td><td>850</td><td>2</td></tr>
+</table></div>
+<p><b>Uppgifter:</b></p>
+<ol>
+  <li><b>Hitta problemen.</b> Ge ett exempel på en uppdaterings-, en insättnings- och en borttagningsanomali i tabellen. Hittar ni en motsägelse i datan?</li>
+  <li><b>Primärnyckel.</b> Vad gör varje rad unik?</li>
+  <li><b>1NF.</b> Vilken kolumn bryter mot 1NF? Åtgärda det.</li>
+  <li><b>Beroenden.</b> Skriv ner de funktionella beroendena: <i>vad bestämmer vad?</i></li>
+  <li><b>2NF och 3NF.</b> Dela upp tabellen. Motivera varje uppdelning med ett beroende.</li>
+  <li><b>ER-diagram.</b> Rita det i <a href="https://app.diagrams.net/" target="_blank" rel="noopener">Draw.io</a> med PK, FK och kråkfötter.</li>
+  <li><b>CREATE TABLE.</b> Skapa databasen <code>Konsert</code> med alla tabeller. Använd minst en <code>NOT NULL</code>, <code>UNIQUE</code>, <code>CHECK</code> och <code>DEFAULT</code> – och ge dem namn.</li>
+  <li><b>CRUD.</b> Lägg in datan med <code>INSERT</code>. Anna har bara en e-post, <i>anna.berg@mail.se</i> – rätta det. Hur många rader ändrades? Lisa avbokar – ta bort hennes bokning. Visa till sist alla bokningar med kundnamn, artist och arena med <code>JOIN</code>.</li>
+</ol>
+<p class="box">Efter övningen visar några par sitt ER-diagram och motiverar ett av sina val. Det finns flera rimliga lösningar – det viktiga är att ni kan förklara varför.</p>
+<details><summary>Fastnat? Tips</summary>
+<ul>
+  <li><code>Kontakt</code> innehåller två uppgifter i en cell.</li>
+  <li>Vad bestämmer <code>Pris</code>? Inte bokningen – titta på konserten och biljettypen.</li>
+  <li>Arenan bestämmer staden.</li>
+  <li>En konsert är en artist på en arena ett visst datum. Ge den ett eget id.</li>
+  <li>En bokning kan innehålla flera biljettyper – precis som en faktura har flera fakturarader.</li>
+  <li>Ni landar troligen på sex eller sju tabeller.</li>
+</ul>
+</details>
+
+<h2 id="del22">22. Övningar i Chinook: CRUD och JOIN</h2>
+<p>Klara med parövningen? Fortsätt i Chinook. Använd den säkra rutinen från avsnitt 19 för alla <code>UPDATE</code> och <code>DELETE</code>.</p>
+<div class="tva-kol" style="align-items:start">
+<div>
+<p class="etikett">CRUD</p>
+<ol>
+  <li>Lägg till dig själv som kund med <code>CustomerId</code> 60. Ange namn, e-post, land och Jane Peacock (<code>EmployeeId</code> 3) som supportkontakt.</li>
+  <li>Visa din kundrad.</li>
+  <li>Du flyttar till Göteborg – uppdatera stad och land.</li>
+  <li>Byt namn på genren <i>Svensk pop</i> från övning A13 till <i>Svenskpop</i>. Finns den inte – lägg till den först.</li>
+  <li>Ta bort genren igen.</li>
+  <li>Försök ta bort artisten AC/DC. Vad händer – och varför?</li>
+</ol>
+</div>
+<div>
+<p class="etikett">Constraints och JOIN</p>
+<ol start="7">
+  <li>Lägg till en <code>UNIQUE</code>-constraint på <code>Customer.Email</code> med namnet <code>UQ_Customer_Email</code>. Testa med en kund som har Joakims e-post.</li>
+  <li>Lägg till en <code>CHECK</code> som kräver att <code>InvoiceLine.Quantity</code> är större än 0. Testa den.</li>
+  <li>Visa alla Iron Maidens album i en fråga.</li>
+  <li>Visa namn och genre för alla låtar på album 1.</li>
+  <li>Visa alla Joakim Johanssons fakturor med hans namn, datum och totalsumma.</li>
+  <li><b>Utmaning:</b> Visa låtnamn, album och artist för alla låtar på faktura 65.</li>
+</ol>
+</div>
+</div>
+<details><summary>Fastnat? Vilket verktyg behövs?</summary>
+<p>1 <code>INSERT</code> – <code>Email</code> och namnen är <code>NOT NULL</code> · 3 <code>UPDATE … SET City = …, Country = …</code> · 4 <code>UPDATE</code> med <code>WHERE GenreId = 26</code> · 6 läs felmeddelandet: vilken constraint stoppar dig? · 7 <code>ALTER TABLE … ADD CONSTRAINT … UNIQUE</code> · 8 <code>CHECK (Quantity &gt; 0)</code> · 9 samma som Iron Maiden-exemplet · 10 <code>Track</code> + <code>Genre</code>, se upp för <code>Name</code> · 11 <code>Customer</code> + <code>Invoice</code>, 7 rader · 12 <code>InvoiceLine</code> + <code>Track</code> + <code>Album</code> + <code>Artist</code>, 4 rader</p>
+</details>
+
+<h2 id="del23">23. Sammanfattning och inför onsdag</h2>
+<ul>
+  <li><b>Normalisering</b> betyder att varje uppgift sparas på ett ställe. Det tar bort uppdaterings-, insättnings- och borttagningsanomalier.</li>
+  <li><b>Funktionellt beroende</b> A → B: om du vet A vet du B.</li>
+  <li><b>1NF:</b> ett värde per cell och en primärnyckel. <b>2NF:</b> varje kolumn beror på hela nyckeln. <b>3NF:</b> inget beror på något annat än nyckeln.</li>
+  <li>Normalisering är databasens version av att byta <b>kopior mot referenser</b> i C#.</li>
+  <li><b>Constraints</b> – <code>NOT NULL</code>, <code>UNIQUE</code>, <code>CHECK</code>, <code>DEFAULT</code> – är regler som databasen kontrollerar för alla program. Ge dem namn.</li>
+  <li><b>CRUD</b> = <code>INSERT</code>, <code>SELECT</code>, <code>UPDATE</code>, <code>DELETE</code>. <code>SELECT</code> först, sedan ändra i en transaktion.</li>
+  <li><b>JOIN</b> sätter ihop normaliserade tabeller igen: <code>ON</code> främmande nyckel = primärnyckel.</li>
+</ul>
+<p><b>Reflektion – skriv i chatten:</b></p>
+<ol>
+  <li>Förklara med egna ord skillnaden mellan 2NF och 3NF.</li>
+  <li>Vilket val i parövningen var svårast att motivera?</li>
+  <li>Varför ska man köra en <code>SELECT</code> innan en <code>UPDATE</code>?</li>
+  <li>En fråga du vill ha svar på på onsdag med Christoffer.</li>
+</ol>
+<p class="box"><b>På onsdag</b> (på plats, Christoffer): SQL CRUD och JOIN – <code>UPDATE</code>, <code>DELETE</code>, <code>WHERE</code>, <code>ORDER BY</code>, <code>GROUP BY</code> och <code>HAVING</code>. Ta med din normaliserade konsertdatabas – den blir bra att öva på.</p>
+
 </main>
 <script type="module">
   import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.esm.min.mjs";
