@@ -235,7 +235,8 @@ SELECT * FROM Genre WHERE GenreId = 26;</code></pre>
   <tr><td>3</td><td>Restless and Wild</td><td class="upprepad">Accept</td></tr>
   <tr><td>5</td><td>Big Ones</td><td>Aerosmith</td></tr>
 </table></div>
-<p>Det ser enkelt ut, men det ger tre problem:</p>
+<p>Samma artistnamn står på flera rader. Det kallas <b>redundans</b>: samma uppgift sparas på flera ställen. Ordet kommer från latinets <i>redundare</i>, "flöda över" – något redundant är överflödigt. I servrar och nätverk är redundans något bra, en reserv om något går sönder. I en databastabell är det oftast dåligt, eftersom samma uppgift kan bli olika på olika ställen.</p>
+<p>Det ser enkelt ut, men redundansen ger tre problem:</p>
 <div class="scroll"><table>
   <tr><th>Problem</th><th>Exempel</th></tr>
   <tr><td><b>Ändra</b></td><td>AC/DC ska stavas om. Då måste alla deras album ändras. Missar man ett finns två olika namn – vilket är rätt? Iron Maiden har 21 album, alltså 21 rader.</td></tr>
